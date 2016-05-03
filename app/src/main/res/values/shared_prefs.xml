@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- contains sharePrefs keys and default values -->
+<resources>
+
+    <string name="key_num_favorites">num_favorites</string>
+    <integer name="default_num_favorites">0</integer>
+
+    <string name="key_movie_filter_sortby">filter_sortby</string>
+    <string name="default_movie_filter_sortby">popularity.desc</string> <!-- most popular -->
+
+    <string name="key_movie_filter_year">filter_year</string>
+    <integer name="default_movie_filter_year">-1</integer> <!-- any year -->
+
+    <string name="key_movie_filter_cert">filter_cert</string>
+    <string name="default_movie_filter_cert">any_cert</string>
+
+    <string name="key_movie_filter_genre">filter_genre</string>
+    <string name="default_movie_filter_genre">any_genre</string>
+
+    <string name="key_favorites_sortby">favorites_sortby</string>
+    <string name="default_favorites_sortby">popularity.desc</string> <!-- most popular -->
+
+    <string name="key_currently_selected_movie_id">curr_sel_movie_id</string>
+    <integer name="default_currently_selected_movie_id">-1</integer> <!-- no movie selected -->
+
+    <string name="key_currently_selected_favorite_id">curr_sel_favorite_id</string>
+    <integer name="default_currently_selected_favorite_id">-1</integer> <!-- no favorite selected -->
+
+    <string name="key_movie_filter_activity_filter_changed">movie_filter_act_filter_changed</string>
+    <bool name="default_movie_filter_activity_filter_changed">false</bool>
+
+</resources>
