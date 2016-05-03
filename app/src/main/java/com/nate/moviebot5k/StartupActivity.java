@@ -20,10 +20,9 @@ public class StartupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOGTAG, "just in onCreate");
+        Log.i(LOGTAG, "entered onCreate");
 
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        initializeSharedPrefs();
 
 
 
@@ -40,7 +39,34 @@ public class StartupActivity extends AppCompatActivity {
     // initialize all sharedPrefs, need this to happen the first time app is installed
     // or if user clears the app data, they will either ALL exist, or NONE will exist
     private void initializeSharedPrefs() {
+        Log.i(LOGTAG, "entered initializeSharedPrefs, will report if defaults are written");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        // if any single sharedPrefs exists, then they all do and have already been initialized
+        if(!sharedPreferences.contains(getString(R.string.key_num_favorites))) {
+            Log.i(LOGTAG, "  sharedPrefs are being initialized, writing defaults...");
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            editor.putInt(getString(R.string.key_num_favorites),
+                    getResources().getInteger(R.integer.default_num_favorites));
+            editor.putString(getString(R.string.key_movie_filter_sortby),
+                    getString(R.string.default_movie_filter_sortby));
+            editor.putInt(getString(R.string.key_movie_filter_year),
+                    getResources().getInteger(R.integer.default_movie_filter_year));
+            editor.putString(getString(R.string.key_movie_filter_cert),
+                    getString(R.string.default_movie_filter_cert));
+            editor.putString(getString(R.string.key_movie_filter_genre),
+                    getString(R.string.default_movie_filter_genre));
+            editor.putString(getString(R.string.key_favorites_sortby),
+                    getString(R.string.default_favorites_sortby));
+            editor.putInt(getString(R.string.key_currently_selected_movie_id),
+                    getResources().getInteger(R.integer.default_currently_selected_movie_id));
+            editor.putInt(getString(R.string.key_currently_selected_favorite_id),
+                    getResources().getInteger(R.integer.default_currently_selected_favorite_id));
+            editor.putBoolean(getString(R.string.key_movie_filter_activity_filter_changed),
+                    getResources().getBoolean(R.bool.default_movie_filter_activity_filter_changed));
+            editor.commit();
+        }
     }
 
 
