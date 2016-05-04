@@ -14,17 +14,16 @@ import com.nate.moviebot5k.SingleFragmentActivity;
  * Created by Nathan Merris on 5/4/2016.
  */
 public class MovieTheaterDbHelper extends SQLiteOpenHelper {
-    private static final String LOGTAG = SingleFragmentActivity.N8LOG + "MovieTheaterDbHelper";
-
+    private static final String LOGTAG = SingleFragmentActivity.N8LOG + "MovTheatrDbHelper";
 
     // If you change the database schema, you must increment the database version.
     private static final int DATABASE_VERSION = 1;
     static final String DATABASE_NAME = "movie_theater.db";
 
+
     public MovieTheaterDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
-
 
 
     @Override
@@ -40,6 +39,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
 //                LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL " +
 //                " );";
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
