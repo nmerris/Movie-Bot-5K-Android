@@ -24,23 +24,12 @@ public class MovieTheaterContract {
     public static final String PATH_CERTS = "certifications";
 
 
-    /**
-     * Defines the table contents that MovieGridFragment and MovieDetailFragment will access when
-     * hosted by HomeActivity and MovieDetailPagerActivity (in phone mode).
-     * Basically this will be the table that is used when user is NOT viewing their favorites.
-     * It will only ever hold one set of data, and will be written over completely every time a
-     * FetchMoviesTask returns at least 1 movie.
-     */
-    public static final class MoviesEntry implements BaseColumns {
 
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_MOVIES).build();
-        public static final String CONTENT_TYPE = ContentResolver
-                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver
-                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
-        public static final String TABLE_NAME = "movies";
-        
+
+
+    // private but not final: privateto protect it from malevolent code forces outside this class,
+    // not final because MoviesEntry and FavoritesEntry extend it
+    private static class MoviesEntryColumns {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_ADULT = "adult";
         public static final String COLUMN_OVERVIEW = "overview";
@@ -89,14 +78,32 @@ public class MovieTheaterContract {
         public static final String COLUMN_VIDEO_SITE4 = "video_site4";
         public static final String COLUMN_VIDEO_SIZE4 = "video_size4";
         public static final String COLUMN_VIDEO_TYPE4 = "video_type4";
+    }
 
+    
+    /**
+     * Defines the table contents that MovieGridFragment and MovieDetailFragment will access when
+     * hosted by HomeActivity and MovieDetailPagerActivity (in phone mode).
+     * Basically this will be the table that is used when user is NOT viewing their favorites.
+     * It will only ever hold one set of data, and will be written over completely every time a
+     * FetchMoviesTask returns at least 1 movie.
+     */
+    public static final class MoviesEntry extends MoviesEntryColumns implements BaseColumns {
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_MOVIES).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
+        public static final String TABLE_NAME = "movies";
+
+        
         // returns a movie Uri (a single record in this table) given a MOVIE id
         public static Uri buildMovieUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
         }
-
-
-
+        
     }
 
 
@@ -109,11 +116,27 @@ public class MovieTheaterContract {
      * and backdrop images, since they are stored locally.  The records in this table are inserted
      * or deleted one at a time.
      */
-    public static final class FavoritesEntry implements BaseColumns {
+    public static final class FavoritesEntry extends MoviesEntryColumns implements BaseColumns {
+        
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_FAVORITES).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
+        public static final String TABLE_NAME = "favorites";
 
 
+        // 2 additional columns needed to store local poster and backdrop image file paths
+        // so that the favorites table can be accessed while offline
+        public static final String COLUMN_POSTER_FILE_PATH = "poster_file_path";
+        public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
 
 
+        // returns a favorte Uri (a single record in this table) given a MOVIE id
+        public static Uri buildFavoriteUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
 
     }
 
@@ -124,8 +147,7 @@ public class MovieTheaterContract {
      */
     public static final class GenresEntry implements BaseColumns {
 
-
-
+        
     }
 
 
@@ -138,7 +160,5 @@ public class MovieTheaterContract {
 
 
     }
-
-
-
+    
 }
