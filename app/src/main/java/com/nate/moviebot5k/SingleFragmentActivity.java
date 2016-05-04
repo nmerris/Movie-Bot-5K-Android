@@ -43,7 +43,7 @@ import android.util.Log;
  *
  * @author Nathan Merris
  */
-abstract class SingleFragmentActivity extends AppCompatActivity
+public abstract class SingleFragmentActivity extends AppCompatActivity
 {
 
     public static final String N8LOG = "N8LOG "; // logtag prefix to use for entire app

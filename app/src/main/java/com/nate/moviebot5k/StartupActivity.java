@@ -1,6 +1,5 @@
 package com.nate.moviebot5k;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -39,12 +38,12 @@ public class StartupActivity extends AppCompatActivity {
     // initialize all sharedPrefs, need this to happen the first time app is installed
     // or if user clears the app data, they will either ALL exist, or NONE will exist
     private void initializeSharedPrefs() {
-        Log.i(LOGTAG, "entered initializeSharedPrefs, will report if defaults are written");
+        Log.i(LOGTAG, "entered initializeSharedPrefs, will report if they do not exist yet");
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // if any single sharedPrefs exists, then they all do and have already been initialized
         if(!sharedPreferences.contains(getString(R.string.key_num_favorites))) {
-            Log.i(LOGTAG, "  sharedPrefs are being initialized, writing defaults...");
+            Log.i(LOGTAG, "  sharedPrefs are being created, writing defaults...");
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
             editor.putInt(getString(R.string.key_num_favorites),
@@ -63,8 +62,8 @@ public class StartupActivity extends AppCompatActivity {
                     getResources().getInteger(R.integer.default_currently_selected_movie_id));
             editor.putInt(getString(R.string.key_currently_selected_favorite_id),
                     getResources().getInteger(R.integer.default_currently_selected_favorite_id));
-            editor.putBoolean(getString(R.string.key_movie_filter_activity_filter_changed),
-                    getResources().getBoolean(R.bool.default_movie_filter_activity_filter_changed));
+            editor.putBoolean(getString(R.string.key_fetch_new_movies),
+                    getResources().getBoolean(R.bool.default_fetch_new_movies));
             editor.commit();
         }
     }

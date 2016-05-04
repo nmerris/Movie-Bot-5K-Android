@@ -27,7 +27,7 @@
     <string name="key_currently_selected_favorite_id">curr_sel_favorite_id</string>
     <integer name="default_currently_selected_favorite_id">-1</integer> <!-- no favorite selected -->
 
-    <string name="key_movie_filter_activity_filter_changed">movie_filter_act_filter_changed</string>
-    <bool name="default_movie_filter_activity_filter_changed">false</bool>
+    <string name="key_fetch_new_movies">fetch_new_movies</string>
+    <bool name="default_fetch_new_movies">true</bool>
 
 </resources>
