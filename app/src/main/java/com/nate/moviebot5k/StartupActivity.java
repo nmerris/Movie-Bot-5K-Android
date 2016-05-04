@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.nate.moviebot5k.data.MovieTheaterContract;
+
 /**
  * Initializes this app the first time it is installed on device, and detects if internet is
  * available.  If internet is available, launches Intent to HomeActivity, if not it will check to
@@ -24,6 +26,15 @@ public class StartupActivity extends AppCompatActivity {
         initializeSharedPrefs();
 
 
+        showDebugLog();
+
+
+
+
+
+
+
+
 
 
 
@@ -39,6 +50,7 @@ public class StartupActivity extends AppCompatActivity {
     // or if user clears the app data, they will either ALL exist, or NONE will exist
     private void initializeSharedPrefs() {
         Log.i(LOGTAG, "entered initializeSharedPrefs, will report if they do not exist yet");
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // if any single sharedPrefs exists, then they all do and have already been initialized
@@ -66,6 +78,18 @@ public class StartupActivity extends AppCompatActivity {
                     getResources().getBoolean(R.bool.default_fetch_new_movies));
             editor.commit();
         }
+    }
+
+    // just pumps out a bunch of stuff that I used when writing this app, mostly db initialization
+    private void showDebugLog() {
+
+        // movies table
+        Log.i(LOGTAG, "MoviesEntry CONTENT_URI: " + MovieTheaterContract.MoviesEntry.CONTENT_URI);
+        Log.i(LOGTAG, "MoviesEntry CONTENT_TYPE: " + MovieTheaterContract.MoviesEntry.CONTENT_TYPE);
+        Log.i(LOGTAG, "MoviesEntry CONTENT_ITEM_TYPE: " + MovieTheaterContract.MoviesEntry.CONTENT_ITEM_TYPE);
+        Log.i(LOGTAG, "MoviesEntry Uri returned from buildMovieUriFromMovieId(999): "
+            + MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(999));
+
     }
 
 
