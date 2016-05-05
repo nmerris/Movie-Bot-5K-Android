@@ -15,6 +15,8 @@ import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.CertsEntry;
 
+import javax.security.auth.login.LoginException;
+
 /**
  * Created by Nathan Merris on 5/4/2016.
  */
@@ -85,64 +87,138 @@ public class MovieTheaterProvider extends ContentProvider {
     }
 
     /**
-     * Insert only allows these Uris:
+     * Insert only allows this Uri:
      * <p>
-     *     1. content://com.nate.moviebot5k/movies - wipes out every record and writes in values
-     * </p>
-     *     2. content://com.nate.moviebot5k/genres - same as movies
-     * <p>
-     *     3. content://com.nate.moviebot5k/certifications - same as movies
-     * </p>
-     *     4. content://com.nate.moviebot5k/favorites/[movie_id] - writes a single record to the
+     *     content://com.nate.moviebot5k/favorites/[movie_id] - writes a single record to the
      *     favorites table, the values passed in must contain only the poster_file_path and
      *     backdrop_file_path datum, so use values.put(MovieTheaterContract.COLUMN_POSTER_FILE_PATH,
      *     [file path to locally stored poster image]) and then again for the backdrop file path,
      *     this method will copy all the other data from the movies table to the corresponding
      *     record in the favorites table, and also add the poster and backdrop file paths.  The point
      *     here is that the user can come back and access their favorites even without internet.
-     *
-     * <p>
-     *     Any other Uri passe in will throw an UnsupportedOperationException
      * </p>
+     * Any other Uri passe in will throw an UnsupportedOperationException.  All other insert
+     * operations in this app should be done with bulkInsert because they will almost always
+     * be inserting multiple records.
      *
-     * @param uri where to insert the incoming values
-     * @param values the data to insert
+     * @param uri the Uri that will point to the new favorites table record
+     * @param values the data to insert as described above
      * @return a Uri that points to the data that was just inserted
      * @throws UnsupportedOperationException
+     * @see #bulkInsert(Uri, ContentValues[])
      */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         Log.i(LOGTAG, "entered insert");
 
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
-        Uri returnUri;
+        if(sUriMatcher.match(uri) == FAVORITE_WITH_MOVIE_ID) {
+            Log.i(LOGTAG, "  about to insert to favorites table: " + uri);
+            final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            Uri returnUri;
 
-        switch (match) {
-            case MOVIES_ALL:
-
-                break;
-
-            case FAVORITE_WITH_MOVIE_ID:
-
-                break;
-
-            case GENRES_ALL:
-
-                break;
-
-            case CERTS_ALL:
-
-                break;
-
-            default:
-                throw new UnsupportedOperationException("this db only allows inserts to the entire" +
-                        " movies, genres, or certifications tables, or 1 single insert with a" +
-                        " movie_id to the favorites table");
+            // TODO: fancy insert to favorites table
 
         }
+        else {
+            throw new UnsupportedOperationException("this db only allows inserts to the entire" +
+                    " movies, genres, or certifications tables, or 1 single insert with a" +
+                    " movie_id to the favorites table");
+        }
+    }
 
 
+    // overriding to make it more efficient with beginTransaction and endTransaction
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        Log.i(LOGTAG, "entered bulkInsert");
+
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int returnCount = 0;
+        int match = sUriMatcher.match(uri);
+
+        if(match == MOVIES_ALL || match == GENRES_ALL || match == CERTS_ALL) {
+            // is this okay?  using getLastPathSegment to get the table name?
+            Log.i(LOGTAG, "  uri.getLastPathSegment, ie table name to insert into: " + uri.getLastPathSegment());
+            db.beginTransaction();
+
+            try {
+                for (ContentValues value : values) {
+                    long _id = db.insert(uri.getLastPathSegment(), null, value);
+                    if (_id != -1) returnCount++;
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+
+            getContext().getContentResolver().notifyChange(uri, null);
+            Log.i(LOGTAG, "    number records inserted: " + returnCount);
+        }
+        else {
+            super.bulkInsert(uri, values);
+        }
+        return returnCount;
+
+
+
+
+
+
+//        switch (sUriMatcher.match(uri)) {
+//            case MOVIES_ALL:
+//                Log.i(LOGTAG, "  about to beginTransaction to movies table");
+//
+//                db.beginTransaction();
+//                int returnCount = 0;
+//
+//                try {
+//                    for (ContentValues value : values) {
+//                        long _id = db.insert(MoviesEntry.TABLE_NAME, null, value);
+//                        if(_id != -1) returnCount++;
+//                    }
+//                    db.setTransactionSuccessful();
+//                }
+//                finally {
+//                    db.endTransaction();
+//                }
+//
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                Log.i(LOGTAG, "    number records inserted: " + returnCount);
+//                return returnCount;
+//                break;
+//
+//            case GENRES_ALL:
+//                Log.i(LOGTAG, "  about to beginTransaction to genres table");
+//
+//                db.beginTransaction();
+//                int returnCount = 0;
+//
+//                try {
+//                    for (ContentValues value : values) {
+//                        long _id = db.insert(MoviesEntry.TABLE_NAME, null, value);
+//                        if(_id != -1) returnCount++;
+//                    }
+//                    db.setTransactionSuccessful();
+//                }
+//                finally {
+//                    db.endTransaction();
+//                }
+//
+//                getContext().getContentResolver().notifyChange(uri, null);
+//                Log.i(LOGTAG, "    number records inserted: " + returnCount);
+//                return returnCount;
+//            break;
+//                break;
+//
+//            case CERTS_ALL:
+//
+//                break;
+//
+//            default:
+//                return super.bulkInsert(uri, values);
+
+
+//        }
     }
 
 
