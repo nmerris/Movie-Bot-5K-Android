@@ -109,16 +109,18 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         // create a table to hold all available movie genres that can be used to filter
         // themoviedb API discover calls
         final String SQL_CREATE_GENRES_TABLE = "CREATE TABLE " + GenresEntry.TABLE_NAME + "(" +
-                GenresEntry.COLUMN_GENRE_ID + "INTEGER NOT NULL, " +
-                GenresEntry.COLUMN_GENRE_NAME + "TEXT NOT NULL)";
+                GenresEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
+                GenresEntry.COLUMN_GENRE_ID + " INTEGER NOT NULL, " +
+                GenresEntry.COLUMN_GENRE_NAME + " TEXT NOT NULL);";
         Log.i(LOGTAG, "onCreate genres table SQL: " + SQL_CREATE_GENRES_TABLE);
         db.execSQL(SQL_CREATE_GENRES_TABLE);
 
         // create a table for certifications, similar to genres table (like G, PG, PG-13, etc)
         final String SQL_CREATE_CERTS_TABLE = "CREATE TABLE " + CertsEntry.TABLE_NAME + "(" +
-                CertsEntry.COLUMN_CERT_ORDER + "INTEGER NOT NULL, " +
-                CertsEntry.COLUMN_CERT_NAME + "TEXT NOT NULL, " +
-                CertsEntry.COLUMN_CERT_MEANING + "TEXT);";
+                CertsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
+                CertsEntry.COLUMN_CERT_ORDER + " INTEGER NOT NULL, " +
+                CertsEntry.COLUMN_CERT_NAME + " TEXT NOT NULL, " +
+                CertsEntry.COLUMN_CERT_MEANING + " TEXT);";
         Log.i(LOGTAG, "onCreate certifications table SQL: " + SQL_CREATE_CERTS_TABLE);
         db.execSQL(SQL_CREATE_CERTS_TABLE);
                 

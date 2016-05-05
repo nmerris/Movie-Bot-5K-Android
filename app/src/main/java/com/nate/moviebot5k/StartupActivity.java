@@ -102,9 +102,11 @@ public class StartupActivity extends AppCompatActivity {
         Log.i(LOGTAG, "FavoritesEntry Uri returned from buildMovieUriFromMovieId(888): "
                 + MovieTheaterContract.FavoritesEntry.buildFavoriteUriFromMovieId(888));
 
-        // MovieTheaterDbHelper create movies table, remove this asap!
-//        MovieTheaterDbHelper testHelper = new MovieTheaterDbHelper(this);
-//        testHelper.getReadableDatabase();
+        // MovieTheaterDbHelper create tables
+        MovieTheaterDbHelper testHelper = new MovieTheaterDbHelper(this);
+        testHelper.getReadableDatabase();
+
+
 
     }
 
