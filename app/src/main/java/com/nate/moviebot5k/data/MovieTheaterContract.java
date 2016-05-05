@@ -27,9 +27,11 @@ public class MovieTheaterContract {
 
 
 
-    // private but not final: privateto protect it from malevolent code forces outside this class,
+    // private but not final: private to protect it from malevolent code goblins outside this class,
     // not final because MoviesEntry and FavoritesEntry extend it
     private static class MoviesEntryColumns {
+
+        // populated in MovieGridFragment from /discover/movie themoviedb API endpoint
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_ADULT = "adult";
         public static final String COLUMN_OVERVIEW = "overview";
@@ -46,10 +48,18 @@ public class MovieTheaterContract {
         public static final String COLUMN_ORIGINAL_LANGUAGE = "original_language";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_BACKDROP_PATH = "backdrop_path";
+        public static final String COLUMN_POSTER_PATH = "poster_path";
         public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_VOTE_COUNT = "vote_count";
         public static final String COLUMN_HAS_VIDEO = "has_video";
         public static final String COLUMN_VOTE_AVG = "vote_average";
+
+        // populated in MovieDetailFragment from /movie/id themoviedb API endpoint
+        public static final String COLUMN_BUDGET = "budget";
+        public static final String COLUMN_REVENUE = "revenue";
+        public static final String COLUMN_RUNTIME = "runtime";
+
+        // populated in MovieDetailFragment from /movie/id/reviews API endpoint
         public static final String COLUMN_REVIEW_AUTHOR1 = "review_author1";
         public static final String COLUMN_REVIEW_CONTENT1 = "review_content1";
         public static final String COLUMN_REVIEW_AUTHOR2 = "review_author2";
@@ -58,6 +68,8 @@ public class MovieTheaterContract {
         public static final String COLUMN_REVIEW_CONTENT3 = "review_content3";
         public static final String COLUMN_REVIEW_AUTHOR4 = "review_author4";
         public static final String COLUMN_REVIEW_CONTENT4 = "review_content4";
+
+        // populated in MovieGridFragment from /movie/id/videos API endpoint
         public static final String COLUMN_VIDEO_KEY1 = "video_key1";
         public static final String COLUMN_VIDEO_NAME1 = "video_name1";
         public static final String COLUMN_VIDEO_SITE1 = "video_site1";
@@ -146,8 +158,15 @@ public class MovieTheaterContract {
      * The data is updated once each time the app is started from dead, in StartupActivity.
      */
     public static final class GenresEntry implements BaseColumns {
-
         
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_GENRES).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_GENRES;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_GENRES;
+        public static final String TABLE_NAME = "genres";
+
     }
 
 
@@ -157,7 +176,13 @@ public class MovieTheaterContract {
      */
     public static final class CertsEntry implements BaseColumns {
 
-
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_CERTS).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CERTS;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CERTS;
+        public static final String TABLE_NAME = "certifications";
 
     }
     

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.nate.moviebot5k.data.MovieTheaterContract;
+import com.nate.moviebot5k.data.MovieTheaterDbHelper;
 
 /**
  * Initializes this app the first time it is installed on device, and detects if internet is
@@ -83,12 +84,27 @@ public class StartupActivity extends AppCompatActivity {
     // just pumps out a bunch of stuff that I used when writing this app, mostly db initialization
     private void showDebugLog() {
 
-        // movies table
+        // MovieTheaterContract movies table
         Log.i(LOGTAG, "MoviesEntry CONTENT_URI: " + MovieTheaterContract.MoviesEntry.CONTENT_URI);
         Log.i(LOGTAG, "MoviesEntry CONTENT_TYPE: " + MovieTheaterContract.MoviesEntry.CONTENT_TYPE);
         Log.i(LOGTAG, "MoviesEntry CONTENT_ITEM_TYPE: " + MovieTheaterContract.MoviesEntry.CONTENT_ITEM_TYPE);
+        Log.i(LOGTAG, "MoviesEntry COLUMN_POPULARITY: " + MovieTheaterContract.MoviesEntry.COLUMN_POPULARITY);
         Log.i(LOGTAG, "MoviesEntry Uri returned from buildMovieUriFromMovieId(999): "
             + MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(999));
+
+        // MovieTheaterContract favorites table
+        Log.i(LOGTAG, "FavoritesEntry CONTENT_URI: " + MovieTheaterContract.FavoritesEntry.CONTENT_URI);
+        Log.i(LOGTAG, "FavoritesEntry CONTENT_TYPE: " + MovieTheaterContract.FavoritesEntry.CONTENT_TYPE);
+        Log.i(LOGTAG, "FavoritesEntry CONTENT_ITEM_TYPE: " + MovieTheaterContract.FavoritesEntry.CONTENT_ITEM_TYPE);
+        Log.i(LOGTAG, "FavoritesEntry COLUMN_POPULARITY: " + MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY);
+        Log.i(LOGTAG, "FavoritesEntry COLUMN_BACKDROP_FILE_PATH: "
+                + MovieTheaterContract.FavoritesEntry.COLUMN_BACKDROP_FILE_PATH);
+        Log.i(LOGTAG, "FavoritesEntry Uri returned from buildMovieUriFromMovieId(888): "
+                + MovieTheaterContract.FavoritesEntry.buildFavoriteUriFromMovieId(888));
+
+        // MovieTheaterDbHelper create movies table, remove this asap!
+        MovieTheaterDbHelper testHelper = new MovieTheaterDbHelper(this);
+        testHelper.getReadableDatabase();
 
     }
 
