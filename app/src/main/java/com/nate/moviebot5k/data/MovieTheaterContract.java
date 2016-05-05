@@ -190,7 +190,7 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CERTS;
         public static final String TABLE_NAME = "certifications";
 
-        public static final String COLUMN_CERT_ID = "certification_id";
+        public static final String COLUMN_CERT_ORDER = "certification_order";
         public static final String COLUMN_CERT_NAME = "certification_name";
         public static final String COLUMN_CERT_MEANING = "certification_meaning";
 

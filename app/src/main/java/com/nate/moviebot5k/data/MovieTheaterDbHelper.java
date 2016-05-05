@@ -8,6 +8,8 @@ import android.util.Log;
 import com.nate.moviebot5k.SingleFragmentActivity;
 import com.nate.moviebot5k.data.MovieTheaterContract.MoviesEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesEntry;
+import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
+import com.nate.moviebot5k.data.MovieTheaterContract.CertsEntry;
 
 
 /**
@@ -89,20 +91,36 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_VIDEO_TYPE4 + " TEXT";
 
 
-        // create a table to hold the currently 'showing' movies, used by MovieGridFragment
+        // create a table to hold the currently 'showing' movies
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MoviesEntry.TABLE_NAME + "(" + 
                 SQL_MOVIES_COLUMNS + ");";
-
         Log.i(LOGTAG, "onCreate movies table SQL: " + SQL_CREATE_MOVIES_TABLE);
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
-        
+
+        // create a table to hold favorites, same as movies except also has local poster
+        // and backdrop paths for offline access, used by
         final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " + FavoritesEntry.TABLE_NAME + "(" +
                 SQL_MOVIES_COLUMNS + ", " +
                 FavoritesEntry.COLUMN_POSTER_FILE_PATH + " TEXT NOT NULL, " +
                 FavoritesEntry.COLUMN_BACKDROP_FILE_PATH + " TEXT NOT NULL);";
-        
         Log.i(LOGTAG, "onCreate favorites table SQL: " + SQL_CREATE_FAVORITES_TABLE);
         db.execSQL(SQL_CREATE_FAVORITES_TABLE);
+
+        // create a table to hold all available movie genres that can be used to filter
+        // themoviedb API discover calls
+        final String SQL_CREATE_GENRES_TABLE = "CREATE TABLE " + GenresEntry.TABLE_NAME + "(" +
+                GenresEntry.COLUMN_GENRE_ID + "INTEGER NOT NULL, " +
+                GenresEntry.COLUMN_GENRE_NAME + "TEXT NOT NULL)";
+        Log.i(LOGTAG, "onCreate genres table SQL: " + SQL_CREATE_GENRES_TABLE);
+        db.execSQL(SQL_CREATE_GENRES_TABLE);
+
+        // create a table for certifications, similar to genres table (like G, PG, PG-13, etc)
+        final String SQL_CREATE_CERTS_TABLE = "CREATE TABLE " + CertsEntry.TABLE_NAME + "(" +
+                CertsEntry.COLUMN_CERT_ORDER + "INTEGER NOT NULL, " +
+                CertsEntry.COLUMN_CERT_NAME + "TEXT NOT NULL, " +
+                CertsEntry.COLUMN_CERT_MEANING + "TEXT);";
+        Log.i(LOGTAG, "onCreate certifications table SQL: " + SQL_CREATE_CERTS_TABLE);
+        db.execSQL(SQL_CREATE_CERTS_TABLE);
                 
     }
 
