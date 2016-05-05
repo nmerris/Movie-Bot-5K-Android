@@ -101,8 +101,12 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         // and backdrop paths for offline access, used by
         final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " + FavoritesEntry.TABLE_NAME + "(" +
                 SQL_MOVIES_COLUMNS + ", " +
-                FavoritesEntry.COLUMN_POSTER_FILE_PATH + " TEXT NOT NULL, " +
-                FavoritesEntry.COLUMN_BACKDROP_FILE_PATH + " TEXT NOT NULL);";
+                // must allow null here because when copying record from movies to favorites
+                // in MovieProvider.insert, the initial sql command will leave these columns null
+                // but then immediately after that they will be filled in, so you can still enforce
+                // NOT NULL over there, just not directly in the database
+                FavoritesEntry.COLUMN_POSTER_FILE_PATH + " TEXT, " +
+                FavoritesEntry.COLUMN_BACKDROP_FILE_PATH + " TEXT);";
         Log.i(LOGTAG, "onCreate favorites table SQL: " + SQL_CREATE_FAVORITES_TABLE);
         db.execSQL(SQL_CREATE_FAVORITES_TABLE);
 

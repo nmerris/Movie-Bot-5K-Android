@@ -111,23 +111,66 @@ public class MovieTheaterProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         Log.i(LOGTAG, "entered insert");
 
+
+
+
+        Uri returnUri;
+
+
         if(sUriMatcher.match(uri) == FAVORITE_WITH_MOVIE_ID) {
             Log.i(LOGTAG, "  about to insert to favorites table: " + uri);
-            final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-            Uri returnUri;
 
-            // TODO: fancy insert to favorites table
+            // incoming ContentValues MUST contain a poster and backdrop image file path
+            // with the correct keys/column names so that the insert to favorites table will be ok
+            if(values.get(FavoritesEntry.COLUMN_POSTER_FILE_PATH) == null
+                    || values.get(FavoritesEntry.COLUMN_BACKDROP_FILE_PATH) == null) {
+                throw new UnsupportedOperationException("you must include a local poster and backdrop" +
+                        " image file path in the ContentValues passed to MovieTheaterProvider.insert." +
+                        " If you want to insert anything else, use bulkInsert");
+            }
+
+
+            final SQLiteDatabase dbFavoritesWriter = mOpenHelper.getWritableDatabase();
+
+            // get the integer value of the movieId, which is the last path segment in the incoming Uri
+            String movieIdStr = uri.getLastPathSegment();
+
+            // the SQL command to copy a record from movies to favorites, minus the poster/backdrop paths
+            String SQL_COPY_MOVIE_RECORD_TO_FAVORITES_TABLE =
+                    "INSERT INTO " + FavoritesEntry.TABLE_NAME +
+                    " SELECT * FROM " + MoviesEntry.TABLE_NAME + " WHERE " +
+                    MoviesEntry.COLUMN_MOVIE_ID + " = " + movieIdStr + ";";
+
+            Log.i(LOGTAG, "    SQL that will be executed to copy record from movies table to" +
+                    " favorites table: " + SQL_COPY_MOVIE_RECORD_TO_FAVORITES_TABLE);
+            dbFavoritesWriter.execSQL(SQL_COPY_MOVIE_RECORD_TO_FAVORITES_TABLE);
+
+
+            // now update the record that was just added to include the poster and backdrop file paths
+            int rowsUpdated;
+            rowsUpdated = dbFavoritesWriter.update(
+                    FavoritesEntry.TABLE_NAME,      // "favorites"
+                    values,                         // date for poster and backdrop file paths
+                    FavoritesEntry.COLUMN_MOVIE_ID, // WHERE clause so only the correct record is updated
+                    new String[] {movieIdStr}       // WHERE arg
+            );
+
+            Log.i(LOGTAG, "      the number of rows updated after adding poster and backdrop" +
+                    " path ContentValues data (should be 1) is: " + rowsUpdated);
+
+            // return the URI of the new favorites record
+            return FavoritesEntry.buildFavoriteUriFromMovieId(Integer.valueOf(movieIdStr));
 
         }
         else {
-            throw new UnsupportedOperationException("this db only allows inserts to the entire" +
-                    " movies, genres, or certifications tables, or 1 single insert with a" +
-                    " movie_id to the favorites table");
+            throw new UnsupportedOperationException("this db only allows individual inserts to the" +
+                    " favorites table, use bulkInsert for everything else");
         }
     }
 
 
     // overriding to make it more efficient with beginTransaction and endTransaction
+    // bulkInsert should be used every time for movies, certs, and genres tables
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
         Log.i(LOGTAG, "entered bulkInsert");
