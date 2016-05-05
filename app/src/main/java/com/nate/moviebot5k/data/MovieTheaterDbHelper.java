@@ -21,7 +21,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
     private static final String LOGTAG = SingleFragmentActivity.N8LOG + "MovTheatrDbHelper";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     static final String DATABASE_NAME = "movie_theater.db";
 
 
@@ -129,6 +129,15 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // this is not really an upgrade strategy, it just wipes out the tables
+        // so do not change the DATABASE_VERSION or everything will get wiped out!
+        // you would need a strategy to preserve the users favorites here
+        db.execSQL("DROP TABLE IF EXISTS " + MoviesEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + FavoritesEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + GenresEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CertsEntry.TABLE_NAME);
 
+        // and recreate them from scratch
+        onCreate(db);
     }
 }
