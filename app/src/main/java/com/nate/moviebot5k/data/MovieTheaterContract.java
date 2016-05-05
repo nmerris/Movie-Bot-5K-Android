@@ -167,6 +167,12 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_GENRES;
         public static final String TABLE_NAME = "genres";
 
+        public static final String COLUMN_GENRE_ID = "genre_id";
+        public static final String COLUMN_GENRE_NAME = "genre_name";
+
+        // should not need any build methods.. genres table is only ever wiped out completely and
+        // then written over with a bulk insert
+
     }
 
 
@@ -183,6 +189,12 @@ public class MovieTheaterContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CERTS;
         public static final String TABLE_NAME = "certifications";
+
+        public static final String COLUMN_CERT_ID = "certification_id";
+        public static final String COLUMN_CERT_NAME = "certification_name";
+        public static final String COLUMN_CERT_MEANING = "certification_meaning";
+
+        // should not need any build methods, same reason as GenresEntry
 
     }
     

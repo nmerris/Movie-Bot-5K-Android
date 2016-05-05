@@ -65,7 +65,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_REVIEW_AUTHOR1 + " TEXT, " +
                 MoviesEntry.COLUMN_REVIEW_CONTENT1 + " TEXT, " +
                 MoviesEntry.COLUMN_REVIEW_AUTHOR2 + " TEXT, " +
-                // the view will have to deal with a movie with no review
+                // the view will have to deal with a movie with no review or video
                 MoviesEntry.COLUMN_REVIEW_CONTENT2 + " TEXT, " +
                 MoviesEntry.COLUMN_REVIEW_AUTHOR3 + " TEXT, " +
                 MoviesEntry.COLUMN_REVIEW_CONTENT3 + " TEXT, " +
@@ -94,7 +94,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 SQL_MOVIES_COLUMNS + ");";
 
         Log.i(LOGTAG, "onCreate movies table SQL: " + SQL_CREATE_MOVIES_TABLE);
-        //db.execSQL(SQL_CREATE_MOVIES_TABLE);
+        db.execSQL(SQL_CREATE_MOVIES_TABLE);
         
         final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " + FavoritesEntry.TABLE_NAME + "(" +
                 SQL_MOVIES_COLUMNS + ", " +
@@ -102,7 +102,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 FavoritesEntry.COLUMN_BACKDROP_FILE_PATH + " TEXT NOT NULL);";
         
         Log.i(LOGTAG, "onCreate favorites table SQL: " + SQL_CREATE_FAVORITES_TABLE);
-        //db.execSQL(SQL_CREATE_FAVORITES_TABLE);
+        db.execSQL(SQL_CREATE_FAVORITES_TABLE);
                 
     }
 

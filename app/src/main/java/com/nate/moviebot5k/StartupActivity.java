@@ -103,8 +103,8 @@ public class StartupActivity extends AppCompatActivity {
                 + MovieTheaterContract.FavoritesEntry.buildFavoriteUriFromMovieId(888));
 
         // MovieTheaterDbHelper create movies table, remove this asap!
-        MovieTheaterDbHelper testHelper = new MovieTheaterDbHelper(this);
-        testHelper.getReadableDatabase();
+//        MovieTheaterDbHelper testHelper = new MovieTheaterDbHelper(this);
+//        testHelper.getReadableDatabase();
 
     }
 
