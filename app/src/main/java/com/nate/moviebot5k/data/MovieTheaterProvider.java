@@ -36,10 +36,12 @@ public class MovieTheaterProvider extends ContentProvider {
     static final int CERTS_ALL = 6; // used to populate certifications spinner
 
     // SQL selection statements
-    private static final String sMovieWithMovieId = MoviesEntry.TABLE_NAME + "." +
-            MoviesEntry.COLUMN_MOVIE_ID + " = ? ";  // "movies.movie_id = ?"
-    private static final String sFavoriteWithMovieId = FavoritesEntry.TABLE_NAME + "." +
-            FavoritesEntry.COLUMN_MOVIE_ID + " = ? "; // "favorites.movie_id = ?"
+//    private static final String sMovieWithMovieIdSelection = MoviesEntry.TABLE_NAME + "." +
+//            MoviesEntry.COLUMN_MOVIE_ID + " = ? ";  // "movies.movie_id = ?"
+//    private static final String sFavoriteWithMovieIdSelection = FavoritesEntry.TABLE_NAME + "." +
+//            FavoritesEntry.COLUMN_MOVIE_ID + " = ? "; // "favorites.movie_id = ?"
+    private static final String sMovieWithMovieIdSelection = MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
+    private static final String sFavoriteWithMovieIdSelection = FavoritesEntry.COLUMN_MOVIE_ID + " = ? ";
 
 
     static UriMatcher buildUriMatcher() {
@@ -73,7 +75,6 @@ public class MovieTheaterProvider extends ContentProvider {
     }
 
 
-    @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Log.i(LOGTAG, "entered query");
@@ -81,36 +82,52 @@ public class MovieTheaterProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case MOVIES_ALL:
-
-
-                break;
-
             case FAVORITES_ALL:
+            case GENRES_ALL:
+            case CERTS_ALL:
+                Log.i(LOGTAG, "  uri matched to switch statement case for either MOVIES_ALL," +
+                        " FAVORITES_ALL, GENRES_ALL, or CERTS_ALL");
+                Log.i(LOGTAG, "    and table name being used for mOpenHelper.query, after extracting from uri," +
+                                " is: " + uri.getLastPathSegment());
 
-
-
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        uri.getLastPathSegment(),  // get table name from uri
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
-
 
             case MOVIE_WITH_MOVIE_ID:
+                Log.i(LOGTAG,"  uri matched to switch statement MOVIE_WITH_MOVIE_ID");
+                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sMovieWithMovieIdSelection);
+                Log.i(LOGTAG,"    with the selectionArg (should be movieId) passed in: " + selectionArgs);
 
-
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MoviesEntry.TABLE_NAME,
+                        projection,
+                        sMovieWithMovieIdSelection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
 
             case FAVORITE_WITH_MOVIE_ID:
+                Log.i(LOGTAG,"  uri matched to switch statement FAVORITE_WITH_MOVIE_ID");
+                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoriteWithMovieIdSelection);
+                Log.i(LOGTAG,"    with the selectionArg (should be movieId) passed in: " + selectionArgs);
 
-
-
-                break;
-
-            case GENRES_ALL:
-
-
-                break;
-
-            case CERTS_ALL:
-
-
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        FavoritesEntry.TABLE_NAME,
+                        projection,
+                        sFavoriteWithMovieIdSelection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
 
             default:
@@ -118,14 +135,69 @@ public class MovieTheaterProvider extends ContentProvider {
 
         }
 
+        // notify whatever is using this cursor when the data it points to changes
+        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return retCursor;
 
 
-
-
-
-
-
-
+//        Log.i(LOGTAG, "entered query");
+//        Cursor retCursor;
+//
+//        switch (sUriMatcher.match(uri)) {
+//            case MOVIES_ALL:
+//                Log.i(LOGTAG, "  matched uri to case MOVIES_ALL");
+//
+//
+//
+//                Log.i(LOGTAG, "    and table name being used for mOpenHelper.query, after extracting from uri," +
+//                        " is: " + uri.getLastPathSegment());
+//                retCursor = mOpenHelper.getReadableDatabase().query( // get table name from uri
+//                        uri.getLastPathSegment(),
+//                        projection,
+//                        selection,
+//                        selectionArgs,
+//                        null,
+//                        null,
+//                        sortOrder);
+//
+//                break;
+//
+//            case FAVORITES_ALL:
+//
+//
+//
+//                break;
+//
+//
+//            case MOVIE_WITH_MOVIE_ID:
+//
+//
+//                break;
+//
+//            case FAVORITE_WITH_MOVIE_ID:
+//
+//
+//
+//                break;
+//
+//            case GENRES_ALL:
+//
+//
+//                break;
+//
+//            case CERTS_ALL:
+//
+//
+//                break;
+//
+//            default:
+//                throw new UnsupportedOperationException("I do not understand this URI: " + uri);
+//
+//        }
+//
+//        // notify whatever is using this cursor when the data it points to changes
+//        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+//        return retCursor;
 
     }
 
