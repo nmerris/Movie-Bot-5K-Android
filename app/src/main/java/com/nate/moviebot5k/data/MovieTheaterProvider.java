@@ -1,5 +1,6 @@
 package com.nate.moviebot5k.data;
 
+import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -486,8 +487,28 @@ public class MovieTheaterProvider extends ContentProvider {
     }
 
 
+    /**
+     * This app never updates any data, it either just wipes it all out and replaces all of it,
+     * or it deletes or inserts a single record to favorites table.  This is because there are way
+     * too many movies in themoviedb to try to keep old records around.. An argument could be made
+     * that it would be more efficient to keep old movies around, but it just doesn't seem worth it.
+     *
+     * Calling this method will do nothing.  Do not call this method.
+     */
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        Log.e(LOGTAG, "Please do not call me, I do nothing.  I am error of Ruto.");
         return 0;
+    }
+
+
+    // You do not need to call this method. This is a method specifically to assist the testing
+    // framework in running smoothly. You can read more at:
+    // http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
+    @Override
+    @TargetApi(11)
+    public void shutdown() {
+        mOpenHelper.close();
+        super.shutdown();
     }
 }
