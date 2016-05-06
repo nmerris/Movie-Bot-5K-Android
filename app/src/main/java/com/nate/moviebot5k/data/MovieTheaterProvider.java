@@ -6,7 +6,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.nate.moviebot5k.SingleFragmentActivity;
@@ -213,12 +212,12 @@ public class MovieTheaterProvider extends ContentProvider {
             case GENRES_ALL:
                 return GenresEntry.CONTENT_TYPE;
             case CERTS_ALL:
-                return FavoritesEntry.CONTENT_TYPE;
+                return CertsEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
-
         }
     }
+
 
     /**
      * Insert only allows this Uri:
@@ -286,6 +285,12 @@ public class MovieTheaterProvider extends ContentProvider {
             // maybe I should bail out here if rowsUpdated is not 1??
             Log.i(LOGTAG, "      the number of rows updated after adding poster and backdrop" +
                     " path ContentValues data (should be 1) is: " + rowsUpdated);
+
+
+            // TODO: similar to delete, need to figure out if should call notifyChange on the entire table,
+            // or just the individual record pointed to by the uri passed in.. in this case since we
+            // are inserting a record, maybe this is the way to go (notifying the entire table) ???
+
 
             // notify any content observers that a row was inserted to favorites table
             getContext().getContentResolver().notifyChange(MoviesEntry.CONTENT_URI, null);
@@ -396,9 +401,88 @@ public class MovieTheaterProvider extends ContentProvider {
     }
 
 
+    /**
+     * Only allowed to delete entire movies, certifications, or genres tables, for example:
+     * "content://com.nate.moviebot5k/movies" will wipe out the entire movies table.
+     *
+     * Only other allowed uri is to delete a single favorites table record with a movieId as the last segment
+     * in the uri, for example:
+     * "content://com.nate.moviebot5k/favorites/[movieId]"
+     *
+     * All other uri's will throw an unsupported operation exception.
+     *
+     * @param uri the uri of the data to delete
+     * @param selection not used, ok to always be null
+     * @param selectionArgs not used, ok to always be null
+     * @return the number of records deleted
+     * @throws UnsupportedOperationException
+     */
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        Log.i(LOGTAG, "entered delete");
+
+        final SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        int rowsDeleted;
+
+        // this makes delete all rows return the number of rows deleted
+//        if(selection == null) selection = "1";
+
+        switch (sUriMatcher.match(uri)) {
+            case MOVIES_ALL:
+            case CERTS_ALL:
+            case GENRES_ALL:
+                Log.i(LOGTAG, "  about to wipe out all records from table: " + uri.getLastPathSegment());
+                // get the table name from the uri and wipe all the records
+                // passing "1" to where clause will make db.delete return the number of rows deleted
+                // when deleting all rows
+                // should look like "DELETE FROM [tableName]"
+                rowsDeleted = db.delete(uri.getLastPathSegment(), "1", null);
+
+                // in these cases, the uri points to the entire table
+                getContext().getContentResolver().notifyChange(uri, null);
+                break;
+
+            case FAVORITE_WITH_MOVIE_ID:
+                Log.i(LOGTAG, "  about to wipe out a single record from favorites table," +
+                        " with movieId: " + uri.getLastPathSegment());
+
+                // should look like "DELETE FROM favorites WHERE movie_id = [movieId]"
+                rowsDeleted = db.delete(
+                        FavoritesEntry.TABLE_NAME,
+                        FavoritesEntry.COLUMN_MOVIE_ID + " = ? ", // "movie_id = ? "
+                        new String[] {uri.getLastPathSegment()});
+
+                // I am not sure if I should be calling update on the ENTIRE table or just the one
+                // record that was deleted..
+//                Log.i(LOGTAG, "    ********** about to call getContentResolver.notifyChange on the ENTIRE favorites table");
+//                Log.i(LOGTAG, "         I need to figure out it it's okay to just call the notify on the specific record" +
+//                        " that was update, which would be the URI passed in: " + uri);
+//                getContext().getContentResolver().notifyChange(FavoritesEntry.CONTENT_URI, null);
+
+                // seems like updating the specific record makes more sense, as opposed to above
+                // then again... both MGF and MDF will be using different cursors to display their data,
+                // and I want them both to update when a single record is removed from favorites table,
+                // so mayby BOTH need to be update here?????????????????
+                // TODO: figure this out
+                Log.i(LOGTAG, "    ********** about to call getContentResolver.notifyChange on ONLY the uri passed in, which points to a single favorites records");
+                Log.i(LOGTAG, "         Is this okay?  do I need to notifyChange on the entire favorites table?  URI passed in: " + uri);
+                getContext().getContentResolver().notifyChange(uri, null);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("delete only supports wiping out the entire" +
+                        "movies, genres, or certifications tables, OR a single record from favorites");
+
+        }
+
+
+        // TODO: if it turns out that calling notifyChange on the uri exactly as it is passed in to
+        // this method is the way to go, just move the notifyChange code out of the switch to here,
+        // and do a quick check if(rowsDeleted != 0) before calling it
+
+
+        Log.i(LOGTAG, "  number of rowsDeleted: " + rowsDeleted);
+        return rowsDeleted;
     }
 
 

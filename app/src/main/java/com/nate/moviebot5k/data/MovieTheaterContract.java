@@ -102,6 +102,7 @@ public class MovieTheaterContract {
      */
     public static final class MoviesEntry extends MoviesEntryColumns implements BaseColumns {
 
+        // "content://com.nate.moviebot5k/movies"
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_MOVIES).build();
         public static final String CONTENT_TYPE = ContentResolver
@@ -134,7 +135,8 @@ public class MovieTheaterContract {
      * or deleted one at a time.
      */
     public static final class FavoritesEntry extends MoviesEntryColumns implements BaseColumns {
-        
+
+        // "content://com.nate.moviebot5k/favorites"
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_FAVORITES).build();
         public static final String CONTENT_TYPE = ContentResolver
