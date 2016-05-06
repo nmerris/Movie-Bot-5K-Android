@@ -1,3 +1,7 @@
 <resources>
+
     <string name="app_name">MovieBot5k</string>
+    <string name="content_authority">com.nate.moviebot5k</string>
+
+
 </resources>
