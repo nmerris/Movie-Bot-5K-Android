@@ -112,6 +112,11 @@ public class MovieTheaterContract {
 
         
         // returns a movie Uri (a single record in this table) given a MOVIE id
+        // MovieTheaterProvider's uri matcher will know what to do if any of it's db related
+        // methods receive a call with a uri as described below, which would look like:
+        // "content://com.nate.moviebot5k/movies/[movieId]"
+        // used by MovieDetailFragment to get a cursor that points to a movie with id = movieId
+        // NOTE: movieId is not the same as the primary key, which is just _id
         public static Uri buildMovieUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
         }

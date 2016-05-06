@@ -76,7 +76,57 @@ public class MovieTheaterProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        Log.i(LOGTAG, "entered query");
+        Cursor retCursor;
+
+        switch (sUriMatcher.match(uri)) {
+            case MOVIES_ALL:
+
+
+                break;
+
+            case FAVORITES_ALL:
+
+
+
+                break;
+
+
+            case MOVIE_WITH_MOVIE_ID:
+
+
+                break;
+
+            case FAVORITE_WITH_MOVIE_ID:
+
+
+
+                break;
+
+            case GENRES_ALL:
+
+
+                break;
+
+            case CERTS_ALL:
+
+
+                break;
+
+            default:
+                throw new UnsupportedOperationException("I do not understand this URI: " + uri);
+
+        }
+
+
+
+
+
+
+
+
+
+
     }
 
 
@@ -111,12 +161,6 @@ public class MovieTheaterProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         Log.i(LOGTAG, "entered insert");
 
-
-
-
-        Uri returnUri;
-
-
         if(sUriMatcher.match(uri) == FAVORITE_WITH_MOVIE_ID) {
             Log.i(LOGTAG, "  about to insert to favorites table: " + uri);
 
@@ -124,9 +168,9 @@ public class MovieTheaterProvider extends ContentProvider {
             // with the correct keys/column names so that the insert to favorites table will be ok
             if(values.get(FavoritesEntry.COLUMN_POSTER_FILE_PATH) == null
                     || values.get(FavoritesEntry.COLUMN_BACKDROP_FILE_PATH) == null) {
-                throw new UnsupportedOperationException("you must include a local poster and backdrop" +
+                throw new UnsupportedOperationException("You must include a local poster and backdrop" +
                         " image file path in the ContentValues passed to MovieTheaterProvider.insert." +
-                        " If you want to insert anything else, use bulkInsert");
+                        "  If you want to insert anything else, use bulkInsert");
             }
 
 
@@ -155,11 +199,14 @@ public class MovieTheaterProvider extends ContentProvider {
                     new String[] {movieIdStr}       // WHERE arg
             );
 
+            // maybe I should bail out here if rowsUpdated is not 1??
             Log.i(LOGTAG, "      the number of rows updated after adding poster and backdrop" +
                     " path ContentValues data (should be 1) is: " + rowsUpdated);
 
+            // notify any content observers that a row was inserted to favorites table
+            getContext().getContentResolver().notifyChange(MoviesEntry.CONTENT_URI, null);
             // return the URI of the new favorites record
-            return FavoritesEntry.buildFavoriteUriFromMovieId(Integer.valueOf(movieIdStr));
+            return FavoritesEntry.buildFavoriteUriFromMovieId(Long.valueOf(movieIdStr));
 
         }
         else {
@@ -194,17 +241,17 @@ public class MovieTheaterProvider extends ContentProvider {
                 db.endTransaction();
             }
 
-            getContext().getContentResolver().notifyChange(uri, null);
             Log.i(LOGTAG, "    number records inserted: " + returnCount);
         }
         else {
+            Log.i(LOGTAG, "  UhOh.. somehow super.bulkInsert is about to be called, should never happen");
             super.bulkInsert(uri, values);
         }
+
+        // notify any content observers that the table data has changed, will be either
+        // movies, genres, or certifications in this case
+        getContext().getContentResolver().notifyChange(uri, null);
         return returnCount;
-
-
-
-
 
 
 //        switch (sUriMatcher.match(uri)) {
