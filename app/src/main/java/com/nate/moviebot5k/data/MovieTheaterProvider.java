@@ -15,7 +15,6 @@ import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.CertsEntry;
 
-import javax.security.auth.login.LoginException;
 
 /**
  * Created by Nathan Merris on 5/4/2016.
@@ -36,6 +35,7 @@ public class MovieTheaterProvider extends ContentProvider {
     static final int CERTS_ALL = 6; // used to populate certifications spinner
 
     // SQL selection statements
+    // so the commented out selection statements are for JOINED tables, I think, not doing that here
 //    private static final String sMovieWithMovieIdSelection = MoviesEntry.TABLE_NAME + "." +
 //            MoviesEntry.COLUMN_MOVIE_ID + " = ? ";  // "movies.movie_id = ?"
 //    private static final String sFavoriteWithMovieIdSelection = FavoritesEntry.TABLE_NAME + "." +
@@ -58,11 +58,6 @@ public class MovieTheaterProvider extends ContentProvider {
 
         return matcher;
     }
-
-
-//    private Cursor getMovieByMovieId() {
-//
-//    }
 
 
     @Override
@@ -202,10 +197,27 @@ public class MovieTheaterProvider extends ContentProvider {
     }
 
 
-    @Nullable
     @Override
     public String getType(Uri uri) {
-        return null;
+        Log.i(LOGTAG, "entered getType");
+
+        switch (sUriMatcher.match(uri)) {
+            case MOVIES_ALL:
+                return MoviesEntry.CONTENT_TYPE;
+            case FAVORITES_ALL:
+                return FavoritesEntry.CONTENT_TYPE;
+            case MOVIE_WITH_MOVIE_ID:
+                return MoviesEntry.CONTENT_ITEM_TYPE;
+            case FAVORITE_WITH_MOVIE_ID:
+                return FavoritesEntry.CONTENT_ITEM_TYPE;
+            case GENRES_ALL:
+                return GenresEntry.CONTENT_TYPE;
+            case CERTS_ALL:
+                return FavoritesEntry.CONTENT_TYPE;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+
+        }
     }
 
     /**
