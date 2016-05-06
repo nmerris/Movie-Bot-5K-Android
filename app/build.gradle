@@ -17,10 +17,26 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildTypes.each {
+
+        /*
+         !!!! ANYONE RUNNING THIS APP: YOU NEED TO HAVE A THEMOVIEDB.ORG API KEY !!!!
+         They are free and require minimal info to sign up, only need a username and email address.
+         If you want to sign up: https://www.themoviedb.org/account/signup
+         After signing up, go to account and click the API link, there you will find your key.
+
+         You need to put the key in your computer's user directory 'gradle.properties' file.
+         On my PC, this was located in [user home]\.gradle\gradle.properties
+         If this file does not exist, you must create it.
+         Finally, you need to add the following line: MyMovieDbApiKey="[your personal api key here]"
+         */
+        it.buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', MyMovieDbApiKey
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.jakewharton:butterknife:7.0.1'
 }

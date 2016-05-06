@@ -1,6 +1,9 @@
 package com.nate.moviebot5k;
 
+import android.app.LoaderManager;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,8 +18,12 @@ import com.nate.moviebot5k.data.MovieTheaterDbHelper;
  * see if user has at least one favorite, and then asks user via an AlertDialog if they would like
  * to view their favorites.  If so, launches and Intent to FavoritesActivity.
  */
-public class StartupActivity extends AppCompatActivity {
+public class StartupActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOGTAG = SingleFragmentActivity.N8LOG + "StartupActivity";
+
+    private static final int GENRE_LOADER_ID = 1;
+    private static final int CERTS_LOADER_ID = 2;
 
 
     @Override
@@ -24,11 +31,14 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
+
         initializeSharedPrefs();
 
 
         showDebugLog();
 
+
+        updateGenres();
 
 
 
@@ -110,5 +120,37 @@ public class StartupActivity extends AppCompatActivity {
 
     }
 
+
+    // this fires an async task to fetch a list of genres and restarts the Loader associated with
+    // this activity
+    private void updateGenres() {
+
+
+
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        // TODO: this is where I need to figure out if the api call to fetch genres and certs was successful
+        // and then decide which Intent to launch next: either to HomeActivity or
+        // FavoritesActivity, although that too will depend on whether user has any favorites
+        // the msg display if the api call
+
+
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 
 }
