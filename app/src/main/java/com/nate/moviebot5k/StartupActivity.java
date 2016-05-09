@@ -28,26 +28,12 @@ public class StartupActivity extends AppCompatActivity
         /*implements LoaderManager.LoaderCallbacks<Cursor>*/ {
     private static final String LOGTAG = SingleFragmentActivity.N8LOG + "StartupActivity";
 
-    private static final int GENRE_LOADER_ID = 1;
-    private static final int CERTS_LOADER_ID = 2;
-
-
-    private Context mContext;
-    private int mNumGenresFetched = 0;
-    private int mNumCertsFetched = 0;
-
-
-    // TODO: prevent StartupActivity from allowing orientation changes
-    // TODO: need to have a timer (maybe a few seconds) that will basically assume themoviedb can't be reached and then
-    // displays a msg prompting user to view favorites (if they have any) or just stops the app with an explanation
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
-        mContext = this;
 
         initializeSharedPrefs();
         showDebugLog();
@@ -57,74 +43,92 @@ public class StartupActivity extends AppCompatActivity
         // on to HomeActivity if successful, or the user will be presented with a choice to view
         // their favorites (if they have any), or the app will just show a msg saying that it needs
         // to have internet connection to work (and that they have not favorites)
-        new FetchGenresTask().execute();
+        new FetchGenresTask(this).execute();
 
 
         // TODO: prob. best to make one async task for fetch geners AND certs
 
 
 
-//        Intent intent = new Intent(this, HomeActivity.class);
-//        startActivity(intent);
-//        finish();
 
     }
 
 
-
-//    // this fires an async task to fetch a list of genres and eventually update the genres db table
-//    private void updateGenres() {
-//        Log.i(LOGTAG, "entered updateGenres");
-//
-//        new FetchGenresTask().execute();
-//
-//
-//
-//
-//
-//
-//
-//    }
 
 
 
 
     private class FetchGenresTask extends AsyncTask<Void, Void, Integer> {
 
+        // async task needs it's own Context it can hold on to, in case of orientation change while
+        // do in background is running
+        Context context;
+
+        private FetchGenresTask(Context c) {
+            context = c;
+        }
+
         @Override
         protected Integer doInBackground(Void... params) {
             Log.i(LOGTAG, "just entered FetchGenresTask.doInBackground");
-            return new GenresFetcher(mContext).fetchAvailableGenres();
+            return new GenresFetcher(context).fetchAvailableGenres();
         }
 
         @Override
         protected void onPostExecute(Integer numGenresFetched) {
-
-            mNumGenresFetched = numGenresFetched;
-
-            Log.i(LOGTAG,"EXITING FetchGenresTask.onPostExecute, numGenresFetched was: " + numGenresFetched);
-        }
-
-    }
+            Log.i(LOGTAG,"  in FetchGenresTask.onPostExecute, numGenresFetched was: " + numGenresFetched);
 
 
+            if (numGenresFetched > 10) { // 10 is arbitrary
+                // if at least 10 genres was fetched, the assumption here is that it was successful
+                // so go ahead and launch HomeActivity (there are 20 genres, but I strip out some)
+
+                Log.i(LOGTAG, "    since there were at least 10 genres fetched, connection to" +
+                        " themoviedb must be ok, so about to launch intent to HomeActivity");
 
 
+            }
+            else {
+                // no items were returned, so check if user has any favorites saved
+                // first get a cursor that points to the favorites table, projection does not matter,
+                // so just arbitrarily use movie_id
+                Cursor cursor = getContentResolver().query(
+                        MovieTheaterContract.FavoritesEntry.CONTENT_URI,
+                        new String[]{MovieTheaterContract.FavoritesEntry.COLUMN_MOVIE_ID},
+                        null, null, null);
 
+                if(cursor == null) {
+                    Log.e(LOGTAG, "    Woah there buddy, somehow a Cursor was null, this should never happen!");
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//
-//        Log.d(LOGTAG, "entered onStart");
-//
-//
-//        updateGenres();
-//
-//
-//
-//
-//    }
+                    // TODO: show msg to user about data being bad, try reinstalling app
+
+                }
+                else {
+                    try {
+                        if (cursor.moveToFirst()) {
+                            // user has at least one favorite saved locally
+
+                            Log.i(LOGTAG, "    no connection to themoviedb, BUT user has at least one favorite" +
+                                    " saved, so about to launch an intent to FavoritesActivity");
+
+                            // TODO: launch intent to FavoritesActivity
+                        } else {
+                            // not much can be done at this point, no connection to themoviedb AND
+                            // user has no favorites saved, so just need to show them an appropriate msg
+
+                            Log.i(LOGTAG, "    NOTHING can be done at this point," +
+                                    " no connection to themoviedb and no favorites saved");
+
+                            // TODO: show msg to user
+                        }
+                    } finally {
+                        cursor.close();
+                    }
+                }
+            } // end else when numGenres fetched was < 10
+        } // end onPostExecute
+    } // end AsyncTask
+
 
 
     // initialize all sharedPrefs, need this to happen the first time app is installed
@@ -139,8 +143,10 @@ public class StartupActivity extends AppCompatActivity
             Log.i(LOGTAG, "  sharedPrefs are being created, writing defaults...");
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
+            // TODO: prob won't end up using num_favorites, easier to just check db each time
             editor.putInt(getString(R.string.key_num_favorites),
                     getResources().getInteger(R.integer.default_num_favorites));
+
             editor.putString(getString(R.string.key_movie_filter_sortby),
                     getString(R.string.default_movie_filter_sortby));
             editor.putInt(getString(R.string.key_movie_filter_year),
@@ -189,53 +195,4 @@ public class StartupActivity extends AppCompatActivity
 
 
     }
-
-
-
-//
-//
-//    @Override
-//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        Log.i(LOGTAG, "entered onCreateLoader");
-//
-//
-//        return new CursorLoader(
-//                this,
-//
-//
-//        )
-//
-//
-//    }
-//
-//
-//    @Override
-//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        Log.i(LOGTAG, "entered onLoadFinished");
-//
-//
-//
-//        // TODO: this is where I need to figure out if the api call to fetch genres and certs was successful
-//        // and then decide which Intent to launch next: either to HomeActivity or
-//        // FavoritesActivity, although that too will depend on whether user has any favorites
-//        // the msg display if the api call
-//
-//        // so I'm not actually using the cursor in this Activity, the loader is just a nice way
-//        // to perform the api syncs for genres and certs tables on a background thread, and it
-//        // since it's a loader, there is no need to worry about Activity lifecycle changes, like
-//        // if the user rotated their device mid-load, which is why it's better than using a an
-//        // async task
-//
-//        // well I guess I'm going to use the cursor to check to see if
-//
-//
-//
-//    }
-//
-//
-//    @Override
-//    public void onLoaderReset(Loader<Cursor> loader) {
-//        Log.i(LOGTAG, "entered onLoaderReset");
-//    }
-
 }

@@ -29,7 +29,8 @@ public class GenresFetcher {
 
     /**
      * Fetches all of the available genres from themoviedb.  The resulting json body is passed to
-     * parseGenresAndInsertToDb, which converts updates the genres db table.
+     * parseGenresAndInsertToDb, which converts updates the genres db table.  It is up to the caller
+     * to determine what should happen if 0 items are returned.
      *
      * @return the number of genres that were fetched, 0 if there was a problem
      *
