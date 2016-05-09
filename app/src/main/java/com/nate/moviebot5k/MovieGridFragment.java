@@ -1,7 +1,9 @@
 package com.nate.moviebot5k;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
@@ -17,6 +19,8 @@ import android.view.View;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.nate.moviebot5k.api_fetching.GenresAndCertsFetcher;
+import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
@@ -117,7 +121,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
 
-
         return null;
 
     }
@@ -129,9 +132,17 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         // check if a new fetch movies task should be launched
-        if(sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
+        // technically mUseFavorites should never be true if sharedPrefs key_fetch_new_movies is true,
+        // but it doesn't hurt to check it as well here before starting a fetch movies async task
+        if(mUseFavorites && sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
             Log.i(LOGTAG, "  and sharedPrefs fetch_new_movies was true, so about to get more movies");
-            // TODO: restart Loader?
+
+            new FetchMoviesTask(getActivity());
+
+            // restart the Loader for the movies table, it doesn't matter if the async task
+            // does not return any movies, it won't update the movies table in that case and the
+            // loader manager can just do nothing until it's restarted again
+            getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, this);
         }
         super.onResume();
     }
@@ -191,6 +202,26 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i(LOGTAG, "entered onCreateLoader");
 
+        if(id == MOVIES_TABLE_LOADER_ID) {
+            Log.i(LOGTAG, "  and about to return new MOVIES_TABLE_LOADER");
+
+            return new CursorLoader(
+                    getActivity(),
+                    MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
+                    MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
+                    null, null, null);
+        }
+
+        if(id == FAVORITES_TABLE_LOADER_ID) {
+            Log.i(LOGTAG, "  and about to return new FAVORITES_TABLE_LOADER");
+
+            return new CursorLoader(
+                    getActivity(),
+                    MovieTheaterContract.FavoritesEntry.CONTENT_URI, // the whole favorites table
+                    FAVORITES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
+                    null, null, null);
+        }
+
         return null;
     }
 
@@ -199,6 +230,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.i(LOGTAG, "entered onLoadFinished");
 
+        // TODO: swap cursor on adapter
+
     }
 
 
@@ -206,6 +239,32 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.i(LOGTAG, "entered onLoaderReset");
 
+        // TODO: swap cursor on adapter (with null argument)
+
+    }
+
+
+    private class FetchMoviesTask extends AsyncTask<Void, Void, Integer> {
+
+        Context context;
+
+        private FetchMoviesTask(Context c) {
+            context = c;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            Log.i(LOGTAG, "just entered FetchMoviesTask.doInBackground");
+
+            return new MoviesFetcher(context).fetchMovies();
+        }
+
+        @Override
+        protected void onPostExecute(Integer numMoviesFetched) {
+            Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, numMovies fetched was: " + numMoviesFetched);
+
+            
+        }
     }
 
 

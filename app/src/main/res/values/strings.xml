@@ -1,7 +1,10 @@
 <resources>
 
     <string name="app_name">MovieBot5k</string>
-    <string name="content_authority">com.nate.moviebot5k</string>
+    <string name="content_authority" translatable="false">com.nate.moviebot5k</string>
+
+    <string name="themoviedb_authority" translatable="false">api.themoviedb.org</string>
+    <string name="themoviedb_scheme" translatable="false">https</string>
 
 
 </resources>

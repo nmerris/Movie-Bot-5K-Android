@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.nate.moviebot5k.BuildConfig;
+import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.SingleFragmentActivity;
 import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.CertsEntry;
@@ -22,10 +23,6 @@ import java.util.Vector;
  */
 public class GenresAndCertsFetcher {
     private final String LOGTAG = SingleFragmentActivity.N8LOG + "GnresCertsFtcher";
-
-    private final String THEMOVIEDB_AUTHORITY = "api.themoviedb.org";
-    private final String THEMOVIEDB_SCHEME = "https";
-    // NOTE: the rest of the URL path and query strings are in their respective methods in this class
 
     private Context mContext; // used to retrieve String resources for API queries
 
@@ -45,10 +42,11 @@ public class GenresAndCertsFetcher {
 
         int numGenresFetched = 0;
 
+
         try { // build the URL for themoviedb GET for genres
             Uri.Builder builder = new Uri.Builder();
-            builder.scheme(THEMOVIEDB_SCHEME)
-                    .authority(THEMOVIEDB_AUTHORITY)
+            builder.scheme(mContext.getString(R.string.themoviedb_scheme))
+                    .authority(mContext.getString(R.string.themoviedb_authority))
                     .appendPath("3")
                     .appendPath("genre")
                     .appendPath("movie")
@@ -79,8 +77,8 @@ public class GenresAndCertsFetcher {
 
         try { // build the URL for themoviedb GET for certs
             Uri.Builder builder = new Uri.Builder();
-            builder.scheme(THEMOVIEDB_SCHEME)
-                    .authority(THEMOVIEDB_AUTHORITY)
+            builder.scheme(mContext.getString(R.string.themoviedb_scheme))
+                    .authority(mContext.getString(R.string.themoviedb_authority))
                     .appendPath("3")
                     .appendPath("certification")
                     .appendPath("movie")

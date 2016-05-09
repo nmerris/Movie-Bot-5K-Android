@@ -17,7 +17,7 @@ public class HomeActivity extends SingleFragmentActivity
         // HomeActivity never shows movies from the favorites table, see FavoritesActivity
         // phone and tablet mode both always have a MovieGridFragment, so no need to check here
         // SingleFragmentActivity will just put it in fragment_container
-        return MovieGridFragment.newInstance(true);
+        return MovieGridFragment.newInstance(false);
 
     }
 

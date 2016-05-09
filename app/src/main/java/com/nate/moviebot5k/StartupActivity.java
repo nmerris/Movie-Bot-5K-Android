@@ -145,8 +145,8 @@ public class StartupActivity extends AppCompatActivity {
                     getResources().getInteger(R.integer.default_movie_filter_year));
             editor.putString(getString(R.string.key_movie_filter_cert),
                     getString(R.string.default_movie_filter_cert));
-            editor.putString(getString(R.string.key_movie_filter_genre),
-                    getString(R.string.default_movie_filter_genre));
+            editor.putInt(getString(R.string.key_movie_filter_genre_id),
+                    getResources().getInteger(R.integer.default_movie_filter_genre_id));
             editor.putString(getString(R.string.key_favorites_sortby),
                     getString(R.string.default_favorites_sortby));
             editor.putInt(getString(R.string.key_currently_selected_movie_id),

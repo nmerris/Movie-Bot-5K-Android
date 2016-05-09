@@ -15,8 +15,8 @@
     <string name="key_movie_filter_cert">filter_cert</string>
     <string name="default_movie_filter_cert">any_cert</string>
 
-    <string name="key_movie_filter_genre">filter_genre</string>
-    <string name="default_movie_filter_genre">any_genre</string>
+    <string name="key_movie_filter_genre_id">filter_genre</string>
+    <integer name="default_movie_filter_genre_id">-1</integer>
 
     <string name="key_favorites_sortby">favorites_sortby</string>
     <string name="default_favorites_sortby">popularity.desc</string> <!-- most popular -->
