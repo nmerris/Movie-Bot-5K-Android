@@ -108,8 +108,8 @@ public class GenresAndCertsFetcher {
             throws IOException, JSONException {
         Log.i(LOGTAG, "entered parseCertsAndInsertToDb");
 
-
-        JSONArray certsJsonArray = jsonBody.getJSONArray("certifications");
+        // get the US certs array out of the certifications json object
+        JSONArray certsJsonArray = jsonBody.getJSONObject("certifications").getJSONArray("US");
         int numCerts = certsJsonArray.length();
 
         // Vector is synchronized, prob. not necessary here because this code should only be reached
@@ -133,8 +133,8 @@ public class GenresAndCertsFetcher {
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
 
-            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getInt("certification"));
-            Log.d(LOGTAG, "  and certification order: " + certJsonObject.getString("order"));
+            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
+            Log.d(LOGTAG, "  and certification order: " + certJsonObject.getInt("order"));
         }
 
 
@@ -148,7 +148,6 @@ public class GenresAndCertsFetcher {
                     .delete(CertsEntry.CONTENT_URI, null, null);
 
             Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
-
 
             Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
             // insert the new data
