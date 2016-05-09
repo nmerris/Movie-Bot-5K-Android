@@ -117,7 +117,6 @@ public class GenresAndCertsFetcher {
         // more likely to have simultaneous movies table writes
         Vector<ContentValues> valuesVector = new Vector<>(numCerts);
 
-
         // iterate through all the genres and convert each one to a ContentValues that genres
         // table will understand
         for (int i = 0; i < numCerts; i++) {
@@ -136,7 +135,6 @@ public class GenresAndCertsFetcher {
             Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
             Log.d(LOGTAG, "  and certification order: " + certJsonObject.getInt("order"));
         }
-
 
 
         if(valuesVector.size() > 0) { // no point in doing anything if no genres could be obtained
@@ -192,6 +190,10 @@ public class GenresAndCertsFetcher {
         for (int i = 0; i < numGenres; i++) {
             // get a single moviedb genre JSON object from jsonBody
             JSONObject genreJsonObject = genresJsonArray.getJSONObject(i);
+
+            // ignore "Foreign" genre, there are too few results to be useful
+            if(genreJsonObject.getString("name").equals("Foreign")) continue;
+
             ContentValues values = new ContentValues();
 
             // extract the data from the json object and put it in a single ContentValues object

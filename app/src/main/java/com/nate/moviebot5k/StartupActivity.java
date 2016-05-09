@@ -1,6 +1,7 @@
 package com.nate.moviebot5k;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -18,8 +19,7 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
  * see if user has at least one favorite, and then asks user via an AlertDialog if they would like
  * to view their favorites.  If so, launches and Intent to FavoritesActivity.
  */
-public class StartupActivity extends AppCompatActivity
-        /*implements LoaderManager.LoaderCallbacks<Cursor>*/ {
+public class StartupActivity extends AppCompatActivity {
     private static final String LOGTAG = SingleFragmentActivity.N8LOG + "StartupActivity";
 
 
@@ -40,16 +40,7 @@ public class StartupActivity extends AppCompatActivity
         new FetchGenresAndCertsTask(this).execute();
 
 
-        // TODO: prob. best to make one async task for fetch geners AND certs
-
-
-
-
     }
-
-
-
-
 
 
     private class FetchGenresAndCertsTask extends AsyncTask<Void, Void, Integer> {
@@ -79,10 +70,14 @@ public class StartupActivity extends AppCompatActivity
             Log.i(LOGTAG,"  in FetchGenresAndCertsTask.onPostExecute, numGenresFetched was: " + numGenresFetched);
 
             // if at least 10 genres was fetched, the assumption here is that it was successful
-            // so go ahead and launch HomeActivity (there are 20 genres, but I strip out some)
+            // so go ahead and launch HomeActivity
             if (numGenresFetched > 10) { // 10 is arbitrary
                 Log.i(LOGTAG, "    since there were at least 10 genres fetched, connection to" +
                         " themoviedb must be ok, so about to launch intent to HomeActivity");
+
+                Intent intent = new Intent(context, HomeActivity.class);
+                startActivity(intent);
+                finish();
 
             }
             // no items were returned, so check if user has any favorites saved
