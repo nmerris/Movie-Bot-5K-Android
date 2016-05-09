@@ -8,24 +8,23 @@ import android.util.Log;
 import com.nate.moviebot5k.BuildConfig;
 import com.nate.moviebot5k.SingleFragmentActivity;
 import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
-import com.nate.moviebot5k.data.MovieTheaterProvider;
-
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Vector;
 
 /**
  * Created by Nathan Merris on 5/6/2016.
  */
-public class FetchGenresTask {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "FetchGenresTask";
+public class GenresFetcher {
+    private final String LOGTAG = SingleFragmentActivity.N8LOG + "GenresFetcher";
 
     private Context mContext; // used to retrieve String resources for API queries
 
-    public FetchGenresTask(Context context) { mContext = context; }
+    public GenresFetcher(Context context) { mContext = context; }
 
 
     /**
@@ -48,6 +47,7 @@ public class FetchGenresTask {
                     .appendPath("genre")
                     .appendPath("movie")
                     .appendPath("list") // https://api.themoviedb.org/3/genre/movie/list
+                    // grab the api key from the gradle 'app' build file
                     .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY);
 
             String url = builder.build().toString();
@@ -82,39 +82,62 @@ public class FetchGenresTask {
             throws IOException, JSONException {
         Log.i(LOGTAG, "entered parseGenresAndInsertToDb");
 
-        // START HERE: need to the the ContentValues Vector<> thing here, fill it
 
-        ContentValues cv = new ContentValues();
         JSONArray genresJsonArray = jsonBody.getJSONArray("genres");
+        int numInserted = 0;
+        int numGenres = genresJsonArray.length();
 
-        for (int i = 0; i < genresJsonArray.length(); i++) {
+        // Vector is synchronized, prob. not necessary here because this code should only be reached
+        // once each time StartupActivity runs, unlike when the movies table is updated which is
+        // more likely to have simultaneous movies table writes
+        Vector<ContentValues> valuesVector = new Vector<>(numGenres);
+
+
+        // iterate through all the genres and convert each one to a ContentValues that genres
+        // table will understand
+        for (int i = 0; i < numGenres; i++) {
             // get a single moviedb genre JSON object from jsonBody
             JSONObject genreJsonObject = genresJsonArray.getJSONObject(i);
+            ContentValues values = new ContentValues();
 
-            cv.put();
+            // extract the data from the json object and put it in a single ContentValues object
+            values.put(GenresEntry.COLUMN_GENRE_ID, genreJsonObject.getInt("id"));
+            values.put(GenresEntry.COLUMN_GENRE_NAME, genreJsonObject.getString("name"));
 
-                    genreJsonObject.getInt("id"),
-                    genreJsonObject.getString("name")
+            // add the single object to the ContentValues Vector
+            valuesVector.add(values);
 
+            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id"));
+            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
+        }
+
+
+
+        if(valuesVector.size() > 0) { // no point in doing anything if no genres could be obtained
+            // TODO: can get rid of numDeleted after testing
+
+
+            Log.i(LOGTAG, "  about to wipe out old genre data, calling delete with uri: " + GenresEntry.CONTENT_URI);
+            // wipe out the old data
+            int numDeleted = mContext.getContentResolver()
+                    .delete(GenresEntry.CONTENT_URI, null, null);
+
+            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
+
+
+            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
+            // insert the new data
+            ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
+            valuesVector.toArray(valuesArray);
+
+            numInserted = mContext.getContentResolver()
+                    .bulkInsert(GenresEntry.CONTENT_URI, valuesArray);
+
+            Log.i(LOGTAG, "        and number of records inserted: " + numInserted);
 
         }
 
-        // TODO: can get rid of numDeleted and numInserted after this has been tested
-
-        Log.i(LOGTAG, "  about to wipe out old genre data, calling delete with uri: " + GenresEntry.CONTENT_URI);
-        // wipe out the old data
-        int numDeleted = mContext.getContentResolver()
-                .delete(GenresEntry.CONTENT_URI, null, null);
-
-        Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
-
-        Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
-        // insert the new data
-        int numInserted =  mContext.getContentResolver()
-                .bulkInsert(GenresEntry.CONTENT_URI, ?????);
-
-        Log.i(LOGTAG, "        and number of records inserted: " + numInserted);
-
+        Log.d(LOGTAG, "        before return from parseGenresAndInsertToDb, numInserted (genres) is: " + numInserted);
         return numInserted;
     }
 
