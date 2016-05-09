@@ -1,9 +1,6 @@
 package com.nate.moviebot5k;
 
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -12,11 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.nate.moviebot5k.api_fetching.GenresFetcher;
+import com.nate.moviebot5k.api_fetching.GenresAndCertsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
-import com.nate.moviebot5k.data.MovieTheaterDbHelper;
-
-import java.util.List;
 
 /**
  * Initializes this app the first time it is installed on device, and detects if internet is
@@ -36,14 +30,14 @@ public class StartupActivity extends AppCompatActivity
 
 
         initializeSharedPrefs();
-        showDebugLog();
+        //showDebugLog();
 
 
-        // go fetch a new list of genres in a background thread, the app will then either continue
+        // go fetch a new list of genres and certs in a background thread, the app will then either continue
         // on to HomeActivity if successful, or the user will be presented with a choice to view
         // their favorites (if they have any), or the app will just show a msg saying that it needs
         // to have internet connection to work (and that they have not favorites)
-        new FetchGenresTask(this).execute();
+        new FetchGenresAndCertsTask(this).execute();
 
 
         // TODO: prob. best to make one async task for fetch geners AND certs
@@ -58,40 +52,43 @@ public class StartupActivity extends AppCompatActivity
 
 
 
-    private class FetchGenresTask extends AsyncTask<Void, Void, Integer> {
+    private class FetchGenresAndCertsTask extends AsyncTask<Void, Void, Integer> {
 
         // async task needs it's own Context it can hold on to, in case of orientation change while
         // do in background is running
         Context context;
 
-        private FetchGenresTask(Context c) {
+        private FetchGenresAndCertsTask(Context c) {
             context = c;
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
-            Log.i(LOGTAG, "just entered FetchGenresTask.doInBackground");
-            return new GenresFetcher(context).fetchAvailableGenres();
+            Log.i(LOGTAG, "just entered FetchGenresAndCertsTask.doInBackground");
+
+            // fetch a new list of certs from themoviedb, the certifications table will be updated
+            new GenresAndCertsFetcher(context).fetchAvailableCertifications();
+
+            // I'm choosing to use genres as the task that returns the number of items fetched,
+            // could be either, it's arbitrary, the genres table will also be updated
+            return new GenresAndCertsFetcher(context).fetchAvailableGenres();
         }
 
         @Override
         protected void onPostExecute(Integer numGenresFetched) {
-            Log.i(LOGTAG,"  in FetchGenresTask.onPostExecute, numGenresFetched was: " + numGenresFetched);
+            Log.i(LOGTAG,"  in FetchGenresAndCertsTask.onPostExecute, numGenresFetched was: " + numGenresFetched);
 
-
+            // if at least 10 genres was fetched, the assumption here is that it was successful
+            // so go ahead and launch HomeActivity (there are 20 genres, but I strip out some)
             if (numGenresFetched > 10) { // 10 is arbitrary
-                // if at least 10 genres was fetched, the assumption here is that it was successful
-                // so go ahead and launch HomeActivity (there are 20 genres, but I strip out some)
-
                 Log.i(LOGTAG, "    since there were at least 10 genres fetched, connection to" +
                         " themoviedb must be ok, so about to launch intent to HomeActivity");
 
-
             }
+            // no items were returned, so check if user has any favorites saved
+            // first get a cursor that points to the favorites table, projection does not matter,
+            // so just arbitrarily use movie_id
             else {
-                // no items were returned, so check if user has any favorites saved
-                // first get a cursor that points to the favorites table, projection does not matter,
-                // so just arbitrarily use movie_id
                 Cursor cursor = getContentResolver().query(
                         MovieTheaterContract.FavoritesEntry.CONTENT_URI,
                         new String[]{MovieTheaterContract.FavoritesEntry.COLUMN_MOVIE_ID},
