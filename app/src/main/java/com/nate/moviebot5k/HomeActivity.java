@@ -5,7 +5,9 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 
-public class HomeActivity extends SingleFragmentActivity {
+public class HomeActivity extends SingleFragmentActivity
+    implements MovieGridFragment.Callbacks {
+
     private final String LOGTAG = SingleFragmentActivity.N8LOG + "HomeActivity";
 
     @Override
@@ -29,6 +31,13 @@ public class HomeActivity extends SingleFragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
+
+    }
+
+
+    @Override
+    public void onMovieSelected(int movieId) {
+        Log.i(LOGTAG, "entered onMovieSelected");
 
     }
 }

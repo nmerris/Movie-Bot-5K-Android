@@ -1,11 +1,14 @@
 package com.nate.moviebot5k;
 
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Loader;
+import android.content.SharedPreferences;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.CursorLoader;
 import android.database.Cursor;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.DimenRes;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,6 +17,8 @@ import android.view.View;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.nate.moviebot5k.data.MovieTheaterContract;
+
 /**
  * Created by Nathan Merris on 5/9/2016.
  */
@@ -21,10 +26,13 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     private final String LOGTAG = SingleFragmentActivity.N8LOG + "MovGridFragment";
 
     private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
+    private static final int MOVIES_TABLE_LOADER_ID = 1;
+    private static final int FAVORITES_TABLE_LOADER_ID =2;
 
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
 
+    public MovieGridFragment() {}
 
     /**
      * Call from a hosting Activity to get a new fragment for a fragment transaction.  The fragment
@@ -76,7 +84,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.i(LOGTAG, "entered onSaveInstanceState");
-
+        Log.i(LOGTAG, "  about to stash in Bundle mUseFavorites: " + mUseFavorites);
         outState.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, mUseFavorites);
         super.onSaveInstanceState(outState);
     }
@@ -110,18 +118,73 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return null;
 
     }
 
 
     @Override
     public void onResume() {
-        super.onResume();
         Log.i(LOGTAG, "entered onResume");
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        // TODO: check sharedPrefs to see if a new fetchmoviestask needs to happen
+        // check if a new fetch movies task should be launched
+        if(sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
+            Log.i(LOGTAG, "  and sharedPrefs fetch_new_movies was true, so about to get more movies");
+            // TODO: restart Loader?
+        }
+        super.onResume();
     }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Log.i(LOGTAG, "entered onActivityCreated");
+
+        // start the appropriate Loader depending on which Activity is hosting this fragment
+        if(mUseFavorites) {
+            Log.i(LOGTAG, "  and about to initLoader FAVORITES_TABLE_LOADER");
+            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+        }
+        else {
+            Log.i(LOGTAG, "  and about to initLoader MOVIES_TABLE_LOADER");
+            getLoaderManager().initLoader(MOVIES_TABLE_LOADER_ID, null, this);
+        }
+
+        super.onActivityCreated(savedInstanceState);
+    }
+
+
+
+    // define a projection for this fragment's Loaders, only want to query what we need for
+    // the movie grid views.  NOTE: this is not going to restrict what actual data is fetched from
+    // themoviedb during the API call, that will grab all the data it needs, the point here to just
+    // grab the data we need to make MovieGridFragment have what it needs to do it's thing
+    private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
+            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID,
+            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH
+    };
+    // these columns variables match the order of the projection above, if you change one you must
+    // also change the other
+    static final int MOVIES_TABLE_COL_MOVIE_ID = 0;
+    static final int MOVIES_TABLE_COL_POSTER_PATH = 1;
+
+
+    // the reason the favorites tables has more columns in it's projection is because when sorting
+    // the favorites table, the sorting happens on the device, as opposed to the live movies table,
+    // where sorting is done by themoviedb API
+    private final String[] FAVORITES_TABLE_COLUMNS_PROJECTION = {
+            MovieTheaterContract.FavoritesEntry.COLUMN_MOVIE_ID,
+            MovieTheaterContract.FavoritesEntry.COLUMN_POSTER_FILE_PATH,
+            MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY,
+            MovieTheaterContract.FavoritesEntry.COLUMN_VOTE_AVG,
+            MovieTheaterContract.FavoritesEntry.COLUMN_REVENUE
+    };
+    static final int FAVORITES_TABLE_COL_MOVIE_ID = 0;
+    static final int FAVORITES_TABLE_COL_POSTER_FILE_PATH = 1;
+    static final int FAVORITES_TABLE_COL_POPULARITY = 2;
+    static final int FAVORITES_TABLE_COL_VOTE_AVG = 3;
+    static final int FAVORITES_TABLE_COL_REVENUE = 4;
 
 
     @Override
