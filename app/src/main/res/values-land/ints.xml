@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- phone landscape -->
-    <integer name="recycler_view_num_columns">3</integer>
+    <integer name="gridview_view_num_columns">3</integer>
 </resources>

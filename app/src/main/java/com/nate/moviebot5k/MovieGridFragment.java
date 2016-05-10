@@ -7,16 +7,12 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
 import android.database.Cursor;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.DimenRes;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
@@ -128,7 +124,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
 
-        Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.recycler_view_num_columns));
+        Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
 
         // add item decoration to make the grid look nice with even spacing all around
 //        moviePosterGridView.addItemDecoration(new GridSpacingItemDecoration(

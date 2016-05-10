@@ -87,7 +87,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         //Log.i(LOGTAG, "just entered onCreate()");
 
-        //displayScreenDP();
+        displayScreenDP();
 
         // load the layout resource, subclassing Activity may or may not provide it's own
         setContentView(getLayoutResourceId());
