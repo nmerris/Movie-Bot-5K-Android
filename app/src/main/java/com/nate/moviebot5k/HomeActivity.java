@@ -1,14 +1,17 @@
 package com.nate.moviebot5k;
 
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class HomeActivity extends SingleFragmentActivity
     implements MovieGridFragment.Callbacks {
 
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "HomeActivity";
+    private final String LOGTAG = N8LOG + "HomeActivity";
 
     @Override
     protected Fragment createFragment() {
@@ -39,5 +42,40 @@ public class HomeActivity extends SingleFragmentActivity
     public void onMovieSelected(int movieId) {
         Log.i(LOGTAG, "entered onMovieSelected");
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch(id) {
+            case R.id.action_movie_filters:
+
+                // TODO: launch intent to MovieFiltersActivity
+
+                break;
+
+            case R.id.action_favorites:
+
+                // TODO: launch intent to FavoritesActivity
+
+                break;
+
+            case R.id.action_about_app:
+                Intent intent = new Intent(this, AboutAppActivity.class);
+                startActivity(intent);
+        }
+
+
+
+        return super.onOptionsItemSelected(item);
     }
 }
