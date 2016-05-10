@@ -137,6 +137,10 @@ public class MoviesFetcher {
             values.put(MoviesEntry.COLUMN_POPULARITY, jsonObject.getDouble("popularity")); // NOT NULL COLUMN
             values.put(MoviesEntry.COLUMN_VOTE_AVG, jsonObject.getDouble("vote_average")); // NOT NULL COLUMN
 
+//            values.put(MoviesEntry.COLUMN_BACKDROP_PATH, jsonObject.getString("backdrop_path")); // NOT NULL COLUMN
+//            values.put(MoviesEntry.COLUMN_POSTER_PATH, jsonObject.getString("poster_path")); // NOT NULL COLUMN
+
+
             // put the fully formed image URL's in the db, this URL will point to an image size that
             // is appropriate for the device this app is running on
             Uri.Builder backdropImageUrlBuilder = new Uri.Builder();
@@ -144,9 +148,10 @@ public class MoviesFetcher {
                     .authority(mContext.getString(R.string.themoviedb_image_authority))
                     .appendPath("t").appendPath("p")
                     .appendPath(mContext.getString(R.string.themoviedb_backdrop_size))
-                     // https://image.tmdb.org/t/p/[image_size] to this point
-                    .appendPath(jsonObject.getString("backdrop_path"));
-            String backdropImageUrl = backdropImageUrlBuilder.build().toString();
+                    .build(); // https://image.tmdb.org/t/p/[image_size] to this point
+
+            String backdropImageUrl = backdropImageUrlBuilder.build().toString()
+                    + jsonObject.getString("backdrop_path");
             values.put(MoviesEntry.COLUMN_BACKDROP_PATH, backdropImageUrl); // NOT NULL COLUMN
 
             Uri.Builder posterImageUrlBuilder = new Uri.Builder();
@@ -154,13 +159,11 @@ public class MoviesFetcher {
                     .authority(mContext.getString(R.string.themoviedb_image_authority))
                     .appendPath("t").appendPath("p")
                     .appendPath(mContext.getString(R.string.themoviedb_poster_size))
-                            // https://image.tmdb.org/t/p/[image_size] to this point
-                    .appendPath(jsonObject.getString("poster_path"));
-            String posterImageUrl = posterImageUrlBuilder.build().toString();
+                    .build(); // https://image.tmdb.org/t/p/[image_size] to this point
+            String posterImageUrl = posterImageUrlBuilder.build().toString()
+                    + jsonObject.getString("poster_path");
             values.put(MoviesEntry.COLUMN_POSTER_PATH, posterImageUrl); // NOT NULL COLUMN
 
-//            values.put(MoviesEntry.COLUMN_BACKDROP_PATH, jsonObject.getString("backdrop_path")); // NOT NULL COLUMN
-            values.put(MoviesEntry.COLUMN_POSTER_PATH, jsonObject.getString("poster_path")); // NOT NULL COLUMN
 
             // and get the genre ids out of the nested json array, ok to be NULL
             JSONArray genresJsonArray = jsonObject.getJSONArray("genre_ids");

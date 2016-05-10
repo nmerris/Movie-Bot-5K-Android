@@ -24,8 +24,6 @@ import butterknife.ButterKnife;
 public class MoviePosterAdapter extends CursorAdapter {
     private final String LOGTAG = SingleFragmentActivity.N8LOG + "MovPosterAdapter";
 
-    private final int MOVIE_POSTER_VIEWHOLDER_TAG_KEY = 1;
-
 
     public MoviePosterAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -52,15 +50,14 @@ public class MoviePosterAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         Log.i(LOGTAG, "entered newView");
 
-        ViewHolder viewHolder;
-
         View view = LayoutInflater.from(context).inflate(R.layout.moviegrid_poster, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
 
-        viewHolder = new ViewHolder(view);
+        // conveniently, you can stash any object with a view with setTag, and grab it later
+        // you can even store multiple objects if you use keys (not needed here)
+        view.setTag(viewHolder);
 
-        view.setTag(MOVIE_POSTER_VIEWHOLDER_TAG_KEY, view);
-
-        return null;
+        return view;
     }
 
 
@@ -68,8 +65,8 @@ public class MoviePosterAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         Log.i(LOGTAG, "entered bindView");
 
-        // get the ViewHolder using the reference to it that was stashed in the tag in newView
-        ViewHolder viewHolder = (ViewHolder) view.getTag(MOVIE_POSTER_VIEWHOLDER_TAG_KEY);
+        // get the ViewHolder, no need for a key because it's the only object associated with the view
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
 
         Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(MovieGridFragment.MOVIES_TABLE_COL_POSTER_PATH));

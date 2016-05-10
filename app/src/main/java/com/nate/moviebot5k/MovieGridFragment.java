@@ -1,7 +1,6 @@
 package com.nate.moviebot5k;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
@@ -19,8 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
-import com.nate.moviebot5k.api_fetching.GenresAndCertsFetcher;
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.adapters.MoviePosterAdapter;
@@ -124,26 +123,27 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
         mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
-//        RecyclerView moviePosterRecyclerView =
-//                (RecyclerView) rootView.findViewById(R.id.fragment_movie_grid_recycler_view);
+        GridView moviePosterGridView =
+                (GridView) rootView.findViewById(R.id.fragment_movie_grid_gridview);
 
 
 
         Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.recycler_view_num_columns));
 
-//        // add item decoration to make the grid look nice with even spacing all around
-//        moviePosterRecyclerView.addItemDecoration(new GridSpacingItemDecoration(
+        // add item decoration to make the grid look nice with even spacing all around
+//        moviePosterGridView.addItemDecoration(new GridSpacingItemDecoration(
 //                // number of columns in poster grid varies with device and orientation
 //                getResources().getInteger(R.integer.recycler_view_num_columns),
 //                getResources().getDimensionPixelSize(R.dimen.movie_grid_poster_margin), true));
 //
 //        // set the required GridLayoutManager on the RecyclerView
-//        moviePosterRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),
+//        moviePosterGridView.setLayoutManager(new GridLayoutManager(getActivity(),
 //                // number of columns in poster grid varies with device and orientation
 //                getResources().getInteger(R.integer.recycler_view_num_columns),
 //                GridLayoutManager.VERTICAL, false));
 
 
+        moviePosterGridView.setAdapter(mMoviePosterAdapter);
 
 
         return rootView;
@@ -195,31 +195,36 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     // the movie grid views.  NOTE: this is not going to restrict what actual data is fetched from
     // themoviedb during the API call, that will grab all the data it needs, the point here to just
     // grab the data we need to make MovieGridFragment have what it needs to do it's thing
+    // NOTE: must include _id column, or Loader will not work
     private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
+            MovieTheaterContract.MoviesEntry._ID,
             MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID,
             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH
     };
     // these columns variables match the order of the projection above, if you change one you must
     // also change the other
-    public static final int MOVIES_TABLE_COL_MOVIE_ID = 0;
-    public static final int MOVIES_TABLE_COL_POSTER_PATH = 1;
+    public static final int MOVIES_TABLE_COL_ID = 0;
+    public static final int MOVIES_TABLE_COL_MOVIE_ID = 1;
+    public static final int MOVIES_TABLE_COL_POSTER_PATH = 2;
 
 
     // the reason the favorites tables has more columns in it's projection is because when sorting
     // the favorites table, the sorting happens on the device, as opposed to the live movies table,
     // where sorting is done by themoviedb API
     private final String[] FAVORITES_TABLE_COLUMNS_PROJECTION = {
+            MovieTheaterContract.FavoritesEntry._ID,
             MovieTheaterContract.FavoritesEntry.COLUMN_MOVIE_ID,
             MovieTheaterContract.FavoritesEntry.COLUMN_POSTER_FILE_PATH,
             MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY,
             MovieTheaterContract.FavoritesEntry.COLUMN_VOTE_AVG,
             MovieTheaterContract.FavoritesEntry.COLUMN_REVENUE
     };
-    public static final int FAVORITES_TABLE_COL_MOVIE_ID = 0;
-    public static final int FAVORITES_TABLE_COL_POSTER_FILE_PATH = 1;
-    public static final int FAVORITES_TABLE_COL_POPULARITY = 2;
-    public static final int FAVORITES_TABLE_COL_VOTE_AVG = 3;
-    public static final int FAVORITES_TABLE_COL_REVENUE = 4;
+    public static final int FAVORITES_TABLE_COL_ID = 0;
+    public static final int FAVORITES_TABLE_COL_MOVIE_ID = 1;
+    public static final int FAVORITES_TABLE_COL_POSTER_FILE_PATH = 2;
+    public static final int FAVORITES_TABLE_COL_POPULARITY = 3;
+    public static final int FAVORITES_TABLE_COL_VOTE_AVG = 4;
+    public static final int FAVORITES_TABLE_COL_REVENUE = 5;
 
 
     @Override
@@ -292,45 +297,45 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
 
-    /**
-     * Make the movie posters look nice, with even padding all around.
-     *
-     * @author edwardaa on Stackoverflow
-     * @see <a>http://stackoverflow.com/questions/28531996/android-recyclerview-gridlayoutmanager-column-spacing</a>
-     */
-    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
-
-        private int spanCount;
-        private int spacing;
-        private boolean includeEdge;
-
-        public GridSpacingItemDecoration(int spanCount, @DimenRes int spacing, boolean includeEdge) {
-            this.spanCount = spanCount;
-            this.spacing = spacing;
-            this.includeEdge = includeEdge;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            int position = parent.getChildAdapterPosition(view); // item position
-            int column = position % spanCount; // item column
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
-
-                if (position < spanCount) { // top edge
-                    outRect.top = spacing;
-                }
-                outRect.bottom = spacing; // item bottom
-            } else {
-                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-                if (position >= spanCount) {
-                    outRect.top = spacing; // item top
-                }
-            }
-        }
-    }
+//    /**
+//     * Make the movie posters look nice, with even padding all around.
+//     *
+//     * @author edwardaa on Stackoverflow
+//     * @see <a>http://stackoverflow.com/questions/28531996/android-recyclerview-gridlayoutmanager-column-spacing</a>
+//     */
+//    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+//
+//        private int spanCount;
+//        private int spacing;
+//        private boolean includeEdge;
+//
+//        public GridSpacingItemDecoration(int spanCount, @DimenRes int spacing, boolean includeEdge) {
+//            this.spanCount = spanCount;
+//            this.spacing = spacing;
+//            this.includeEdge = includeEdge;
+//        }
+//
+//        @Override
+//        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+//            int position = parent.getChildAdapterPosition(view); // item position
+//            int column = position % spanCount; // item column
+//
+//            if (includeEdge) {
+//                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
+//                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
+//
+//                if (position < spanCount) { // top edge
+//                    outRect.top = spacing;
+//                }
+//                outRect.bottom = spacing; // item bottom
+//            } else {
+//                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
+//                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
+//                if (position >= spanCount) {
+//                    outRect.top = spacing; // item top
+//                }
+//            }
+//        }
+//    }
 
 }
