@@ -40,7 +40,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         final String SQL_MOVIES_COLUMNS =
                 MoviesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
                 MoviesEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
-                MoviesEntry.COLUMN_ADULT + " INTEGER, " +
+                MoviesEntry.COLUMN_ADULT + " STRING, " +
                 MoviesEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
                 // it's okay if a movie has no associated genre, the view will just work around it
@@ -59,10 +59,10 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_POPULARITY + " REAL NOT NULL, " +
                 MoviesEntry.COLUMN_VOTE_COUNT + " INTEGER, " +
-                MoviesEntry.COLUMN_HAS_VIDEO + " INTEGER, " +
+                MoviesEntry.COLUMN_HAS_VIDEO + " STRING, " +
                 MoviesEntry.COLUMN_VOTE_AVG + " REAL NOT NULL, " +
                 MoviesEntry.COLUMN_BUDGET + " INTEGER, " +
-                MoviesEntry.COLUMN_REVENUE + " INTEGER NOT NULL, " +
+                MoviesEntry.COLUMN_REVENUE + " INTEGER, " +
                 MoviesEntry.COLUMN_RUNTIME + " INTEGER, " +
                 MoviesEntry.COLUMN_REVIEW_AUTHOR1 + " TEXT, " +
                 MoviesEntry.COLUMN_REVIEW_CONTENT1 + " TEXT, " +

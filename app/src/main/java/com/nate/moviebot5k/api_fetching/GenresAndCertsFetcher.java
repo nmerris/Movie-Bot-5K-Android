@@ -225,12 +225,9 @@ public class GenresAndCertsFetcher {
 
             numInserted = mContext.getContentResolver()
                     .bulkInsert(GenresEntry.CONTENT_URI, valuesArray);
-
-            Log.i(LOGTAG, "        and number of records inserted: " + numInserted);
-
         }
 
-        Log.d(LOGTAG, "        before return from parseGenresAndInsertToDb, numInserted (genres) is: " + numInserted);
+        Log.d(LOGTAG, "        before return from parseGenresAndInsertToDb, numInserted is: " + numInserted);
         return numInserted;
     }
 

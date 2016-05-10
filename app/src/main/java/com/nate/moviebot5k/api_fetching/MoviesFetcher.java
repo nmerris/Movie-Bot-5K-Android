@@ -11,6 +11,7 @@ import com.nate.moviebot5k.BuildConfig;
 import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.SingleFragmentActivity;
 import com.nate.moviebot5k.data.MovieTheaterContract;
+import com.nate.moviebot5k.data.MovieTheaterContract.MoviesEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -112,6 +113,7 @@ public class MoviesFetcher {
         
         JSONArray moviesJsonArray = jsonBody.getJSONArray("results");
         int numMovies = moviesJsonArray.length();
+        int numInserted = 0;
         Vector<ContentValues> valuesVector = new Vector<>(numMovies);
 
         for (int i = 0; i < numMovies; i++) {
@@ -120,42 +122,78 @@ public class MoviesFetcher {
             ContentValues values = new ContentValues();
 
             // extract the data from the json object and put it in a single ContentValues object
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID, jsonObject.getInt("id"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_ADULT, jsonObject.getInt("adult"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_OVERVIEW, jsonObject.getString("overview"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_RELEASE_DATE, jsonObject.getString("release_date"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_ORIGINAL_TITLE, jsonObject.getString("original_title"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_TITLE, jsonObject.getString("title"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH, jsonObject.getString("backdrop_path"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_POPULARITY, jsonObject.getLong("popularity"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_VOTE_COUNT, jsonObject.getInt("vote_count"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_HAS_VIDEO, jsonObject.getInt("video"));
-            values.put(MovieTheaterContract.MoviesEntry.COLUMN_VOTE_AVG, jsonObject.getLong("vote_average"));
+            values.put(MoviesEntry.COLUMN_MOVIE_ID, jsonObject.getLong("id")); // NOT NULL COLUMN
+            values.put(MoviesEntry.COLUMN_VOTE_COUNT, jsonObject.getLong("vote_count"));
 
-            // and get the genre ids out of the nested json array
+            values.put(MoviesEntry.COLUMN_OVERVIEW, jsonObject.getString("overview")); // NOT NULL COLUMN
+            values.put(MoviesEntry.COLUMN_RELEASE_DATE, jsonObject.getString("release_date")); // NOT NULL COLUMN
+//            values.put(MoviesEntry.COLUMN_ORIGINAL_TITLE, jsonObject.getString("original_title"));
+            values.put(MoviesEntry.COLUMN_TITLE, jsonObject.getString("title")); // NOT NULL COLUMN
+            values.put(MoviesEntry.COLUMN_BACKDROP_PATH, jsonObject.getString("backdrop_path")); // NOT NULL COLUMN
+            values.put(MoviesEntry.COLUMN_POSTER_PATH, jsonObject.getString("poster_path")); // NOT NULL COLUMN
+//            values.put(MoviesEntry.COLUMN_ORIGINAL_LANGUAGE, jsonObject.getString("original_language"));
+
+//            values.put(MoviesEntry.COLUMN_HAS_VIDEO, jsonObject.getString("video"));
+//            values.put(MoviesEntry.COLUMN_ADULT, jsonObject.getString("adult"));
+
+            values.put(MoviesEntry.COLUMN_POPULARITY, jsonObject.getDouble("popularity")); // NOT NULL COLUMN
+            values.put(MoviesEntry.COLUMN_VOTE_AVG, jsonObject.getDouble("vote_average")); // NOT NULL COLUMN
+
+            // and get the genre ids out of the nested json array, ok to be NULL
             JSONArray genresJsonArray = jsonObject.getJSONArray("genre_ids");
             try {
-                values.put(MovieTheaterContract.MoviesEntry.COLUMN_GENRE_ID1, genresJsonArray.getInt(0));
-                values.put(MovieTheaterContract.MoviesEntry.COLUMN_GENRE_ID2, genresJsonArray.getInt(1));
-                values.put(MovieTheaterContract.MoviesEntry.COLUMN_GENRE_ID3, genresJsonArray.getInt(2));
-                values.put(MovieTheaterContract.MoviesEntry.COLUMN_GENRE_ID4, genresJsonArray.getInt(3));
+                values.put(MoviesEntry.COLUMN_GENRE_ID1, genresJsonArray.getInt(0));
+                values.put(MoviesEntry.COLUMN_GENRE_ID2, genresJsonArray.getInt(1));
+                values.put(MoviesEntry.COLUMN_GENRE_ID3, genresJsonArray.getInt(2));
+                values.put(MoviesEntry.COLUMN_GENRE_ID4, genresJsonArray.getInt(3));
             } catch (JSONException e) {
-                Log.i(LOGTAG, "  there were less than 4 genres associated with this movie, not a problem");
+                Log.i(LOGTAG, "  there were less than 4 genres associated with this movie, this is not an error");
             }
             
+
+            // print the data for all the NON NULL columns
+            Log.d(LOGTAG, "  added movie id: " + jsonObject.getLong("id"));
+            Log.d(LOGTAG, "  and overview: " + jsonObject.getString("overview"));
+            Log.d(LOGTAG, "  and release_date: " + jsonObject.getString("release_date"));
+            Log.d(LOGTAG, "  and movie title: " + jsonObject.getString("title"));
+            Log.d(LOGTAG, "  and backdrop_path: " + jsonObject.getString("backdrop_path"));
+            Log.d(LOGTAG, "  and poster_path: " + jsonObject.getString("poster_path"));
+            Log.d(LOGTAG, "  and popularity: " + jsonObject.getDouble("popularity"));
+            Log.d(LOGTAG, "  and vote_avg: " + jsonObject.getDouble("vote_average"));
+
+            // print the data for genre id(s)
+            Log.d(LOGTAG, "  and genre_id_1: " + genresJsonArray.getInt(0));
+//            Log.d(LOGTAG, "  and genre_id_2: " + genresJsonArray.getInt(1));
+//            Log.d(LOGTAG, "  and genre_id_3: " + genresJsonArray.getInt(2));
+//            Log.d(LOGTAG, "  and genre_id_4: " + genresJsonArray.getInt(3));
+
+
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
-
-            // arbitrarily print out some data for debug
-            Log.d(LOGTAG, "  added movie id: " + jsonObject.getString("certification"));
-            Log.d(LOGTAG, "  and movie title: " + jsonObject.getInt("order"));
-            Log.d(LOGTAG, "  and genre_id_1: " + genresJsonArray.getInt(0));
         }
 
+        if(valuesVector.size() > 0) { // no point in doing anything if no data could be obtained
+            // TODO: can get rid of numDeleted after testing
 
-        return 0;
-//        return numInserted;
+            Log.i(LOGTAG, "  about to wipe out old movies table data, calling delete with uri: " + MoviesEntry.CONTENT_URI);
+            // wipe out the old data
+            int numDeleted = mContext.getContentResolver()
+                    .delete(MoviesEntry.CONTENT_URI, null, null);
+
+            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
+
+
+            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
+            // insert the new data
+            ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
+            valuesVector.toArray(valuesArray);
+
+            numInserted = mContext.getContentResolver()
+                    .bulkInsert(MoviesEntry.CONTENT_URI, valuesArray);
+        }
+
+        Log.d(LOGTAG, "        before return from parseMoviesAndInsertToDb, numInserted is: " + numInserted);
+        return numInserted;
     }
-
 
 }
