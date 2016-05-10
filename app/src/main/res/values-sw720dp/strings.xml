@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- larger images for larger screens -->
+    <string name="themoviedb_poster_size" translatable="false">w342</string>
+    <string name="themoviedb_backdrop_size" translatable="false">w1280</string>
+
+</resources>

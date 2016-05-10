@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import com.nate.moviebot5k.api_fetching.GenresAndCertsFetcher;
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
+import com.nate.moviebot5k.adapters.MoviePosterAdapter;
 
 /**
  * Created by Nathan Merris on 5/9/2016.
@@ -36,6 +37,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
+    private MoviePosterAdapter mMoviePosterAdapter;
 
 //    public MovieGridFragment() {}
 
@@ -119,26 +121,27 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(LOGTAG, "entered onCreateView");
-        
+
+        mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
-        RecyclerView moviePosterRecyclerView =
-                (RecyclerView) rootView.findViewById(R.id.fragment_movie_grid_recycler_view);
+//        RecyclerView moviePosterRecyclerView =
+//                (RecyclerView) rootView.findViewById(R.id.fragment_movie_grid_recycler_view);
 
 
 
         Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.recycler_view_num_columns));
 
-        // add item decoration to make the grid look nice with even spacing all around
-        moviePosterRecyclerView.addItemDecoration(new GridSpacingItemDecoration(
-                // number of columns in poster grid varies with device and orientation
-                getResources().getInteger(R.integer.recycler_view_num_columns),
-                getResources().getDimensionPixelSize(R.dimen.movie_grid_poster_margin), true));
-
-        // set the required GridLayoutManager on the RecyclerView
-        moviePosterRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),
-                // number of columns in poster grid varies with device and orientation
-                getResources().getInteger(R.integer.recycler_view_num_columns),
-                GridLayoutManager.VERTICAL, false));
+//        // add item decoration to make the grid look nice with even spacing all around
+//        moviePosterRecyclerView.addItemDecoration(new GridSpacingItemDecoration(
+//                // number of columns in poster grid varies with device and orientation
+//                getResources().getInteger(R.integer.recycler_view_num_columns),
+//                getResources().getDimensionPixelSize(R.dimen.movie_grid_poster_margin), true));
+//
+//        // set the required GridLayoutManager on the RecyclerView
+//        moviePosterRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),
+//                // number of columns in poster grid varies with device and orientation
+//                getResources().getInteger(R.integer.recycler_view_num_columns),
+//                GridLayoutManager.VERTICAL, false));
 
 
 
@@ -198,8 +201,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     };
     // these columns variables match the order of the projection above, if you change one you must
     // also change the other
-    static final int MOVIES_TABLE_COL_MOVIE_ID = 0;
-    static final int MOVIES_TABLE_COL_POSTER_PATH = 1;
+    public static final int MOVIES_TABLE_COL_MOVIE_ID = 0;
+    public static final int MOVIES_TABLE_COL_POSTER_PATH = 1;
 
 
     // the reason the favorites tables has more columns in it's projection is because when sorting
@@ -212,11 +215,11 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             MovieTheaterContract.FavoritesEntry.COLUMN_VOTE_AVG,
             MovieTheaterContract.FavoritesEntry.COLUMN_REVENUE
     };
-    static final int FAVORITES_TABLE_COL_MOVIE_ID = 0;
-    static final int FAVORITES_TABLE_COL_POSTER_FILE_PATH = 1;
-    static final int FAVORITES_TABLE_COL_POPULARITY = 2;
-    static final int FAVORITES_TABLE_COL_VOTE_AVG = 3;
-    static final int FAVORITES_TABLE_COL_REVENUE = 4;
+    public static final int FAVORITES_TABLE_COL_MOVIE_ID = 0;
+    public static final int FAVORITES_TABLE_COL_POSTER_FILE_PATH = 1;
+    public static final int FAVORITES_TABLE_COL_POPULARITY = 2;
+    public static final int FAVORITES_TABLE_COL_VOTE_AVG = 3;
+    public static final int FAVORITES_TABLE_COL_REVENUE = 4;
 
 
     @Override
@@ -232,8 +235,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
                     MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
                     null, null, null);
         }
-
-        if(id == FAVORITES_TABLE_LOADER_ID) {
+        else if(id == FAVORITES_TABLE_LOADER_ID) {
             Log.i(LOGTAG, "  and about to return new FAVORITES_TABLE_LOADER");
 
             return new CursorLoader(
@@ -251,7 +253,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.i(LOGTAG, "entered onLoadFinished");
 
-        // TODO: swap cursor on adapter
+        // swap the cursor so the adapter can load the new images
+        mMoviePosterAdapter.swapCursor(data);
 
     }
 
@@ -259,9 +262,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.i(LOGTAG, "entered onLoaderReset");
-
-        // TODO: swap cursor on adapter (with null argument)
-
+        mMoviePosterAdapter.swapCursor(null);
     }
 
 

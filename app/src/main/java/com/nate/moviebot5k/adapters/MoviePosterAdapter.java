@@ -10,8 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.nate.moviebot5k.MovieGridFragment;
 import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.SingleFragmentActivity;
+import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,7 +44,10 @@ public class MoviePosterAdapter extends CursorAdapter {
         }
     }
 
-
+    // N8NOTE: using newView instead of getView, Android takes care of reusing the same view as
+    // needed while scrolling through the listview
+    // NOTE: BaseAdapter, from which CursorAdapter extends, does NOT have a newView method,
+    // so it's just easier and convenient to use newView when possible, and more efficient
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         Log.i(LOGTAG, "entered newView");
@@ -63,6 +68,18 @@ public class MoviePosterAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         Log.i(LOGTAG, "entered bindView");
 
+        // get the ViewHolder using the reference to it that was stashed in the tag in newView
+        ViewHolder viewHolder = (ViewHolder) view.getTag(MOVIE_POSTER_VIEWHOLDER_TAG_KEY);
+
+
+        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(MovieGridFragment.MOVIES_TABLE_COL_POSTER_PATH));
+        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(MovieGridFragment.MOVIES_TABLE_COL_MOVIE_ID));
+
+        // have Picasso download the image and update the view when it's done
+        Picasso.with(context)
+                .load(cursor.getString(MovieGridFragment.MOVIES_TABLE_COL_POSTER_PATH))
+                .into(viewHolder.posterImageView);
+        // TODO: use placeholder images?
 
     }
 }
