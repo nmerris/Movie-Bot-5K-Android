@@ -130,8 +130,8 @@ public class GenresAndCertsFetcher {
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
 
-            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
-            Log.d(LOGTAG, "  and certification order: " + certJsonObject.getInt("order"));
+//            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
+//            Log.d(LOGTAG, "  and certification order: " + certJsonObject.getInt("order"));
         }
 
 
@@ -201,8 +201,8 @@ public class GenresAndCertsFetcher {
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
 
-            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id"));
-            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
+//            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id"));
+//            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
         }
 
 

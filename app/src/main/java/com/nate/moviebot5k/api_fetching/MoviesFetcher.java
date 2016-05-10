@@ -10,7 +10,6 @@ import android.util.Log;
 import com.nate.moviebot5k.BuildConfig;
 import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.SingleFragmentActivity;
-import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.data.MovieTheaterContract.MoviesEntry;
 
 import org.json.JSONArray;
@@ -147,25 +146,25 @@ public class MoviesFetcher {
                 values.put(MoviesEntry.COLUMN_GENRE_ID3, genresJsonArray.getInt(2));
                 values.put(MoviesEntry.COLUMN_GENRE_ID4, genresJsonArray.getInt(3));
             } catch (JSONException e) {
-                Log.i(LOGTAG, "  there were less than 4 genres associated with this movie, this is not an error");
+//                Log.i(LOGTAG, "  there were less than 4 genres associated with this movie, this is not an error");
             }
             
 
             // print the data for all the NON NULL columns
             Log.d(LOGTAG, "  added movie id: " + jsonObject.getLong("id"));
-            Log.d(LOGTAG, "  and overview: " + jsonObject.getString("overview"));
-            Log.d(LOGTAG, "  and release_date: " + jsonObject.getString("release_date"));
-            Log.d(LOGTAG, "  and movie title: " + jsonObject.getString("title"));
-            Log.d(LOGTAG, "  and backdrop_path: " + jsonObject.getString("backdrop_path"));
-            Log.d(LOGTAG, "  and poster_path: " + jsonObject.getString("poster_path"));
-            Log.d(LOGTAG, "  and popularity: " + jsonObject.getDouble("popularity"));
-            Log.d(LOGTAG, "  and vote_avg: " + jsonObject.getDouble("vote_average"));
-
-            // print the data for genre id(s)
-            Log.d(LOGTAG, "  and genre_id_1: " + genresJsonArray.getInt(0));
-//            Log.d(LOGTAG, "  and genre_id_2: " + genresJsonArray.getInt(1));
-//            Log.d(LOGTAG, "  and genre_id_3: " + genresJsonArray.getInt(2));
-//            Log.d(LOGTAG, "  and genre_id_4: " + genresJsonArray.getInt(3));
+//            Log.d(LOGTAG, "  and overview: " + jsonObject.getString("overview"));
+//            Log.d(LOGTAG, "  and release_date: " + jsonObject.getString("release_date"));
+//            Log.d(LOGTAG, "  and movie title: " + jsonObject.getString("title"));
+//            Log.d(LOGTAG, "  and backdrop_path: " + jsonObject.getString("backdrop_path"));
+//            Log.d(LOGTAG, "  and poster_path: " + jsonObject.getString("poster_path"));
+//            Log.d(LOGTAG, "  and popularity: " + jsonObject.getDouble("popularity"));
+//            Log.d(LOGTAG, "  and vote_avg: " + jsonObject.getDouble("vote_average"));
+//
+//            // print the data for genre id(s)
+//            Log.d(LOGTAG, "  and genre_id_1: " + genresJsonArray.getInt(0));
+////            Log.d(LOGTAG, "  and genre_id_2: " + genresJsonArray.getInt(1));
+////            Log.d(LOGTAG, "  and genre_id_3: " + genresJsonArray.getInt(2));
+////            Log.d(LOGTAG, "  and genre_id_4: " + genresJsonArray.getInt(3));
 
 
             // add the single object to the ContentValues Vector

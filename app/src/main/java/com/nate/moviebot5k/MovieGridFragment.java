@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.DimenRes;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +37,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
 
-    public MovieGridFragment() {}
+//    public MovieGridFragment() {}
 
     /**
      * Call from a hosting Activity to get a new fragment for a fragment transaction.  The fragment
@@ -118,11 +119,31 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(LOGTAG, "entered onCreateView");
+        
+        View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
+        RecyclerView moviePosterRecyclerView =
+                (RecyclerView) rootView.findViewById(R.id.fragment_movie_grid_recycler_view);
 
 
 
-        return null;
+        Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.recycler_view_num_columns));
 
+        // add item decoration to make the grid look nice with even spacing all around
+        moviePosterRecyclerView.addItemDecoration(new GridSpacingItemDecoration(
+                // number of columns in poster grid varies with device and orientation
+                getResources().getInteger(R.integer.recycler_view_num_columns),
+                getResources().getDimensionPixelSize(R.dimen.movie_grid_poster_margin), true));
+
+        // set the required GridLayoutManager on the RecyclerView
+        moviePosterRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),
+                // number of columns in poster grid varies with device and orientation
+                getResources().getInteger(R.integer.recycler_view_num_columns),
+                GridLayoutManager.VERTICAL, false));
+
+
+
+
+        return rootView;
     }
 
 
