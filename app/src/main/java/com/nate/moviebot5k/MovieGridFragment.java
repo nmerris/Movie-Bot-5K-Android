@@ -134,10 +134,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         // check if a new fetch movies task should be launched
         // technically mUseFavorites should never be true if sharedPrefs key_fetch_new_movies is true,
         // but it doesn't hurt to check it as well here before starting a fetch movies async task
-        if(mUseFavorites && sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
+        if(!mUseFavorites && sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
             Log.i(LOGTAG, "  and sharedPrefs fetch_new_movies was true, so about to get more movies");
 
-            new FetchMoviesTask(getActivity());
+            new FetchMoviesTask(getActivity()).execute();
 
             // restart the Loader for the movies table, it doesn't matter if the async task
             // does not return any movies, it won't update the movies table in that case and the

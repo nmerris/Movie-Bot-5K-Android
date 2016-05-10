@@ -1,5 +1,6 @@
 package com.nate.moviebot5k.api_fetching;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -9,17 +10,20 @@ import android.util.Log;
 import com.nate.moviebot5k.BuildConfig;
 import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.SingleFragmentActivity;
+import com.nate.moviebot5k.data.MovieTheaterContract;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Vector;
 
 /**
  * Created by Nathan Merris on 5/9/2016.
  */
 public class MoviesFetcher {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "MoviesFtcher";
+    private final String LOGTAG = SingleFragmentActivity.N8LOG + "MoviesFetcher";
 
     private Context mContext; // used to retrieve String resources for API queries
 
@@ -90,7 +94,7 @@ public class MoviesFetcher {
             Log.i(LOGTAG, "    Received JSON: " + jsonString);
 
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
-//            numMoviesFetched = parseMovies(jsonBody);
+            numMoviesFetched = parseMoviesAndInsertToDb(jsonBody);
 
         } catch (IOException ioe) {
             Log.e(LOGTAG, "Failed to fetch items", ioe);
@@ -103,10 +107,54 @@ public class MoviesFetcher {
     }
 
 
-    private int parseMovies(JSONObject jsonBody) {
+    private int parseMoviesAndInsertToDb(JSONObject jsonBody) throws JSONException {
+        Log.i(LOGTAG, "entered parseMoviesAndInsertToDb");
+        
+        JSONArray moviesJsonArray = jsonBody.getJSONArray("results");
+        int numMovies = moviesJsonArray.length();
+        Vector<ContentValues> valuesVector = new Vector<>(numMovies);
+
+        for (int i = 0; i < numMovies; i++) {
+            // get a single JSON object from jsonBody
+            JSONObject jsonObject = moviesJsonArray.getJSONObject(i);
+            ContentValues values = new ContentValues();
+
+            // extract the data from the json object and put it in a single ContentValues object
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID, jsonObject.getInt("id"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_ADULT, jsonObject.getInt("adult"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_OVERVIEW, jsonObject.getString("overview"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_RELEASE_DATE, jsonObject.getString("release_date"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_ORIGINAL_TITLE, jsonObject.getString("original_title"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_TITLE, jsonObject.getString("title"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH, jsonObject.getString("backdrop_path"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_POPULARITY, jsonObject.getLong("popularity"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_VOTE_COUNT, jsonObject.getInt("vote_count"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_HAS_VIDEO, jsonObject.getInt("video"));
+            values.put(MovieTheaterContract.MoviesEntry.COLUMN_VOTE_AVG, jsonObject.getLong("vote_average"));
+
+            // and get the genre ids out of the nested json array
+            JSONArray genresJsonArray = jsonObject.getJSONArray("genre_ids");
+            try {
+                values.put(MovieTheaterContract.MoviesEntry.COLUMN_GENRE_ID1, genresJsonArray.getInt(0));
+                values.put(MovieTheaterContract.MoviesEntry.COLUMN_GENRE_ID2, genresJsonArray.getInt(1));
+                values.put(MovieTheaterContract.MoviesEntry.COLUMN_GENRE_ID3, genresJsonArray.getInt(2));
+                values.put(MovieTheaterContract.MoviesEntry.COLUMN_GENRE_ID4, genresJsonArray.getInt(3));
+            } catch (JSONException e) {
+                Log.i(LOGTAG, "  there were less than 4 genres associated with this movie, not a problem");
+            }
+            
+            // add the single object to the ContentValues Vector
+            valuesVector.add(values);
+
+            // arbitrarily print out some data for debug
+            Log.d(LOGTAG, "  added movie id: " + jsonObject.getString("certification"));
+            Log.d(LOGTAG, "  and movie title: " + jsonObject.getInt("order"));
+            Log.d(LOGTAG, "  and genre_id_1: " + genresJsonArray.getInt(0));
+        }
 
 
         return 0;
+//        return numInserted;
     }
 
 
