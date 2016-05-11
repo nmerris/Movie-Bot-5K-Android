@@ -29,6 +29,19 @@
         <activity
             android:name=".AboutAppActivity"
             android:parentActivityName=".HomeActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nate.moviebot5k.HomeActivity" />
+        </activity>
+
+        <activity
+            android:name=".MovieFiltersActivity"
+            android:parentActivityName=".HomeActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nate.moviebot5k.HomeActivity" />
         </activity>
 
 
@@ -36,8 +49,6 @@
             android:authorities="@string/content_authority"
             android:name=".data.MovieTheaterProvider"
             android:exported="false" />
-
-
 
     </application>
 </manifest>

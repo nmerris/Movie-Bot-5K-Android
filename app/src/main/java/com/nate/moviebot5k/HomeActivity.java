@@ -1,6 +1,5 @@
 package com.nate.moviebot5k;
 
-import android.app.LoaderManager;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -55,12 +54,12 @@ public class HomeActivity extends SingleFragmentActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Intent intent;
 
         switch(id) {
             case R.id.action_movie_filters:
-
-                // TODO: launch intent to MovieFiltersActivity
-
+                intent = new Intent(this, MovieFiltersActivity.class);
+                startActivity(intent);
                 break;
 
             case R.id.action_favorites:
@@ -70,12 +69,11 @@ public class HomeActivity extends SingleFragmentActivity
                 break;
 
             case R.id.action_about_app:
-                Intent intent = new Intent(this, AboutAppActivity.class);
+                intent = new Intent(this, AboutAppActivity.class);
                 startActivity(intent);
         }
 
-
-
         return super.onOptionsItemSelected(item);
     }
+
 }

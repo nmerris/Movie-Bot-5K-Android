@@ -1,10 +1,13 @@
-package com.nate.moviebot5k.api_fetching;
+package com.nate.moviebot5k;
+
+import android.content.Context;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
 
 /**
  * Created by Nathan Merris on 5/6/2016.
@@ -38,6 +41,23 @@ public class Utility {
     // returns the URL fetch as a string, use when parsing json with async tasks
     public static String getUrlString(String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
+    }
+
+
+
+
+    public static String[] getMovieFilterYears(Context context) {
+
+        String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+        int minYear =  context.getResources().getInteger(R.integer.min_year_movie_filter);
+        int numYears = Integer.valueOf(currentYear) - minYear;
+
+        String[] years = new String[numYears];
+        for(int i = 0; i < numYears; i++) {
+            years[i] = String.valueOf(minYear + i);
+        }
+
+        return years;
     }
 
 }

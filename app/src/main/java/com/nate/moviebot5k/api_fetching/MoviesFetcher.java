@@ -10,6 +10,7 @@ import android.util.Log;
 import com.nate.moviebot5k.BuildConfig;
 import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.SingleFragmentActivity;
+import com.nate.moviebot5k.Utility;
 import com.nate.moviebot5k.data.MovieTheaterContract.MoviesEntry;
 
 import org.json.JSONArray;

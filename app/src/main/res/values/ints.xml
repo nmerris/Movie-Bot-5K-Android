@@ -2,4 +2,8 @@
 <resources>
     <!-- phone portrait -->
     <integer name="gridview_view_num_columns">2</integer>
+
+    <!-- note: the max year picker year is programmatically set to the current year -->
+    <integer name="min_year_movie_filter">1920</integer>
+
 </resources>

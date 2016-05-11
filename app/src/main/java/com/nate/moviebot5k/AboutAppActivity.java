@@ -9,7 +9,7 @@ import android.view.Menu;
  */
 public class AboutAppActivity extends SingleFragmentActivity {
 
-    private final String LOGTAG = N8LOG + getClass().getSimpleName();
+//    private final String LOGTAG = N8LOG + getClass().getSimpleName();
 
     @Override
     protected Fragment createFragment() {
