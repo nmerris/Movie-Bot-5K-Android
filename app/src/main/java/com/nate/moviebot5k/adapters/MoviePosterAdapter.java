@@ -27,6 +27,7 @@ public class MoviePosterAdapter extends CursorAdapter {
 
     public MoviePosterAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        Log.i(LOGTAG, "entered MoviePosterAdapter constructor");
     }
 
 
@@ -48,7 +49,7 @@ public class MoviePosterAdapter extends CursorAdapter {
     // so it's just easier and convenient to use newView when possible, and more efficient
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        Log.i(LOGTAG, "entered newView");
+//        Log.i(LOGTAG, "entered newView");
 
         View view = LayoutInflater.from(context).inflate(R.layout.moviegrid_poster, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
@@ -63,20 +64,20 @@ public class MoviePosterAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.i(LOGTAG, "entered bindView");
+//        Log.i(LOGTAG, "entered bindView");
 
         // get the ViewHolder, no need for a key because it's the only object associated with the view
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
+//        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(MovieGridFragment.MOVIES_TABLE_COL_POSTER_PATH));
+//        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(MovieGridFragment.MOVIES_TABLE_COL_MOVIE_ID));
 
-        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(MovieGridFragment.MOVIES_TABLE_COL_POSTER_PATH));
-        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(MovieGridFragment.MOVIES_TABLE_COL_MOVIE_ID));
-
-        // have Picasso download the image and update the view when it's done
         Picasso.with(context)
                 .load(cursor.getString(MovieGridFragment.MOVIES_TABLE_COL_POSTER_PATH))
                 .into(viewHolder.posterImageView);
-        // TODO: use placeholder images?
 
+        // TODO: use placeholder images? at least in case a movie has no image poster
+        // no wait.. poster and backdrop paths are both NOT NULL in the db, so that will never happen
     }
+
 }

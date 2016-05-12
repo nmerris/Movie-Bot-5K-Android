@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- contains sharePrefs keys and default values -->
+<!-- contains keys and defaults for anything related to shared prefs -->
 <resources>
 
     <string name="key_num_favorites">num_favorites</string>
@@ -11,9 +11,11 @@
 
     <string name="key_movie_filter_year">filter_year</string>
     <string name="default_movie_filter_year">Any Year</string>
+    <string name="key_movie_filter_year_spinner_position">year_spinner_position</string>
 
     <string name="key_movie_filter_cert">filter_cert</string>
     <string name="default_movie_filter_cert">Any Rating</string>
+    <string name="key_movie_filter_sortby_spinner_position">sortby_spinner_position</string>
 
     <string name="key_movie_filter_genre_id">filter_genre</string>
     <string name="default_movie_filter_genre_id">Any Genre</string>

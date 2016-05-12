@@ -4,6 +4,7 @@
     <string name="movie_filters_activity_label">Movie Filters</string>
     <string name="content_authority" translatable="false">com.nate.moviebot5k</string>
 
+    <!-- api fetching basics, specific endpoint paths are in the java code -->
     <string name="themoviedb_authority" translatable="false">api.themoviedb.org</string>
     <string name="themoviedb_scheme" translatable="false">https</string>
     <string name="themoviedb_image_authority" translatable="false">image.tmdb.org</string>
@@ -12,11 +13,23 @@
     <string name="themoviedb_poster_size" translatable="false">w185</string>
     <string name="themoviedb_backdrop_size" translatable="false">w780</string>
 
+    <!-- menu -->
     <string name="action_movie_filters">Filters</string>
     <string name="action_favorites">Favorites</string>
     <string name="action_about_app">About</string>
 
 
+    <!-- movie sortby filter labels -->
+    <string name="filter_sortby_most_popular_label">Most Popular</string>
+    <string name="filter_sortby_highest_rated_label">Highest Rated</string>
+    <string name="filter_sortby_highest_revenue_label">Highest Revenue</string>
+    <string name="filter_sortby_lowest_revenue_label">Lowest Revenue</string>
+
+    <!-- spinner labels -->
+    <string name="spinner_year_label">Year:</string>
+    <string name="spinner_genre_label">Genre:</string>
+    <string name="spinner_cert_label">Rating:</string>
+    <string name="spinner_sortby_label">Sort By:</string>
 
     <!-- about app fragment related -->
     <!-- TODO: update about app text -->

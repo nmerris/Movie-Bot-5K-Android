@@ -111,7 +111,7 @@ public class MoviesFetcher {
             SharedPreferences.Editor editor = sharedPrefs.edit();
             editor.putBoolean(mContext.getString(R.string.key_fetch_new_movies), false);
             editor.commit();
-            Log.i(LOGTAG, "      fetch had no exceptions, don't care if zero movies fetched, so just set sharedPrefs key_fetch_new_movies to FALSE");
+            Log.i(LOGTAG, "      fetch had no exceptions, don't care if zero movies fetched, so just set sharedPrefs key_fetch_new_movies to ****FALSE****");
 
 
         } catch (IOException ioe) {

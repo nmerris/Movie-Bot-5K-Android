@@ -126,18 +126,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
         Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
 
-        // add item decoration to make the grid look nice with even spacing all around
-//        moviePosterGridView.addItemDecoration(new GridSpacingItemDecoration(
-//                // number of columns in poster grid varies with device and orientation
-//                getResources().getInteger(R.integer.recycler_view_num_columns),
-//                getResources().getDimensionPixelSize(R.dimen.movie_grid_poster_margin), true));
-//
-//        // set the required GridLayoutManager on the RecyclerView
-//        moviePosterGridView.setLayoutManager(new GridLayoutManager(getActivity(),
-//                // number of columns in poster grid varies with device and orientation
-//                getResources().getInteger(R.integer.recycler_view_num_columns),
-//                GridLayoutManager.VERTICAL, false));
-
 
         moviePosterGridView.setAdapter(mMoviePosterAdapter);
 
@@ -289,49 +277,5 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             
         }
     }
-
-
-
-
-//    /**
-//     * Make the movie posters look nice, with even padding all around.
-//     *
-//     * @author edwardaa on Stackoverflow
-//     * @see <a>http://stackoverflow.com/questions/28531996/android-recyclerview-gridlayoutmanager-column-spacing</a>
-//     */
-//    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
-//
-//        private int spanCount;
-//        private int spacing;
-//        private boolean includeEdge;
-//
-//        public GridSpacingItemDecoration(int spanCount, @DimenRes int spacing, boolean includeEdge) {
-//            this.spanCount = spanCount;
-//            this.spacing = spacing;
-//            this.includeEdge = includeEdge;
-//        }
-//
-//        @Override
-//        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-//            int position = parent.getChildAdapterPosition(view); // item position
-//            int column = position % spanCount; // item column
-//
-//            if (includeEdge) {
-//                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-//                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
-//
-//                if (position < spanCount) { // top edge
-//                    outRect.top = spacing;
-//                }
-//                outRect.bottom = spacing; // item bottom
-//            } else {
-//                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-//                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-//                if (position >= spanCount) {
-//                    outRect.top = spacing; // item top
-//                }
-//            }
-//        }
-//    }
 
 }
