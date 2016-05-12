@@ -153,6 +153,8 @@ public class MovieTheaterContract {
 
 
         // returns a favorte Uri (a single record in this table) given a MOVIE id
+        // TODO: this is not going to work, needs to use .appendQueryParameter
+        // .withAppendedId will only work for the primary key _id, I think
         public static Uri buildFavoriteUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
         }
@@ -179,6 +181,11 @@ public class MovieTheaterContract {
 
         // should not need any build methods.. genres table is only ever wiped out completely and
         // then written over with a bulk insert
+
+        public static Uri buildGenreIdUriFromGenreName(String genreName) {
+            return CONTENT_URI.buildUpon()
+                    .appendQueryParameter(COLUMN_GENRE_NAME, genreName).build();
+        }
 
     }
 

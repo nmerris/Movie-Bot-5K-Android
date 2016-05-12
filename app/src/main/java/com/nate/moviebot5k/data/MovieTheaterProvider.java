@@ -134,66 +134,6 @@ public class MovieTheaterProvider extends ContentProvider {
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
 
-
-//        Log.i(LOGTAG, "entered query");
-//        Cursor retCursor;
-//
-//        switch (sUriMatcher.match(uri)) {
-//            case MOVIES_ALL:
-//                Log.i(LOGTAG, "  matched uri to case MOVIES_ALL");
-//
-//
-//
-//                Log.i(LOGTAG, "    and table name being used for mOpenHelper.query, after extracting from uri," +
-//                        " is: " + uri.getLastPathSegment());
-//                retCursor = mOpenHelper.getReadableDatabase().query( // get table name from uri
-//                        uri.getLastPathSegment(),
-//                        projection,
-//                        selection,
-//                        selectionArgs,
-//                        null,
-//                        null,
-//                        sortOrder);
-//
-//                break;
-//
-//            case FAVORITES_ALL:
-//
-//
-//
-//                break;
-//
-//
-//            case MOVIE_WITH_MOVIE_ID:
-//
-//
-//                break;
-//
-//            case FAVORITE_WITH_MOVIE_ID:
-//
-//
-//
-//                break;
-//
-//            case GENRES_ALL:
-//
-//
-//                break;
-//
-//            case CERTS_ALL:
-//
-//
-//                break;
-//
-//            default:
-//                throw new UnsupportedOperationException("I do not understand this URI: " + uri);
-//
-//        }
-//
-//        // notify whatever is using this cursor when the data it points to changes
-//        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
-//        return retCursor;
-
     }
 
 
@@ -343,62 +283,6 @@ public class MovieTheaterProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
         return returnCount;
 
-
-//        switch (sUriMatcher.match(uri)) {
-//            case MOVIES_ALL:
-//                Log.i(LOGTAG, "  about to beginTransaction to movies table");
-//
-//                db.beginTransaction();
-//                int returnCount = 0;
-//
-//                try {
-//                    for (ContentValues value : values) {
-//                        long _id = db.insert(MoviesEntry.TABLE_NAME, null, value);
-//                        if(_id != -1) returnCount++;
-//                    }
-//                    db.setTransactionSuccessful();
-//                }
-//                finally {
-//                    db.endTransaction();
-//                }
-//
-//                getContext().getContentResolver().notifyChange(uri, null);
-//                Log.i(LOGTAG, "    number records inserted: " + returnCount);
-//                return returnCount;
-//                break;
-//
-//            case GENRES_ALL:
-//                Log.i(LOGTAG, "  about to beginTransaction to genres table");
-//
-//                db.beginTransaction();
-//                int returnCount = 0;
-//
-//                try {
-//                    for (ContentValues value : values) {
-//                        long _id = db.insert(MoviesEntry.TABLE_NAME, null, value);
-//                        if(_id != -1) returnCount++;
-//                    }
-//                    db.setTransactionSuccessful();
-//                }
-//                finally {
-//                    db.endTransaction();
-//                }
-//
-//                getContext().getContentResolver().notifyChange(uri, null);
-//                Log.i(LOGTAG, "    number records inserted: " + returnCount);
-//                return returnCount;
-//            break;
-//                break;
-//
-//            case CERTS_ALL:
-//
-//                break;
-//
-//            default:
-//                return super.bulkInsert(uri, values);
-
-
-//        }
     }
 
 
