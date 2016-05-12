@@ -33,12 +33,16 @@ public class MoviesFetcher {
 
 
     public int fetchMovies() {
-        Log.i(LOGTAG, "entered fetchMovies");
+        Log.i(LOGTAG, "entered fetchMovies, only possible to get here if key_fetch_new_movies in sharedPrefs is TRUE");
 
         int numMoviesFetched = 0;
 
         // compile a list to use as query params for the discover movie endpoint
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+        Log.i(LOGTAG, "  but just to check, here is it's current value: "
+                + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
+
         String selectedCert = sharedPrefs
                 .getString(mContext.getString(R.string.key_movie_filter_cert), "");
         String selectedYear = sharedPrefs
@@ -96,10 +100,28 @@ public class MoviesFetcher {
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
             numMoviesFetched = parseMoviesAndInsertToDb(jsonBody);
 
+            // if this code is reached, there must not have been any exceptions thrown,
+            // so set key_fetch_new_movies to false.. we don't really care if zero movies was return,
+            // this could only happen if the user has filter criteria that is too restrictive, in
+            // which case they will need to adjust their filter, and will be shown a msg
+            // however if an exception is thrown, that implies a network or json error, so
+            // do not set the fetch_new_movies bool to false because we want to try again in the hopes
+            // that the user has network access in the future..  this is checked every time
+            // MovieGridFragment.onResume is called, which is where this task is fired from
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.putBoolean(mContext.getString(R.string.key_fetch_new_movies), false);
+            editor.commit();
+            Log.i(LOGTAG, "      fetch had no exceptions, don't care if zero movies fetched, so just set sharedPrefs key_fetch_new_movies to FALSE");
+
+
         } catch (IOException ioe) {
             Log.e(LOGTAG, "Failed to fetch items", ioe);
+            Log.i(LOGTAG, "  so sharedPrefs key_fetch_new_movies should still be true, here's what it is: "
+                    + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
         } catch (JSONException je) {
             Log.e(LOGTAG, "Failed to parse JSON", je);
+            Log.i(LOGTAG, "  so sharedPrefs key_fetch_new_movies should still be true, here's what it is: "
+                    + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
         }
 
         return numMoviesFetched;
