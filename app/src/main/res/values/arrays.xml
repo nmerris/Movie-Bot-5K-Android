@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- order matters here, if you change one you must change the other -->
     <string-array name="movie_filter_sortby_labels">
         <item>@string/filter_sortby_most_popular_label</item>
         <item>@string/filter_sortby_highest_rated_label</item>
         <item>@string/filter_sortby_highest_revenue_label</item>
         <item>@string/filter_sortby_lowest_revenue_label</item>
     </string-array>
-
     <string-array name="movie_filter_sortby_values">
-        <item>@string/default_movie_filter_sortby</item>
+        <item>@string/default_movie_filter_sortby_value</item>
         <item>vote_average.desc</item>
         <item>revenue.desc</item>
         <item>revenue.asc</item>

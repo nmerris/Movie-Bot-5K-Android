@@ -101,23 +101,18 @@ public class MovieFiltersFragment extends Fragment implements AdapterView.OnItem
                 break;
 
             case R.id.fragment_movie_filter_spinner_sortby:
-                String currentSortbyFilter = mSharedPrefs.getString(getString(R.string.key_movie_filter_sortby), "");
+                int savedSortbySpinnerPosition = mSharedPrefs
+                        .getInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0);
 
-                for
+                // check to see if the user actually changed the sortby selection
+                // this is why the order of the resource array matters
+                if(savedSortbySpinnerPosition != position) {
+                    String[] sortbyValues = getResources().getStringArray(R.array.movie_filter_sortby_values);
 
-                String selectedSortbyFilter = parent.getItemAtPosition(position).toString();
-
-
-
-
-
-                // check to make sure user did not just select the same item that was already selected
-                if(!currentSortbyFilter.equals(selectedSortbyFilter)) {
-
-                    // update the sortby filter
-                    editor.putString(getString(R.string.key_movie_filter_sortby), selectedSortbyFilter);
-
-
+                    // update the sortby filter value, which is not the same as the label
+                    // the value is what is used in MoviesFetcher for the API call
+                    // the label is what the user sees in the spinner
+                    editor.putString(getString(R.string.key_movie_filter_sortby_value), sortbyValues[position]);
 
                     // set fetch movies key to true so that MoviesFetcher is called when user goes back to
                     // HomeActivity which hosts MovieGridFragment, which launches the fetch task
@@ -125,8 +120,9 @@ public class MovieFiltersFragment extends Fragment implements AdapterView.OnItem
                     // store the position in the spinner so that it's the same next time user comes back here
                     editor.putInt(getString(R.string.key_movie_filter_sortby_spinner_position), position);
 
-                    Log.i(LOGTAG, "  just wrote to sharedPrefs key_movie_filter_sortby: " + selectedSortbyFilter);
+                    Log.i(LOGTAG, "  just wrote to sharedPrefs key_movie_filter_sortby_value: " + sortbyValues[position]);
                     Log.i(LOGTAG, "    and changed sharedPrefs key_fetch_new_movies bool to ****TRUE****");
+
                 }
                 break;
 

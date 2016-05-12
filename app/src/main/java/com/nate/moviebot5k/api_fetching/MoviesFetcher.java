@@ -50,7 +50,7 @@ public class MoviesFetcher {
         String selectedGenre = sharedPrefs
                 .getString(mContext.getString(R.string.key_movie_filter_genre_id), "");
         String selectedSortBy = sharedPrefs
-                .getString(mContext.getString(R.string.key_movie_filter_sortby), "");
+                .getString(mContext.getString(R.string.key_movie_filter_sortby_value), "");
 
         try { // build the URL for themoviedb GET for genres
             Uri.Builder builder = new Uri.Builder();

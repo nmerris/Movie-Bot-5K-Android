@@ -131,16 +131,16 @@ public class StartupActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // if any single sharedPrefs exists, then they all do and have already been initialized
-        if(!sharedPreferences.contains(getString(R.string.key_num_favorites))) {
-            Log.i(LOGTAG, "  sharedPrefs are being created, writing defaults...");
+        if(!sharedPreferences.contains(getString(R.string.key_movie_filter_year))) {
+            Log.i(LOGTAG, "  sharedPrefs are being created for the first time, writing defaults...");
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
             // TODO: prob won't end up using num_favorites, easier to just check db each time
             editor.putInt(getString(R.string.key_num_favorites),
                     getResources().getInteger(R.integer.default_num_favorites));
 
-            editor.putString(getString(R.string.key_movie_filter_sortby),
-                    getString(R.string.default_movie_filter_sortby));
+            editor.putString(getString(R.string.key_movie_filter_sortby_value),
+                    getString(R.string.default_movie_filter_sortby_value));
 
             editor.putString(getString(R.string.key_movie_filter_year),
                     getString(R.string.default_movie_filter_year));
@@ -153,8 +153,8 @@ public class StartupActivity extends AppCompatActivity {
             editor.putString(getString(R.string.key_movie_filter_genre_id),
                     getString(R.string.default_movie_filter_genre_id));
 
-            editor.putString(getString(R.string.key_favorites_sortby),
-                    getString(R.string.default_favorites_sortby));
+            editor.putString(getString(R.string.key_favorites_sortby_value),
+                    getString(R.string.default_favorites_sortby_value));
             editor.putInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0);
 
             editor.putInt(getString(R.string.key_currently_selected_movie_id),
