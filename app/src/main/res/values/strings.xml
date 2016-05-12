@@ -1,6 +1,7 @@
 <resources>
 
     <string name="app_name">MovieBot5k</string>
+    <string name="movie_filters_activity_label">Movie Filters</string>
     <string name="content_authority" translatable="false">com.nate.moviebot5k</string>
 
     <string name="themoviedb_authority" translatable="false">api.themoviedb.org</string>

@@ -11,18 +11,29 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:paddingLeft="16dp"
+
+            style="?android:attr/spinnerDropDownItemStyle"
             android:text="Year:"/>
 
+        <!-- It turns out that Android does NOT preserve the Spinner drop down view when the device
+        is rotated, but Android DOES preserve the dialog view, so why fight it?  I went with dialog mode -->
         <android.support.v7.widget.AppCompatSpinner
             android:id="@+id/fragment_movie_filter_spinner_year"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:spinnerMode="dialog"
 
-            android:minWidth="200dp"
-            android:dropDownVerticalOffset="48dp"
             />
 
 
 </LinearLayout>
+
+
+    <!--
+        android:minWidth="200dp"
+            android:dropDownVerticalOffset="48dp"
+
+    android:spinnerMode="dialog"
+
+
+    -->

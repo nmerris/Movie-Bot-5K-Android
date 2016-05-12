@@ -7,13 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.nate.moviebot5k.adapters.YearSpinnerAdapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 /**
  * Created by Nathan Merris on 5/11/2016.
  */
-public class MovieFiltersFragment extends Fragment {
+public class MovieFiltersFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private final String LOGTAG = SingleFragmentActivity.N8LOG + "MovFiltsFragmnt";
 
 
@@ -25,12 +25,29 @@ public class MovieFiltersFragment extends Fragment {
 
 
         AppCompatSpinner spinner = (AppCompatSpinner) rootView.findViewById(R.id.fragment_movie_filter_spinner_year);
-        spinner.setAdapter(new YearSpinnerAdapter(getActivity(),
-                Utility.getMovieFilterYears(getActivity())));
+        ArrayAdapter<String> yrSpinnerAdapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_spinner_item,
+                Utility.getMovieFilterYears(getActivity()));
+        yrSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(yrSpinnerAdapter);
+
+
+
 
 
 
         return rootView;
     }
 
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }

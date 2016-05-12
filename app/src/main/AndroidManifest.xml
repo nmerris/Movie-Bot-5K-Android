@@ -37,6 +37,7 @@
 
         <activity
             android:name=".MovieFiltersActivity"
+            android:label="@string/movie_filters_activity_label"
             android:parentActivityName=".HomeActivity">
 
             <meta-data
