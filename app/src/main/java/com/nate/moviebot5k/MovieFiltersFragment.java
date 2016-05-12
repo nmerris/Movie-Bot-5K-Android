@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import com.nate.moviebot5k.adapters.YearSpinnerAdapter;
 
@@ -25,7 +24,7 @@ public class MovieFiltersFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_movie_filters, container, false);
 
 
-        AppCompatSpinner spinner = (AppCompatSpinner) rootView.findViewById(R.id.spinner_year);
+        AppCompatSpinner spinner = (AppCompatSpinner) rootView.findViewById(R.id.fragment_movie_filter_spinner_year);
         spinner.setAdapter(new YearSpinnerAdapter(getActivity(),
                 Utility.getMovieFilterYears(getActivity())));
 

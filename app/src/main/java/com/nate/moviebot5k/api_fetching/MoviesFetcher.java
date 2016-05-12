@@ -41,10 +41,10 @@ public class MoviesFetcher {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         String selectedCert = sharedPrefs
                 .getString(mContext.getString(R.string.key_movie_filter_cert), "");
-        int selectedYear = sharedPrefs
-                .getInt(mContext.getString(R.string.key_movie_filter_year), -1);
-        int selectedGenre = sharedPrefs
-                .getInt(mContext.getString(R.string.key_movie_filter_genre_id), -1);
+        String selectedYear = sharedPrefs
+                .getString(mContext.getString(R.string.key_movie_filter_year), "");
+        String selectedGenre = sharedPrefs
+                .getString(mContext.getString(R.string.key_movie_filter_genre_id), "");
         String selectedSortBy = sharedPrefs
                 .getString(mContext.getString(R.string.key_movie_filter_sortby), "");
 
@@ -57,20 +57,19 @@ public class MoviesFetcher {
                     .appendPath("movie") // https://api.themoviedb.org/3/discover/movie/
                     .appendQueryParameter("certification_country", "US"); // US movies only
 
-            if(!selectedCert.equals(mContext.getString(R.string.default_movie_filter_cert, ""))) {
+            if(!selectedCert.equals(mContext.getString(R.string.default_movie_filter_cert))) {
                 // if "Any Certification" is not currently selected, query by whatever is selected
                 builder.appendQueryParameter("certification", selectedCert);
             }
 
-            if(selectedYear != -1) {
-                // if "Any Year" (which is represented by -1) is not currently selected, then query
-                // by whatever is selected
-                builder.appendQueryParameter("primary_release_year", String.valueOf(selectedYear));
+            if(!selectedYear.equals(mContext.getString(R.string.default_movie_filter_year))) {
+                // if "Any Year" is not currently selected, then query by whatever is selected
+                builder.appendQueryParameter("primary_release_year", selectedYear);
             }
 
-            if(selectedGenre != -1) {
+            if(!selectedGenre.equals(mContext.getString(R.string.default_movie_filter_genre_id))) {
                 // if "Any Genre" is not currently selected, query by the genre id that is selected
-                builder.appendQueryParameter("with_genres", String.valueOf(selectedGenre));
+                builder.appendQueryParameter("with_genres", selectedGenre);
             }
 
             // if you don't specify a min number of votes, you end up with really bogus

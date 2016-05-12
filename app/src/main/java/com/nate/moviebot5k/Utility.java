@@ -45,17 +45,22 @@ public class Utility {
 
 
 
-
+    // returns an array of Strings to fill the year filter spinner, starting at the min year
+    // as defined in values/ints resource file and ending at the current year
+    // the zeroth element is filled with the default year, which is 'Any Year'
+    // NOTE: the spinner adapter lists the zeroth element first
     public static String[] getMovieFilterYears(Context context) {
 
         String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-        int minYear =  context.getResources().getInteger(R.integer.min_year_movie_filter);
+        int currentYearInt = Integer.valueOf(currentYear);
+        int minYear =  context.getResources().getInteger(R.integer.min_year_movie_filter) - 1;
         int numYears = Integer.valueOf(currentYear) - minYear;
 
-        String[] years = new String[numYears];
+        String[] years = new String[numYears + 1];
         for(int i = 0; i < numYears; i++) {
-            years[i] = String.valueOf(minYear + i);
+            years[i + 1] = String.valueOf(currentYearInt - i);
         }
+        years[0] = context.getString(R.string.default_movie_filter_year);
 
         return years;
     }

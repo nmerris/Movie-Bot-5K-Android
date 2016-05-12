@@ -28,4 +28,10 @@
     <dimen name="about_app_content_padding_bottom">16dp</dimen>
     <dimen name="about_app_moviedb_attribution_padding_top">36dp</dimen>
 
+    <!-- spinner year filter -->
+    <dimen name="spinner_year_width">256dp</dimen>
+    <dimen name="spinner_year_drop_down_text_size">26sp</dimen>
+    <dimen name="spinner_year_drop_down_padding">3dp</dimen>
+    <dimen name="spinner_year_height">30dp</dimen>
+
 </resources>

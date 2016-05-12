@@ -2,13 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <android.support.v7.widget.AppCompatSpinner
-        android:id="@+id/spinner_year"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
-    </android.support.v7.widget.AppCompatSpinner>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:paddingLeft="16dp"
+            android:text="Year:"/>
+
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/fragment_movie_filter_spinner_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:minWidth="200dp"
+            android:dropDownVerticalOffset="48dp"
+            />
+
 
 </LinearLayout>

@@ -10,13 +10,13 @@
     <string name="default_movie_filter_sortby">popularity.desc</string> <!-- most popular -->
 
     <string name="key_movie_filter_year">filter_year</string>
-    <integer name="default_movie_filter_year">-1</integer> <!-- any year -->
+    <string name="default_movie_filter_year">Any Year</string>
 
     <string name="key_movie_filter_cert">filter_cert</string>
-    <string name="default_movie_filter_cert">any_cert</string>
+    <string name="default_movie_filter_cert">Any Rating</string>
 
     <string name="key_movie_filter_genre_id">filter_genre</string>
-    <integer name="default_movie_filter_genre_id">-1</integer>
+    <string name="default_movie_filter_genre_id">Any Genre</string>
 
     <string name="key_favorites_sortby">favorites_sortby</string>
     <string name="default_favorites_sortby">popularity.desc</string> <!-- most popular -->
