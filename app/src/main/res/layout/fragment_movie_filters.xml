@@ -25,6 +25,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="?android:attr/spinnerDropDownItemStyle"
+        android:text="@string/spinner_genre_label"/>
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/fragment_movie_filter_spinner_genre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dialog"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?android:attr/spinnerDropDownItemStyle"
+        android:text="@string/spinner_cert_label"/>
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/fragment_movie_filter_spinner_cert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dialog"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?android:attr/spinnerDropDownItemStyle"
         android:text="@string/spinner_year_label"/>
 
     <android.support.v7.widget.AppCompatSpinner
@@ -32,10 +58,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:spinnerMode="dialog"/>
-
-
-
-
 
 
 </LinearLayout>

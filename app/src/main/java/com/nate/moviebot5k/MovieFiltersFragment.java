@@ -1,9 +1,13 @@
 package com.nate.moviebot5k;
 
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,17 +16,25 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import com.nate.moviebot5k.data.MovieTheaterContract;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
  * Created by Nathan Merris on 5/11/2016.
  */
-public class MovieFiltersFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class MovieFiltersFragment extends Fragment
+        implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
     private final String LOGTAG = SingleFragmentActivity.N8LOG + "MovFiltsFragmnt";
     
     @Bind(R.id.fragment_movie_filter_spinner_year) AppCompatSpinner yearSpinner;
     @Bind(R.id.fragment_movie_filter_spinner_sortby) AppCompatSpinner sortbySpinner;
+    @Bind(R.id.fragment_movie_filter_spinner_genre) AppCompatSpinner genreSpinner;
+    @Bind(R.id.fragment_movie_filter_spinner_cert) AppCompatSpinner certSpinner;
+
+    private static final int GENRES_TABLE_LOADER_ID = 1;
+    private static final int CERTS_TABLE_LOADER_ID = 2;
     
     SharedPreferences mSharedPrefs;
 
@@ -30,10 +42,22 @@ public class MovieFiltersFragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
+
+
     }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+
+        getLoaderManager().initLoader(GENRES_TABLE_LOADER_ID, null, this);
+        getLoaderManager().initLoader(CERTS_TABLE_LOADER_ID, null, this);
+
+        super.onActivityCreated(savedInstanceState);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,6 +92,25 @@ public class MovieFiltersFragment extends Fragment implements AdapterView.OnItem
         sortbySpinner.setSelection(mSharedPrefs.
                 getInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0));
         sortbySpinner.setOnItemSelectedListener(this);
+
+
+
+
+
+
+//        ArrayAdapter<String> genreSpinnerAdapter = new ArrayAdapter<>(getActivity(),
+//                android.R.layout.simple_spinner_item,
+//                getResources().getStringArray(R.array.movie_filter_genre_labels));
+
+
+
+
+        genreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        genreSpinner.setAdapter(genreSpinnerAdapter);
+
+        genreSpinner.setSelection(mSharedPrefs.
+                getInt(getString(R.string.key_movie_filter_genre_spinner_position), 0));
+        genreSpinner.setOnItemSelectedListener(this);
                 
 
 
@@ -146,4 +189,48 @@ public class MovieFiltersFragment extends Fragment implements AdapterView.OnItem
         // intentionally blank
     }
 
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.i(LOGTAG, "entered onCreateLoader");
+
+        if(id == GENRES_TABLE_LOADER_ID) {
+            Log.i(LOGTAG, "  and about to return new GENRES_TABLE_LOADER");
+
+            return new CursorLoader(
+                    getActivity(),
+                    MovieTheaterContract.GenresEntry.CONTENT_URI,
+                    null, // need both columns
+                    null, null, null); // don't care about sort order
+        }
+        else if(id == CERTS_TABLE_LOADER_ID) {
+            Log.i(LOGTAG, "  and about to return new CERTS_TABLE_LOADER");
+
+            return new CursorLoader(
+                    getActivity(),
+                    MovieTheaterContract.CertsEntry.CONTENT_URI,
+                    // need only name column
+                    new String[] {MovieTheaterContract.CertsEntry.COLUMN_CERT_NAME},
+                    null, null,
+                    // here we do want the proper order, ie NR, G, PG, PG-13, etc
+                    MovieTheaterContract.CertsEntry.COLUMN_CERT_ORDER + " ASC");
+        }
+
+
+        return null;
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.i(LOGTAG, "entered onLoadFinished");
+
+
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }

@@ -3,9 +3,6 @@
 <!-- keys and defaults for anything related to shared prefs -->
 <resources>
 
-    <string name="key_num_favorites">num_favorites</string>
-    <integer name="default_num_favorites">0</integer>
-
     <string name="key_movie_filter_sortby_value">filter_sortby</string>
     <string name="default_movie_filter_sortby_value">popularity.desc</string> <!-- most popular -->
     <string name="key_movie_filter_sortby_spinner_position">sortby_spinner_position</string>
@@ -16,14 +13,18 @@
 
     <string name="key_movie_filter_cert">filter_cert</string>
     <string name="default_movie_filter_cert">Any Rating</string>
+    <string name="key_movie_filter_cert_spinner_position">cert_spinner_position</string>
 
     <string name="key_movie_filter_genre_id">filter_genre</string>
     <string name="default_movie_filter_genre_id">Any Genre</string>
+    <string name="key_movie_filter_genre_spinner_position">genre_spinner_position</string>
 
     <!-- favorites sortby, sorts only favorites in favorites table locally, this sortby filter is
     not associated with any API calls -->
     <string name="key_favorites_sortby_value">favorites_sortby</string>
     <string name="default_favorites_sortby_value">popularity.desc</string> <!-- most popular -->
+    <string name="key_favorites_sortby_spinner_position">fav_sortby_spinner_position</string>
+
 
     <string name="key_currently_selected_movie_id">curr_sel_movie_id</string>
     <integer name="default_currently_selected_movie_id">-1</integer> <!-- no movie selected -->
@@ -32,6 +33,8 @@
     <string name="key_currently_selected_favorite_id">curr_sel_favorite_id</string>
     <integer name="default_currently_selected_favorite_id">-1</integer> <!-- no favorite selected -->
 
+    <string name="key_num_favorites">num_favorites</string>
+    <integer name="default_num_favorites">0</integer>
 
     <string name="key_fetch_new_movies">fetch_new_movies</string>
     <bool name="default_fetch_new_movies">true</bool>

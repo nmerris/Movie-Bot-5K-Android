@@ -144,8 +144,6 @@ public class StartupActivity extends AppCompatActivity {
 
             editor.putString(getString(R.string.key_movie_filter_year),
                     getString(R.string.default_movie_filter_year));
-            // all spinners start at zeroth position
-            editor.putInt(getString(R.string.key_movie_filter_year_spinner_position), 0);
 
             editor.putString(getString(R.string.key_movie_filter_cert),
                     getString(R.string.default_movie_filter_cert));
@@ -155,14 +153,23 @@ public class StartupActivity extends AppCompatActivity {
 
             editor.putString(getString(R.string.key_favorites_sortby_value),
                     getString(R.string.default_favorites_sortby_value));
-            editor.putInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0);
 
             editor.putInt(getString(R.string.key_currently_selected_movie_id),
                     getResources().getInteger(R.integer.default_currently_selected_movie_id));
+
             editor.putInt(getString(R.string.key_currently_selected_favorite_id),
                     getResources().getInteger(R.integer.default_currently_selected_favorite_id));
+
             editor.putBoolean(getString(R.string.key_fetch_new_movies),
                     getResources().getBoolean(R.bool.default_fetch_new_movies));
+
+            // all spinners start at zeroth position
+            editor.putInt(getString(R.string.key_movie_filter_year_spinner_position), 0);
+            editor.putInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0);
+            editor.putInt(getString(R.string.key_movie_filter_cert_spinner_position), 0);
+            editor.putInt(getString(R.string.key_movie_filter_genre_spinner_position), 0);
+            editor.putInt(getString(R.string.key_favorites_sortby_spinner_position), 0);
+
             editor.commit();
         }
     }
