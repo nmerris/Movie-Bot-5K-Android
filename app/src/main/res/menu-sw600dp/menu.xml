@@ -4,15 +4,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- DO NOT CHANGE THE ID OF THE SPINNERS because SpinnerListener depends on it -->
 
     <item
-        android:id="@+id/spinner_actionbar_genres"
+        android:id="@+id/spinner_genre"
         android:orderInCategory="10"
         android:title="GENRE SPIN"
         app:showAsAction="always"
         app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
 
-
+    <item
+        android:id="@+id/spinner_cert"
+        android:orderInCategory="20"
+        android:title="GENRE CERT"
+        app:showAsAction="always"
+        app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
 
 
 

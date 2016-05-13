@@ -10,12 +10,20 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import com.nate.moviebot5k.adapters.CertSpinnerAdapter;
+import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.adapters.MoviePosterAdapter;
@@ -28,13 +36,14 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
     private static final int MOVIES_TABLE_LOADER_ID = 1;
-    private static final int FAVORITES_TABLE_LOADER_ID =2;
+    private static final int FAVORITES_TABLE_LOADER_ID = 2;
 
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
     private MoviePosterAdapter mMoviePosterAdapter;
 
-//    public MovieGridFragment() {}
+    private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
+    private AppCompatSpinner mGenreSpinner, mCertSpinner;
 
     /**
      * Call from a hosting Activity to get a new fragment for a fragment transaction.  The fragment
@@ -96,6 +105,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
+
+        setHasOptionsMenu(true);
 
         if(savedInstanceState == null) {
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
@@ -174,6 +185,41 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     }
 
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.i(LOGTAG, "entered onCreateOptionsMenu");
+
+        inflater.inflate(R.menu.menu, menu);
+
+        // check if app is running in tablet mode, in which case there will be spinners in the menu
+        // the menu resource is qualified by min available screen width
+        // only need to check for one spinner because if it's present, they all are
+        if(menu.findItem(R.id.spinner_genre) != null) {
+
+            MenuItem genreSpinnerMenuItem = menu.findItem(R.id.spinner_genre);
+            mGenreSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(genreSpinnerMenuItem);
+            mGenreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
+            mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
+
+            MenuItem certSpinnerMenuItem = menu.findItem(R.id.spinner_cert);
+            mCertSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(certSpinnerMenuItem);
+            mCertSpinnerAdapter = new CertSpinnerAdapter(getActivity());
+            mCertSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mCertSpinner.setAdapter(mCertSpinnerAdapter);
+
+            // not sure where to put this.. don't want to start the loader unless the adapters
+            // are definitely already created and not null
+            // the loader for the movie poster in onActivityCreated is a completely different loader
+            // with different ID's and should not interfere with this loader at all
+            new GenreAndSpinnerLoader(getActivity(), mGenreSpinnerAdapter, mCertSpinnerAdapter,
+                    mGenreSpinner, mCertSpinner, getLoaderManager());
+
+        }
+
+    }
+    
+    
 
     // define a projection for this fragment's Loaders, only want to query what we need for
     // the movie grid views.  NOTE: this is not going to restrict what actual data is fetched from

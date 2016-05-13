@@ -14,11 +14,10 @@ import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
 
 public class HomeActivity extends SingleFragmentActivity
     implements MovieGridFragment.Callbacks {
-
     private final String LOGTAG = N8LOG + "HomeActivity";
 
-    private SimpleCursorAdapter mGenreSpinnerAdapter;
-    private AppCompatSpinner mGenreSpinner;
+//    private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
+//    private AppCompatSpinner mGenreSpinner, mCertSpinner;
 
 
 
@@ -44,7 +43,12 @@ public class HomeActivity extends SingleFragmentActivity
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
+//        new GenreAndSpinnerLoader(this, mGenreSpinnerAdapter, mCertSpinnerAdapter,
+//                mGenreSpinner, mCertSpinner, android.support.v4.app.LoaderManager.);
+
     }
+
+
 
 
     @Override
@@ -54,21 +58,27 @@ public class HomeActivity extends SingleFragmentActivity
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        Log.i(LOGTAG, "entered onCreateOptionsMenu");
 //
-//        MenuItem genreSpinnerMenuItem = menu.findItem(R.id.spinner_actionbar_genres);
-//        mGenreSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(genreSpinnerMenuItem);
+//        getMenuInflater().inflate(R.menu.menu, menu);
 //
-//        mGenreSpinnerAdapter = new GenreSpinnerAdapter(this);
-//        mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
-
-
-        return true;
-    }
+//        // check if app is running in tablet mode, in which case there will be spinners in the menu
+//        if(menu.findItem(R.id.spinner_actionbar_genres) != null) {
+//            MenuItem genreSpinnerMenuItem = menu.findItem(R.id.spinner_actionbar_genres);
+//            mGenreSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(genreSpinnerMenuItem);
+//
+//            mGenreSpinnerAdapter = new GenreSpinnerAdapter(this);
+//            mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//            mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
+//
+//
+//        }
+//
+//
+//        return true;
+//    }
 
 
     @Override

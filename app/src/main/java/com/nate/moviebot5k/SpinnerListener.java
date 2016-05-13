@@ -28,7 +28,7 @@ public class SpinnerListener implements AdapterView.OnItemSelectedListener {
         SharedPreferences.Editor editor = mSharedPrefs.edit();
 
         switch (parent.getId()) {
-            case R.id.fragment_movie_filter_spinner_year:
+            case R.id.spinner_year:
                 String currentYearFilter = mSharedPrefs.getString(mContext.getString(R.string.key_movie_filter_year), "");
                 String selectedYearFilter = parent.getItemAtPosition(position).toString();
 
@@ -47,7 +47,7 @@ public class SpinnerListener implements AdapterView.OnItemSelectedListener {
                 }
                 break;
 
-            case R.id.fragment_movie_filter_spinner_sortby:
+            case R.id.spinner_sortby:
                 int savedSortbySpinnerPosition = mSharedPrefs
                         .getInt(mContext.getString(R.string.key_movie_filter_sortby_spinner_position), 0);
 
@@ -73,7 +73,7 @@ public class SpinnerListener implements AdapterView.OnItemSelectedListener {
                 }
                 break;
 
-            case R.id.fragment_movie_filter_spinner_genre:
+            case R.id.spinner_genre:
                 String savedGenreId = mSharedPrefs
                         .getString(mContext.getString(R.string.key_movie_filter_genre_id), "");
 
@@ -95,7 +95,7 @@ public class SpinnerListener implements AdapterView.OnItemSelectedListener {
                 }
                 break;
 
-            case R.id.fragment_movie_filter_spinner_cert:
+            case R.id.spinner_cert:
                 String savedCert = mSharedPrefs
                         .getString(mContext.getString(R.string.key_movie_filter_cert), "");
 

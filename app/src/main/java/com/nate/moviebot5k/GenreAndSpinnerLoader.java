@@ -29,8 +29,10 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
     private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
     private AppCompatSpinner mGenreSpinner, mCertSpinner;
 
-    private static final int GENRES_TABLE_LOADER_ID = 1;
-    private static final int CERTS_TABLE_LOADER_ID = 2;
+    // these loader ID's must not conflict with the ID's in MovieGridFragment!
+    // because the same loader manager is used for all that fragment's loading
+    private static final int GENRES_TABLE_LOADER_ID = 10;
+    private static final int CERTS_TABLE_LOADER_ID = 20;
 
     // genresProjection and the ints that follow must be changed together, order matters
     public static final String[] genresProjection = {
