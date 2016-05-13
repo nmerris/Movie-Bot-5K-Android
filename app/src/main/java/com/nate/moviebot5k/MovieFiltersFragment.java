@@ -46,7 +46,7 @@ public class MovieFiltersFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // this is where Loaders are recommended to be initialized
-        new GenreAndSpinnerLoader(getActivity(), mGenreSpinnerAdapter, mCertSpinnerAdapter,
+        new GenreAndCertSpinnerLoader(getActivity(), mGenreSpinnerAdapter, mCertSpinnerAdapter,
                 mGenreSpinner, mCertSpinner, getLoaderManager());
 
         super.onActivityCreated(savedInstanceState);

@@ -20,7 +20,7 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
 /**
  * Created by Nathan Merris on 5/13/2016.
  */
-public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     private final String LOGTAG = SingleFragmentActivity.N8LOG + "GenreSpnnerLoader";
 
 
@@ -56,9 +56,9 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
 
 
 
-    public GenreAndSpinnerLoader(Context context, SimpleCursorAdapter genreAdapter,
-        SimpleCursorAdapter certAdapter, AppCompatSpinner genreSpinner, AppCompatSpinner certSpinner,
-        LoaderManager loaderManager) {
+    public GenreAndCertSpinnerLoader(Context context, SimpleCursorAdapter genreAdapter,
+                                     SimpleCursorAdapter certAdapter, AppCompatSpinner genreSpinner, AppCompatSpinner certSpinner,
+                                     LoaderManager loaderManager) {
         
         mContext = context;
         mGenreSpinnerAdapter = genreAdapter;

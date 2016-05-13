@@ -43,7 +43,7 @@ public class HomeActivity extends SingleFragmentActivity
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
-//        new GenreAndSpinnerLoader(this, mGenreSpinnerAdapter, mCertSpinnerAdapter,
+//        new GenreAndCertSpinnerLoader(this, mGenreSpinnerAdapter, mCertSpinnerAdapter,
 //                mGenreSpinner, mCertSpinner, android.support.v4.app.LoaderManager.);
 
     }

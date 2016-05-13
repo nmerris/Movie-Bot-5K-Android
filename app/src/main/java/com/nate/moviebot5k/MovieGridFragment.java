@@ -20,10 +20,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
 import com.nate.moviebot5k.adapters.CertSpinnerAdapter;
 import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
+import com.nate.moviebot5k.adapters.YearSpinnerAdapter;
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.adapters.MoviePosterAdapter;
@@ -41,9 +43,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
     private MoviePosterAdapter mMoviePosterAdapter;
-
-    private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
-    private AppCompatSpinner mGenreSpinner, mCertSpinner;
 
     /**
      * Call from a hosting Activity to get a new fragment for a fragment transaction.  The fragment
@@ -197,23 +196,42 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         if(menu.findItem(R.id.spinner_genre) != null) {
 
             MenuItem genreSpinnerMenuItem = menu.findItem(R.id.spinner_genre);
-            mGenreSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(genreSpinnerMenuItem);
-            mGenreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
-            mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
+            AppCompatSpinner genreSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(genreSpinnerMenuItem);
+            SimpleCursorAdapter genreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
+            genreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            genreSpinner.setAdapter(genreSpinnerAdapter);
 
             MenuItem certSpinnerMenuItem = menu.findItem(R.id.spinner_cert);
-            mCertSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(certSpinnerMenuItem);
-            mCertSpinnerAdapter = new CertSpinnerAdapter(getActivity());
-            mCertSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            mCertSpinner.setAdapter(mCertSpinnerAdapter);
+            AppCompatSpinner certSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(certSpinnerMenuItem);
+            SimpleCursorAdapter certSpinnerAdapter = new CertSpinnerAdapter(getActivity());
+            certSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            certSpinner.setAdapter(certSpinnerAdapter);
 
             // not sure where to put this.. don't want to start the loader unless the adapters
             // are definitely already created and not null
             // the loader for the movie poster in onActivityCreated is a completely different loader
             // with different ID's and should not interfere with this loader at all
-            new GenreAndSpinnerLoader(getActivity(), mGenreSpinnerAdapter, mCertSpinnerAdapter,
-                    mGenreSpinner, mCertSpinner, getLoaderManager());
+            // this also sets SpinnerListener on both the genre and certs spinner
+            // see GenreAndS
+            new GenreAndCertSpinnerLoader(getActivity(), genreSpinnerAdapter, certSpinnerAdapter,
+                    genreSpinner, certSpinner, getLoaderManager());
+
+
+            // the following spinners do not need CursorLoaders
+            // honestly considering the small amount of data being loaded above I don't think they
+            // really need loaders either, but as I understand it, it's a best practice to not
+            // have any database querying on the UI thread, who am I to argue?
+            MenuItem yearSpinnerMenuItem = menu.findItem(R.id.spinner_year);
+            AppCompatSpinner yearSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(yearSpinnerMenuItem);
+            ArrayAdapter<String> yearSpinnerAdapter = new YearSpinnerAdapter(getActivity());
+            yearSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            yearSpinner.setAdapter(yearSpinnerAdapter);
+
+            MenuItem sortbySpinnerMenuItem = menu.findItem(R.id.spinner_sortby);
+            AppCompatSpinner sortbySpinner = (AppCompatSpinner) MenuItemCompat.getActionView(sortbySpinnerMenuItem);
+            ArrayAdapter<String> sortbySpinnerAdapter = new YearSpinnerAdapter(getActivity());
+            sortbySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            sortbySpinner.setAdapter(sortbySpinnerAdapter);
 
         }
 
