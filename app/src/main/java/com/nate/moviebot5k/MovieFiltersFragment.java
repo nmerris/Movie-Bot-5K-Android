@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import com.nate.moviebot5k.adapters.CertSpinnerAdapter;
 import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
+import com.nate.moviebot5k.adapters.SortbySpinnerAdapter;
+import com.nate.moviebot5k.adapters.YearSpinnerAdapter;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 import butterknife.Bind;
@@ -99,9 +101,10 @@ public class MovieFiltersFragment extends Fragment
 
         
         // set an adapter on the year spinner
-        ArrayAdapter<String> yrSpinnerAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_item,
-                Utility.getMovieFilterYears(getActivity())); // get all the selectable years
+//        ArrayAdapter<String> yrSpinnerAdapter = new ArrayAdapter<>(getActivity(),
+//                android.R.layout.simple_spinner_item,
+//                Utility.getMovieFilterYears(getActivity())); // get all the selectable years
+        ArrayAdapter<String> yrSpinnerAdapter = new YearSpinnerAdapter(getActivity()); // get all the selectable years
         yrSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mYearSpinner.setAdapter(yrSpinnerAdapter);
 
@@ -112,9 +115,10 @@ public class MovieFiltersFragment extends Fragment
 
 
         // set an adapter on the sortby spinner
-        ArrayAdapter<String> sortbySpinnerAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.movie_filter_sortby_labels));
+//        ArrayAdapter<String> sortbySpinnerAdapter = new ArrayAdapter<>(getActivity(),
+//                android.R.layout.simple_spinner_item,
+//                getResources().getStringArray(R.array.movie_filter_sortby_labels));
+        ArrayAdapter<String> sortbySpinnerAdapter = new SortbySpinnerAdapter(getActivity());
         sortbySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSortbySpinner.setAdapter(sortbySpinnerAdapter);
         mSortbySpinner.setSelection(mSharedPrefs.

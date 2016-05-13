@@ -63,8 +63,12 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
         mCertSpinnerAdapter = certAdapter;
         mGenreSpinner = genreSpinner;
         mCertSpinner = certSpinner;
-
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+
+
+
+
 
         loaderManager.initLoader(GENRES_TABLE_LOADER_ID, null, this);
         loaderManager.initLoader(CERTS_TABLE_LOADER_ID, null, this);
