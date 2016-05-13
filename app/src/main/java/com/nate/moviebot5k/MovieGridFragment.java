@@ -25,6 +25,7 @@ import android.widget.GridView;
 
 import com.nate.moviebot5k.adapters.CertSpinnerAdapter;
 import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
+import com.nate.moviebot5k.adapters.SortbySpinnerAdapter;
 import com.nate.moviebot5k.adapters.YearSpinnerAdapter;
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
@@ -43,6 +44,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
     private MoviePosterAdapter mMoviePosterAdapter;
+    private SharedPreferences mSharedPrefs;
 
     /**
      * Call from a hosting Activity to get a new fragment for a fragment transaction.  The fragment
@@ -106,6 +108,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         Log.i(LOGTAG, "entered onCreate");
 
         setHasOptionsMenu(true);
+
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         if(savedInstanceState == null) {
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
@@ -226,12 +230,18 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             ArrayAdapter<String> yearSpinnerAdapter = new YearSpinnerAdapter(getActivity());
             yearSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             yearSpinner.setAdapter(yearSpinnerAdapter);
-
+            yearSpinner.setSelection(mSharedPrefs.
+                    getInt(getString(R.string.key_movie_filter_year_spinner_position), 0));
+            yearSpinner.setOnItemSelectedListener(new SpinnerListener(getActivity()));
+            
             MenuItem sortbySpinnerMenuItem = menu.findItem(R.id.spinner_sortby);
             AppCompatSpinner sortbySpinner = (AppCompatSpinner) MenuItemCompat.getActionView(sortbySpinnerMenuItem);
-            ArrayAdapter<String> sortbySpinnerAdapter = new YearSpinnerAdapter(getActivity());
+            ArrayAdapter<String> sortbySpinnerAdapter = new SortbySpinnerAdapter(getActivity());
             sortbySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             sortbySpinner.setAdapter(sortbySpinnerAdapter);
+            sortbySpinner.setSelection(mSharedPrefs.
+                    getInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0));
+            sortbySpinner.setOnItemSelectedListener(new SpinnerListener(getActivity()));
 
         }
 
