@@ -65,14 +65,8 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
         mCertSpinner = certSpinner;
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-
-
-
-
-
         loaderManager.initLoader(GENRES_TABLE_LOADER_ID, null, this);
         loaderManager.initLoader(CERTS_TABLE_LOADER_ID, null, this);
-        
     }
 
 
@@ -119,14 +113,14 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
             // API call when user navigates back to HomeActivity.. details details
             mGenreSpinner.setSelection(mSharedPrefs.
                     getInt(mContext.getString(R.string.key_movie_filter_genre_spinner_position), 0));
-            // I don't think it matters if setOnItemSelectedListener is here on in onCreate
-//            mGenreSpinner.setOnItemSelectedListener(this);
+            // I don't think it matters if setOnItemSelectedListener is here
+            mGenreSpinner.setOnItemSelectedListener(new SpinnerListener(mContext));
         }
         else if (loader.getId() == CERTS_TABLE_LOADER_ID) {
             mCertSpinnerAdapter.swapCursor(data);
             mCertSpinner.setSelection(mSharedPrefs.
                     getInt(mContext.getString(R.string.key_movie_filter_cert_spinner_position), 0));
-//            mCertSpinner.setOnItemSelectedListener(this);
+            mCertSpinner.setOnItemSelectedListener(new SpinnerListener(mContext));
         }
     }
 
