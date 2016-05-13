@@ -17,6 +17,8 @@
     <string name="action_movie_filters">Filters</string>
     <string name="action_favorites">Favorites</string>
     <string name="action_about_app">About</string>
+    <string name="action_item_favorites_id" translatable="false">action_favorites</string>
+    <string name="action_item_about_app_id" translatable="false">action_about_app</string>
 
 
     <!-- movie sortby filter labels -->

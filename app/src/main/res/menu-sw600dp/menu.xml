@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/spinner_actionbar_genres"
+        android:orderInCategory="10"
+        android:title="GENRE SPIN"
+        app:showAsAction="always"
+        app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
+
+
+
+
+
+    <item
+        android:id="@+id/action_favorites"
+        android:orderInCategory="200"
+        android:title="@string/action_favorites"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_about_app"
+        android:orderInCategory="300"
+        android:title="@string/action_about_app"
+        app:showAsAction="never"/>
+
+</menu>

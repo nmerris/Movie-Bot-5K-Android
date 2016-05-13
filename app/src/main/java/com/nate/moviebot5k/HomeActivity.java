@@ -3,14 +3,24 @@ package com.nate.moviebot5k;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
 
 public class HomeActivity extends SingleFragmentActivity
     implements MovieGridFragment.Callbacks {
 
     private final String LOGTAG = N8LOG + "HomeActivity";
+
+    private SimpleCursorAdapter mGenreSpinnerAdapter;
+    private AppCompatSpinner mGenreSpinner;
+
+
 
     @Override
     protected Fragment createFragment() {
@@ -47,6 +57,16 @@ public class HomeActivity extends SingleFragmentActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+
+
+        MenuItem genreSpinnerMenuItem = menu.findItem(R.id.spinner_actionbar_genres);
+        mGenreSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(genreSpinnerMenuItem);
+
+        mGenreSpinnerAdapter = new GenreSpinnerAdapter(this);
+        mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
+
+
         return true;
     }
 
