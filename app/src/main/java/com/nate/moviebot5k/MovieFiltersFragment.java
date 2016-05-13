@@ -37,6 +37,16 @@ public class MovieFiltersFragment extends Fragment
 
     private static final int GENRES_TABLE_LOADER_ID = 1;
     private static final int CERTS_TABLE_LOADER_ID = 2;
+
+    // genresProjection and the ints that follow must be changed together
+    public static final String[] genresProjection = {
+            MovieTheaterContract.GenresEntry._ID,
+            MovieTheaterContract.GenresEntry.COLUMN_GENRE_ID,
+            MovieTheaterContract.GenresEntry.COLUMN_GENRE_NAME
+    };
+    public static final int GENRE_TABLE_COLUMN_ID = 0;
+    public static final int GENRE_TABLE_COLUMN_GENRE_ID = 1;
+    public static final int GENRE_TABLE_COLUMN_NAME = 2;
     
     private SharedPreferences mSharedPrefs;
     private SimpleCursorAdapter mGenreSpinnerAdapter, mCertsSpinnerAdapter;
@@ -97,16 +107,7 @@ public class MovieFiltersFragment extends Fragment
         sortbySpinner.setOnItemSelectedListener(this);
 
 
-        // set a SimpleCursorAdapter on the genre spinner
-        mGenreSpinnerAdapter = new SimpleCursorAdapter(getActivity(),
-                android.R.layout.simple_spinner_item,
-                null, // cursor is null here because Loader will deal with it
-                // what data column to bind to the text view built into the spinner
-                new String[] {MovieTheaterContract.GenresEntry.COLUMN_GENRE_NAME},
-                // this was tricky for me to figure out, this is the view id used by the spinner
-                // when you use the built in simple_spinner_item layout
-                new int[]{android.R.id.text1},
-                0); // no flags needed
+        mGenreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
         mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         genreSpinner.setAdapter(mGenreSpinnerAdapter);
         genreSpinner.setSelection(mSharedPrefs.
@@ -179,26 +180,37 @@ public class MovieFiltersFragment extends Fragment
                 break;
 
             case R.id.fragment_movie_filter_spinner_genre:
-                String selectedGenreName = parent.getItemAtPosition(position).toString();
-                String savedGenreName = mSharedPrefs
-                        .getString(getString(R.string.key_movie_filter_genre_id), "");
 
-                // get the genreId from the db, given a genre name
 
-                // check to see if user actually changed the genre filter
-                if(!selectedGenreName.equals(savedGenreName)) {
+                Log.i(LOGTAG, "  ********************spinner view tag: " + view.getTag());
 
-                    Uri currGenreIdQueryUri = MovieTheaterContract.GenresEntry
-                            .buildGenreIdUriFromGenreName(selectedGenreName);
 
-                    Cursor c = getActivity().getContentResolver().query(currGenreIdQueryUri, null, null, null, null);
 
-                    if(c.moveToFirst()) {
-                        String selectedGenreId = c.getString(1);
 
-                    }
 
-                }
+//                String selectedGenreName = parent.getItemAtPosition(position).toString();
+//                String savedGenreId = mSharedPrefs
+//                        .getString(getString(R.string.key_movie_filter_genre_id), "");
+//                String savedGenreName;
+//
+//                Uri currGenreUri = MovieTheaterContract.GenresEntry
+//                        .buildGenreUriFromGenreName(savedGenreName);
+//
+//                Cursor c = getActivity().getContentResolver().query(currGenreUri, null, null, null, null);
+//
+//                if(c != null && c.moveToFirst()) {
+//                    savedGenreName = c.getString(1);
+//
+//                }
+//
+//                // get the genreId from the db, given a genre name
+//
+//                // check to see if user actually changed the genre filter
+//                if(!selectedGenreName.equals(savedGenreId)) {
+//
+//
+//
+//                }
 
 
 

@@ -179,13 +179,14 @@ public class MovieTheaterContract {
         public static final String COLUMN_GENRE_ID = "genre_id";
         public static final String COLUMN_GENRE_NAME = "genre_name";
 
+
         // should not need any build methods.. genres table is only ever wiped out completely and
         // then written over with a bulk insert
 
-        public static Uri buildGenreIdUriFromGenreName(String genreName) {
-            return CONTENT_URI.buildUpon()
-                    .appendQueryParameter(COLUMN_GENRE_NAME, genreName).build();
-        }
+//        public static Uri buildGenreUriFromGenreName(String genreName) {
+//            return CONTENT_URI.buildUpon()
+//                    .appendQueryParameter(COLUMN_GENRE_NAME, genreName).build();
+//        }
 
     }
 
