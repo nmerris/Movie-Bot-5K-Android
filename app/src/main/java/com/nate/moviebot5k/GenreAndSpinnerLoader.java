@@ -1,11 +1,18 @@
 package com.nate.moviebot5k;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 
 import com.nate.moviebot5k.data.MovieTheaterContract;
@@ -14,11 +21,55 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
  * Created by Nathan Merris on 5/13/2016.
  */
 public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Cursor> {
+    private final String LOGTAG = SingleFragmentActivity.N8LOG + "GenreSpnnerLoader";
 
 
-    public GenreAndSpinnerLoader(Context context, )
+    private Context mContext;
+    private SharedPreferences mSharedPrefs;
+    private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
+    private AppCompatSpinner mGenreSpinner, mCertSpinner;
+
+    private static final int GENRES_TABLE_LOADER_ID = 1;
+    private static final int CERTS_TABLE_LOADER_ID = 2;
+
+    // genresProjection and the ints that follow must be changed together, order matters
+    public static final String[] genresProjection = {
+            MovieTheaterContract.GenresEntry._ID,
+            MovieTheaterContract.GenresEntry.COLUMN_GENRE_ID,
+            MovieTheaterContract.GenresEntry.COLUMN_GENRE_NAME
+    };
+    public static final int GENRE_TABLE_COLUMN_ID = 0;
+    public static final int GENRE_TABLE_COLUMN_GENRE_ID = 1;
+    public static final int GENRE_TABLE_COLUMN_NAME = 2;
+
+    // certsProjection and the ints that follow must be changed together, order matters
+    public static final String[] certsProjection = {
+            MovieTheaterContract.CertsEntry._ID,
+            MovieTheaterContract.CertsEntry.COLUMN_CERT_ORDER,
+            MovieTheaterContract.CertsEntry.COLUMN_CERT_NAME
+    };
+    public static final int CERTS_TABLE_COLUMN_ID = 0;
+    public static final int CERTS_TABLE_COLUMN_CERTS_ORDER = 1;
+    public static final int CERTS_TABLE_COLUMN_NAME = 2;
 
 
+
+    public GenreAndSpinnerLoader(Context context, SimpleCursorAdapter genreAdapter,
+        SimpleCursorAdapter certAdapter, AppCompatSpinner genreSpinner, AppCompatSpinner certSpinner,
+        LoaderManager loaderManager) {
+        
+        mContext = context;
+        mGenreSpinnerAdapter = genreAdapter;
+        mCertSpinnerAdapter = certAdapter;
+        mGenreSpinner = genreSpinner;
+        mCertSpinner = certSpinner;
+
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        loaderManager.initLoader(GENRES_TABLE_LOADER_ID, null, this);
+        loaderManager.initLoader(CERTS_TABLE_LOADER_ID, null, this);
+        
+    }
 
 
     @Override
@@ -28,7 +79,7 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
         if(id == GENRES_TABLE_LOADER_ID) {
             Log.i(LOGTAG, "  and about to return new GENRES_TABLE_LOADER");
 
-            return new CursorLoader(getActivity(),
+            return new CursorLoader(mContext,
                     MovieTheaterContract.GenresEntry.CONTENT_URI,
                     genresProjection,
                     // the order in which the genres are listed doesn't matter
@@ -38,7 +89,7 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
         else if(id == CERTS_TABLE_LOADER_ID) {
             Log.i(LOGTAG, "  and about to return new CERTS_TABLE_LOADER");
 
-            return new CursorLoader(getActivity(),
+            return new CursorLoader(mContext,
                     MovieTheaterContract.CertsEntry.CONTENT_URI,
                     certsProjection,
                     null, null,
@@ -63,15 +114,15 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
             // will think that the user changed the selection, while will trigger an unnecessary
             // API call when user navigates back to HomeActivity.. details details
             mGenreSpinner.setSelection(mSharedPrefs.
-                    getInt(getString(R.string.key_movie_filter_genre_spinner_position), 0));
+                    getInt(mContext.getString(R.string.key_movie_filter_genre_spinner_position), 0));
             // I don't think it matters if setOnItemSelectedListener is here on in onCreate
-            mGenreSpinner.setOnItemSelectedListener(this);
+//            mGenreSpinner.setOnItemSelectedListener(this);
         }
         else if (loader.getId() == CERTS_TABLE_LOADER_ID) {
             mCertSpinnerAdapter.swapCursor(data);
             mCertSpinner.setSelection(mSharedPrefs.
-                    getInt(getString(R.string.key_movie_filter_cert_spinner_position), 0));
-            mCertSpinner.setOnItemSelectedListener(this);
+                    getInt(mContext.getString(R.string.key_movie_filter_cert_spinner_position), 0));
+//            mCertSpinner.setOnItemSelectedListener(this);
         }
     }
 
@@ -82,7 +133,7 @@ public class GenreAndSpinnerLoader implements LoaderManager.LoaderCallbacks<Curs
             mGenreSpinnerAdapter.swapCursor(null);
         }
         else if(loader.getId() == CERTS_TABLE_LOADER_ID) {
-//            mCertSpinnerAdapter.swapCursor(null);
+            mCertSpinnerAdapter.swapCursor(null);
         }
     }
 }

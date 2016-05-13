@@ -58,13 +58,13 @@ public class HomeActivity extends SingleFragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
 
-
-        MenuItem genreSpinnerMenuItem = menu.findItem(R.id.spinner_actionbar_genres);
-        mGenreSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(genreSpinnerMenuItem);
-
-        mGenreSpinnerAdapter = new GenreSpinnerAdapter(this);
-        mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
+//
+//        MenuItem genreSpinnerMenuItem = menu.findItem(R.id.spinner_actionbar_genres);
+//        mGenreSpinner = (AppCompatSpinner) MenuItemCompat.getActionView(genreSpinnerMenuItem);
+//
+//        mGenreSpinnerAdapter = new GenreSpinnerAdapter(this);
+//        mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
 
 
         return true;
