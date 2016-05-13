@@ -25,11 +25,14 @@
     <string name="filter_sortby_highest_revenue_label">Highest Revenue</string>
     <string name="filter_sortby_lowest_revenue_label">Lowest Revenue</string>
 
-    <!-- spinner labels -->
+    <!-- spinners -->
     <string name="spinner_year_label">Year:</string>
     <string name="spinner_genre_label">Genre:</string>
     <string name="spinner_cert_label">Rating:</string>
     <string name="spinner_sortby_label">Sort By:</string>
+    <string name="spinner_cert_any_cert_label">Any Rating</string>
+    <string name="spinner_year_any_year_label">Any Year</string>
+    <string name="spinner_genre_any_genre_label">Any Genre</string>
 
     <!-- about app fragment related -->
     <!-- TODO: update about app text -->

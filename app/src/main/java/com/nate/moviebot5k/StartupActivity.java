@@ -136,8 +136,7 @@ public class StartupActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
             // TODO: prob won't end up using num_favorites, easier to just check db each time
-            editor.putInt(getString(R.string.key_num_favorites),
-                    getResources().getInteger(R.integer.default_num_favorites));
+            editor.putInt(getString(R.string.key_num_favorites), 0);
 
             editor.putString(getString(R.string.key_movie_filter_sortby_value),
                     getString(R.string.default_movie_filter_sortby_value));
@@ -160,8 +159,7 @@ public class StartupActivity extends AppCompatActivity {
             editor.putInt(getString(R.string.key_currently_selected_favorite_id),
                     getResources().getInteger(R.integer.default_currently_selected_favorite_id));
 
-            editor.putBoolean(getString(R.string.key_fetch_new_movies),
-                    getResources().getBoolean(R.bool.default_fetch_new_movies));
+            editor.putBoolean(getString(R.string.key_fetch_new_movies), true);
 
             // all spinners start at zeroth position
             editor.putInt(getString(R.string.key_movie_filter_year_spinner_position), 0);

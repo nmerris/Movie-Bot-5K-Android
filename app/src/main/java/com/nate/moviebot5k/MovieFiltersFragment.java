@@ -2,7 +2,6 @@ package com.nate.moviebot5k;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -18,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 import butterknife.Bind;
@@ -50,7 +50,7 @@ public class MovieFiltersFragment extends Fragment
     
     private SharedPreferences mSharedPrefs;
     private SimpleCursorAdapter mGenreSpinnerAdapter, mCertsSpinnerAdapter;
-    private Cursor mGenresCursor, mCertsCursor;
+//    private Cursor mGenresCursor, mCertsCursor;
 
 
     @Override
@@ -107,22 +107,18 @@ public class MovieFiltersFragment extends Fragment
         sortbySpinner.setOnItemSelectedListener(this);
 
 
+        // set an adapter on the genre spinner
         mGenreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
         mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         genreSpinner.setAdapter(mGenreSpinnerAdapter);
-        genreSpinner.setSelection(mSharedPrefs.
-                getInt(getString(R.string.key_movie_filter_genre_spinner_position), 0));
-        genreSpinner.setOnItemSelectedListener(this);
+//        genreSpinner.setSelection(mSharedPrefs.
+//                getInt(getString(R.string.key_movie_filter_genre_spinner_position), 0));
+//        genreSpinner.setOnItemSelectedListener(this);
                 
 
 
         return rootView;
     }
-
-
-
-
-
 
 
 
@@ -180,69 +176,23 @@ public class MovieFiltersFragment extends Fragment
                 break;
 
             case R.id.fragment_movie_filter_spinner_genre:
+                String savedGenreId = mSharedPrefs
+                        .getString(getString(R.string.key_movie_filter_genre_id), "");
+                String selectedGenreId = (String) view.getTag();
 
+                // check if user actually changed the genre filter
+                if(!savedGenreId.equals(selectedGenreId)) {
+                    // update the genreId saved in sharedPrefs
+                    editor.putString(getString(R.string.key_movie_filter_genre_id), selectedGenreId);
+                    // update fetch_new_movies so a new fetch task starts when appropriate
+                    editor.putBoolean(getString(R.string.key_fetch_new_movies), true);
+                    // save the new position of the spinner
+                    editor.putInt(getString(R.string.key_movie_filter_genre_spinner_position), position);
 
-                Log.i(LOGTAG, "  ********************spinner view tag: " + view.getTag());
+                    Log.i(LOGTAG, "  just wrote to sharedPrefs key_movie_filter_genre_id: " + selectedGenreId);
+                    Log.i(LOGTAG, "    and changed sharedPrefs key_fetch_new_movies bool to ****TRUE****");
 
-
-
-
-
-//                String selectedGenreName = parent.getItemAtPosition(position).toString();
-//                String savedGenreId = mSharedPrefs
-//                        .getString(getString(R.string.key_movie_filter_genre_id), "");
-//                String savedGenreName;
-//
-//                Uri currGenreUri = MovieTheaterContract.GenresEntry
-//                        .buildGenreUriFromGenreName(savedGenreName);
-//
-//                Cursor c = getActivity().getContentResolver().query(currGenreUri, null, null, null, null);
-//
-//                if(c != null && c.moveToFirst()) {
-//                    savedGenreName = c.getString(1);
-//
-//                }
-//
-//                // get the genreId from the db, given a genre name
-//
-//                // check to see if user actually changed the genre filter
-//                if(!selectedGenreName.equals(savedGenreId)) {
-//
-//
-//
-//                }
-
-
-
-
-
-
-
-//
-//                int savedGenreSpinnerPosition = mSharedPrefs
-//                        .getInt(getString(R.string.key_movie_filter_genre_spinner_position), 0);
-//
-//                // check to see if the user actually changed the genre selection
-//                // this is why the order of the resource array matters
-//                if(savedSortbySpinnerPosition != position) {
-//
-//
-//
-//                    // update the genre filter id
-//                    editor.putInt(getString(R.string.key_movie_filter_genre_id), genreValues[position]);
-//
-//
-//
-//                    // set fetch movies key to true so that MoviesFetcher is called when user goes back to
-//                    // HomeActivity which hosts MovieGridFragment, which launches the fetch task
-//                    editor.putBoolean(getString(R.string.key_fetch_new_movies), true);
-//                    // store the position in the spinner so that it's the same next time user comes back here
-//                    editor.putInt(getString(R.string.key_movie_filter_genre_spinner_position), position);
-//
-//                    Log.i(LOGTAG, "  just wrote to sharedPrefs key_movie_filter_genre_value: " + genreValues[position]);
-//                    Log.i(LOGTAG, "    and changed sharedPrefs key_fetch_new_movies bool to ****TRUE****");
-//
-//                }
+                }
                 break;
 
 
@@ -289,11 +239,22 @@ public class MovieFiltersFragment extends Fragment
 
         if(loader.getId() == GENRES_TABLE_LOADER_ID) {
             mGenreSpinnerAdapter.swapCursor(data);
-            mGenresCursor = data;
+
+            // must wait until load finished to setSelection in spinner, because the
+            // onItemSelected spinner callback fires immediately when it's set up, and if
+            // the selected item is not in the list yet (because the loader has not returned the
+            // cursor which contains the spinner drop down elements), the onItemSelected method
+            // will think that the user changed the selection, while will trigger an unnecessary
+            // API call when user navigates back to HomeActivity.. details details
+            genreSpinner.setSelection(mSharedPrefs.
+                    getInt(getString(R.string.key_movie_filter_genre_spinner_position), 0));
+            // I don't think it matters if setOnItemSelectedListener is here on in onCreate
+            genreSpinner.setOnItemSelectedListener(this);
         }
         else if (loader.getId() == CERTS_TABLE_LOADER_ID) {
 //            mCertsSpinnerAdapter.swapCursor(data);
-//            mCertsCursor = data;
+
+
         }
     }
 

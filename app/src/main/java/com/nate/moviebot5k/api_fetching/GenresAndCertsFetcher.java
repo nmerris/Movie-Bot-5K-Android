@@ -116,7 +116,14 @@ public class GenresAndCertsFetcher {
         // more likely to have simultaneous movies table writes
         Vector<ContentValues> valuesVector = new Vector<>(numCerts);
 
-        // iterate through all the genres and convert each one to a ContentValues that genres
+        // first add the 'Any Rating' record
+        ContentValues anyCertCV = new ContentValues();
+        anyCertCV.put(CertsEntry.COLUMN_CERT_ORDER, 0); // want it to be at top of list of certs
+        anyCertCV.put(CertsEntry.COLUMN_CERT_NAME, mContext.getString(R.string.default_movie_filter_cert));
+        anyCertCV.put(CertsEntry.COLUMN_CERT_MEANING, mContext.getString(R.string.default_movie_filter_cert));
+        valuesVector.add(anyCertCV);
+
+        // iterate through all the genres and convert each one to a ContentValues that certs
         // table will understand
         for (int i = 0; i < numCerts; i++) {
             // get a single moviedb genre JSON object from jsonBody
@@ -135,8 +142,8 @@ public class GenresAndCertsFetcher {
 //            Log.d(LOGTAG, "  and certification order: " + certJsonObject.getInt("order"));
         }
 
-
-        if(valuesVector.size() > 0) { // no point in doing anything if no genres could be obtained
+        // greater than 1 below because there will always be a single 'Any Rating' in valuesVector
+        if(valuesVector.size() > 1) { // no point in doing anything if no genres could be obtained
             // TODO: can get rid of numDeleted and numInserted after testing
 
             Log.i(LOGTAG, "  about to wipe out old certification table data, calling delete with uri: " + CertsEntry.CONTENT_URI);
@@ -182,33 +189,37 @@ public class GenresAndCertsFetcher {
         // once each time StartupActivity runs, unlike when the movies table is updated which is
         // more likely to have simultaneous movies table writes
         Vector<ContentValues> valuesVector = new Vector<>(numGenres);
-
+        
+        // first add the 'Any Genre' record
+        ContentValues anyGenreCV = new ContentValues();
+        anyGenreCV.put(GenresEntry.COLUMN_GENRE_ID, mContext.getString(R.string.default_movie_filter_genre_id));
+        anyGenreCV.put(GenresEntry.COLUMN_GENRE_NAME, mContext.getString(R.string.spinner_genre_any_genre_label));
+        valuesVector.add(anyGenreCV);
 
         // iterate through all the genres and convert each one to a ContentValues that genres
         // table will understand
         for (int i = 0; i < numGenres; i++) {
             // get a single moviedb genre JSON object from jsonBody
             JSONObject genreJsonObject = genresJsonArray.getJSONObject(i);
+            ContentValues cv = new ContentValues();
 
             // ignore "Foreign" genre, there are too few results to be useful
             if(genreJsonObject.getString("name").equals("Foreign")) continue;
-
-            ContentValues values = new ContentValues();
-
+            
             // extract the data from the json object and put it in a single ContentValues object
-            values.put(GenresEntry.COLUMN_GENRE_ID, genreJsonObject.getInt("id"));
-            values.put(GenresEntry.COLUMN_GENRE_NAME, genreJsonObject.getString("name"));
+            cv.put(GenresEntry.COLUMN_GENRE_ID, genreJsonObject.getInt("id"));
+            cv.put(GenresEntry.COLUMN_GENRE_NAME, genreJsonObject.getString("name"));
 
             // add the single object to the ContentValues Vector
-            valuesVector.add(values);
+            valuesVector.add(cv);
 
-//            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id"));
-//            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
+            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id"));
+            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
         }
 
 
-
-        if(valuesVector.size() > 0) { // no point in doing anything if no genres could be obtained
+        // conditioning on greater than 1 because there will always be a single 'Any Genre' in the Vector
+        if(valuesVector.size() > 1) { // no point in doing anything if no genres could be obtained
             // TODO: can get rid of numDeleted after testing
 
             Log.i(LOGTAG, "  about to wipe out old genre table data, calling delete with uri: " + GenresEntry.CONTENT_URI);

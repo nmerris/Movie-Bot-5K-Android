@@ -3,25 +3,28 @@
 <!-- keys and defaults for anything related to shared prefs -->
 <resources>
 
-    <string name="key_movie_filter_sortby_value">filter_sortby</string>
+    <string name="key_movie_filter_sortby_value">filter_sortby</string> <!-- value type String -->
     <string name="default_movie_filter_sortby_value">popularity.desc</string> <!-- most popular -->
     <string name="key_movie_filter_sortby_spinner_position">sortby_spinner_position</string>
 
-    <string name="key_movie_filter_year">filter_year</string>
-    <string name="default_movie_filter_year">Any Year</string>
+    <string name="key_movie_filter_year">filter_year</string> <!-- value type String -->
+    <string name="default_movie_filter_year">@string/spinner_year_any_year_label</string>
     <string name="key_movie_filter_year_spinner_position">year_spinner_position</string>
 
-    <string name="key_movie_filter_cert">filter_cert</string>
-    <string name="default_movie_filter_cert">Any Rating</string>
+    <!-- NOTE: unlike genre queries, themoviedb just takes the name of the genre to query by genre -->
+    <string name="key_movie_filter_cert">filter_cert</string> <!-- value type String -->
+    <string name="default_movie_filter_cert">@string/spinner_cert_any_cert_label</string>
     <string name="key_movie_filter_cert_spinner_position">cert_spinner_position</string>
 
-    <string name="key_movie_filter_genre_id">filter_genre</string>
-    <string name="default_movie_filter_genre_id">Any Genre</string>
+    <!-- NOTE: themoviedb takes a numerical genre **ID** to query by genre -->
+    <string name="key_movie_filter_genre_id">filter_genre</string> <!-- value type String -->
+    <!--<string name="default_movie_filter_genre_id">@string/spinner_genre_any_genre_label</string>-->
+    <string name="default_movie_filter_genre_id">-1</string> <!-- Any Genre -->
     <string name="key_movie_filter_genre_spinner_position">genre_spinner_position</string>
 
     <!-- favorites sortby, sorts only favorites in favorites table locally, this sortby filter is
     not associated with any API calls -->
-    <string name="key_favorites_sortby_value">favorites_sortby</string>
+    <string name="key_favorites_sortby_value">favorites_sortby</string> <!-- value type String -->
     <string name="default_favorites_sortby_value">popularity.desc</string> <!-- most popular -->
     <string name="key_favorites_sortby_spinner_position">fav_sortby_spinner_position</string>
 
@@ -34,9 +37,9 @@
     <integer name="default_currently_selected_favorite_id">-1</integer> <!-- no favorite selected -->
 
     <string name="key_num_favorites">num_favorites</string>
-    <integer name="default_num_favorites">0</integer>
+    <!--<integer name="default_num_favorites">0</integer>-->
 
     <string name="key_fetch_new_movies">fetch_new_movies</string>
-    <bool name="default_fetch_new_movies">true</bool>
+    <!--<bool name="default_fetch_new_movies">true</bool>-->
 
 </resources>
