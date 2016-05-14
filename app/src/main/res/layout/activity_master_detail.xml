@@ -4,18 +4,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:layout_gravity="center">
+    android:orientation="horizontal">
 
     <!-- the first containter MUST have the same name as the single FrameLayout
          in activity_single_fragment, or SingleFragmentActivity will fail -->
 
-    <!-- this is where MovieGridFragment will live, with 1 columns in portrait orientation -->
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="35"/>
+        android:layout_weight="45"/>
 
     <!-- this is where MovieDetailFragment will live -->
     <FrameLayout
