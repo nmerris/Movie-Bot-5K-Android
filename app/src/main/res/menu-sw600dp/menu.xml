@@ -4,35 +4,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- DO NOT CHANGE THE ID OF THE SPINNERS because SpinnerListener depends on it -->
 
-    <item
-        android:id="@+id/spinner_sortby"
-        android:orderInCategory="10"
-        android:title="SORTBY SPIN"
-        app:showAsAction="always"
-        app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
 
-    <item
-        android:id="@+id/spinner_year"
-        android:orderInCategory="20"
-        android:title="SORTBY SPIN"
-        app:showAsAction="always"
-        app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
 
-    <item
-        android:id="@+id/spinner_genre"
-        android:orderInCategory="30"
-        android:title="GENRE SPIN"
-        app:showAsAction="ifRoom"
-        app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
 
-    <item
-        android:id="@+id/spinner_cert"
-        android:orderInCategory="40"
-        android:title="GENRE CERT"
-        app:showAsAction="ifRoom"
-        app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
+
 
 
 
@@ -40,7 +16,11 @@
         android:id="@+id/action_favorites"
         android:orderInCategory="200"
         android:title="@string/action_favorites"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+
+
+
+        />
 
     <item
         android:id="@+id/action_about_app"
@@ -49,3 +29,58 @@
         app:showAsAction="never"/>
 
 </menu>
+
+
+
+<!--
+    <?xml version="1.0" encoding="utf-8"?>
+
+<menu
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+
+&lt;!&ndash; DO NOT CHANGE THE ID OF THE SPINNERS because SpinnerListener depends on it &ndash;&gt;
+
+<item
+    android:id="@+id/spinner_sortby"
+    android:orderInCategory="10"
+    android:title="SORTBY SPIN"
+    app:showAsAction="always"
+    app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
+
+<item
+    android:id="@+id/spinner_year"
+    android:orderInCategory="20"
+    android:title="SORTBY SPIN"
+    app:showAsAction="always"
+    app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
+
+<item
+    android:id="@+id/spinner_genre"
+    android:orderInCategory="30"
+    android:title="GENRE SPIN"
+    app:showAsAction="always"
+    app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
+
+<item
+    android:id="@+id/spinner_cert"
+    android:orderInCategory="40"
+    android:title="GENRE CERT"
+    app:showAsAction="always"
+    app:actionViewClass="android.support.v7.widget.AppCompatSpinner"/>
+
+
+
+<item
+    android:id="@+id/action_favorites"
+    android:orderInCategory="200"
+    android:title="@string/action_favorites"
+    app:showAsAction="never"/>
+
+<item
+    android:id="@+id/action_about_app"
+    android:orderInCategory="300"
+    android:title="@string/action_about_app"
+    app:showAsAction="never"/>
+
+</menu>-->

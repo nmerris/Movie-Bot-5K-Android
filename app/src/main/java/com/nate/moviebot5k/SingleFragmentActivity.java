@@ -48,7 +48,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
     public static final String N8LOG = "N8LOG "; // logtag prefix to use for entire app
     private final String LOGTAG = N8LOG + "SingleFragmentAct";
-    private boolean mTwoPane; // true if subclassing activity is hosting a dual pane layout
+    public boolean mTwoPane; // true if subclassing activity is hosting a dual pane layout
 
     /**
      * Loads a Fragment into a simple FrameLayout that fills entire screen for Activities that
