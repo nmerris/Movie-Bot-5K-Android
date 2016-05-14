@@ -1,30 +1,15 @@
 package com.nate.moviebot5k;
 
 import android.content.Intent;
-import android.os.PersistableBundle;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
 
 public class HomeActivity extends SingleFragmentActivity
     implements MovieGridFragment.Callbacks {
     private final String LOGTAG = N8LOG + "HomeActivity";
-
-//    private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
-//    private AppCompatSpinner mGenreSpinner, mCertSpinner;
-
 
 
     @Override
@@ -51,35 +36,6 @@ public class HomeActivity extends SingleFragmentActivity
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
-
-
-
-
-//
-//        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar_movie_grid_fragment);
-//        setSupportActionBar(actionBarToolbar);
-
-//        Log.i(LOGTAG, "actionBarToolbar.toString: " + actionBarToolbar.toString());
-
-//        actionBarToolbar.inflateMenu(R.menu.menu);
-
-
-
-//        ActionBar actionBar = getSupportActionBar();
-//
-//        View actionBarLayout = getLayoutInflater().inflate(R.layout.activity_home_actionbar_tablet, null);
-//
-//        actionBar.setCustomView(actionBarLayout);
-//
-//        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-//
-//
-//
-//
-//
-//        // this Activity will always have a support action bar, so I don't think it's possible
-//        // for getSupportActionBar to produce a null pointer exception
-//        if(mTwoPane) actionBar.setDisplayShowTitleEnabled(false);
     }
 
 

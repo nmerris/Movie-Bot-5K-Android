@@ -1,5 +1,6 @@
 package com.nate.moviebot5k;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
@@ -105,6 +106,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
     } // end onCreate()
 
+
+    @Override
+    protected void onResume() {
+        // it really works better to just keep the app in landscape on tablet and larger devices
+        if(mTwoPane) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+
+        super.onResume();
+    }
 
     public void displayScreenDP() {
         // TESTING: just want to see what screen dp of device is..
