@@ -1,10 +1,15 @@
 package com.nate.moviebot5k;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
 public class HomeActivity extends SingleFragmentActivity
@@ -27,7 +32,7 @@ public class HomeActivity extends SingleFragmentActivity
     // will return either activity_single_fragment or activity_master_detail depending on min screen width
     @Override
     protected int getLayoutResourceId() {
-        return R.layout.activity_home_ref;
+        return R.layout.activity_home;
     }
 
 
@@ -36,6 +41,19 @@ public class HomeActivity extends SingleFragmentActivity
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
+        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(actionBarToolbar);
+
+//        actionBarToolbar.inflateMenu(R.menu.menu);
+
+
+
+    }
+
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
     }
 
 
@@ -45,6 +63,14 @@ public class HomeActivity extends SingleFragmentActivity
 
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.i(LOGTAG, "entered onCreateOptionsMenu");
+
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

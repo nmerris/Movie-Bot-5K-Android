@@ -111,7 +111,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        setHasOptionsMenu(true);
+//        setHasOptionsMenu(true);
 
         if(savedInstanceState == null) {
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
@@ -140,8 +140,12 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         // title, UP navigation, nav drawer, and basically anything else to work, ie it will allow
         // the TOOLBAR to have the same functionality as the ACTION BAR, but toolbars are nicer
         // because they are much easier to customize
-        Toolbar actionBarToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_movie_grid_fragment);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(actionBarToolbar);
+//        Toolbar actionBarToolbar = (Toolbar) rootView.findViewById(R.id.toolbar_movie_grid_fragment);
+//
+//        actionBarToolbar.inflateMenu(R.menu.menu);
+
+//        ((AppCompatActivity) getActivity()).setSupportActionBar(actionBarToolbar);
+//        getActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
         GridView moviePosterGridView =
@@ -199,7 +203,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     }
 
 
-    @Override
+/*    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.i(LOGTAG, "entered onCreateOptionsMenu");
 
@@ -256,7 +260,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 //
 //        }
 
-    }
+    }*/
     
     
 
