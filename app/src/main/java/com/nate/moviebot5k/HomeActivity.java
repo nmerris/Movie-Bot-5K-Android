@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.os.PersistableBundle;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,6 +50,19 @@ public class HomeActivity extends SingleFragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
+
+
+
+
+
+//
+//        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar_movie_grid_fragment);
+//        setSupportActionBar(actionBarToolbar);
+
+//        Log.i(LOGTAG, "actionBarToolbar.toString: " + actionBarToolbar.toString());
+
+//        actionBarToolbar.inflateMenu(R.menu.menu);
+
 
 
 //        ActionBar actionBar = getSupportActionBar();
