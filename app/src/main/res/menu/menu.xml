@@ -4,12 +4,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
+<!--    <item
         android:id="@+id/action_movie_filters"
         android:orderInCategory="100"
         android:title="@string/action_movie_filters"
         app:showAsAction="always"
-        android:icon="@drawable/filter_icon"/>
+        android:icon="@drawable/filter_icon"/>-->
 
     <item
         android:id="@+id/action_favorites"

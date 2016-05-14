@@ -52,12 +52,6 @@ public class HomeActivity extends SingleFragmentActivity
 
 
     @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-        return super.onCreateView(parent, name, context, attrs);
-    }
-
-
-    @Override
     public void onMovieSelected(int movieId) {
         Log.i(LOGTAG, "entered onMovieSelected");
 
@@ -78,10 +72,10 @@ public class HomeActivity extends SingleFragmentActivity
         Intent intent;
 
         switch(id) {
-            case R.id.action_movie_filters:
+/*            case R.id.action_movie_filters:
                 intent = new Intent(this, MovieFiltersActivity.class);
                 startActivity(intent);
-                break;
+                break;*/
 
             case R.id.action_favorites:
 

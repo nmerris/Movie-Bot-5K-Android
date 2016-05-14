@@ -14,64 +14,98 @@
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:background="@color/colorPrimary">
+        android:background="@color/colorAccent">
 
-        <!-- contains selected filters text -->
+    </android.support.v7.widget.Toolbar>
+
+
+    <!-- contains filter spinners -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/movie_grid_poster_margin"
+        android:layout_marginLeft="@dimen/movie_grid_poster_margin"
+        android:layout_marginRight="@dimen/movie_grid_poster_margin"
+        android:padding="10dp"
+        android:background="@color/white">
+
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="240dp"
-            android:layout_height="match_parent">
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="40"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical">
 
-            <!-- contains Sortby and Genre selected filters text -->
+            <!-- genre spinner -->
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="120dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-                <!-- selected sortby -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Highest Rated"
-                    android:id="@+id/textView" />
+                    android:textColor="@color/black"
+                    android:text="Genre: " />
 
-                <!-- selected genre -->
-                <TextView
-                    android:layout_width="wrap_content"
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/spinner_genre"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Science Fiction"
-                    android:id="@+id/textView2" />
+                    android:spinnerMode="dialog"/>
             </LinearLayout>
 
-            <!-- contains Cert and Year selected filters text -->
+
+            <!-- cert spinner -->
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="80dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-                <!-- selected cert -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Any Rating"
-                    android:id="@+id/textView3" />
+                    android:textColor="@color/black"
+                    android:text="Rating: " />
 
-                <!-- selected year -->
-                <TextView
-                    android:layout_width="wrap_content"
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/spinner_cert"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Any Year"
-                    android:id="@+id/textView4" />
-
+                    android:spinnerMode="dialog"/>
             </LinearLayout>
         </LinearLayout>
-    </android.support.v7.widget.Toolbar>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="60"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical">
+
+            <!-- year spinner -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/black"
+                android:text="Year: "/>
+
+            <!-- sortby spinner -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/black"
+                android:text="Sort: "/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
 
     <!-- do not change the id below because SingleFragmentActivity depends on it -->
     <FrameLayout
