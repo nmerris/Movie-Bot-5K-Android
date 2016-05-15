@@ -6,6 +6,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
 
 import com.nate.moviebot5k.GenreAndCertSpinnerLoader;
+import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
@@ -13,9 +14,18 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
  */
 public class GenreSpinnerAdapter extends SimpleCursorAdapter {
 
-    public GenreSpinnerAdapter(Context context) {
+/*    public GenreSpinnerAdapter(Context context) {
         super(context,
                 android.R.layout.simple_spinner_item,
+                null,
+                new String[]{MovieTheaterContract.GenresEntry.COLUMN_GENRE_NAME},
+                new int[]{android.R.id.text1},
+                0);
+    }*/
+
+    public GenreSpinnerAdapter(Context context) {
+        super(context,
+                R.layout.spinner_item,
                 null,
                 new String[]{MovieTheaterContract.GenresEntry.COLUMN_GENRE_NAME},
                 new int[]{android.R.id.text1},

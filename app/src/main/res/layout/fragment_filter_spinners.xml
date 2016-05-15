@@ -19,7 +19,7 @@
 
         <!-- genre spinner -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
@@ -28,13 +28,15 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/black"
-                android:text="Genre: " />
+                android:text="Genre: "
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/spinner_genre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:spinnerMode="dialog"
+                android:padding="0dp"
                 android:background="@drawable/spinner_dropdown_button"/>
         </LinearLayout>
 
@@ -50,6 +52,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/black"
+                android:textStyle="bold"
                 android:text="Rating: " />
 
             <Spinner
