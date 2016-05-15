@@ -20,98 +20,17 @@
 
 
     <!-- contains filter spinners -->
-    <LinearLayout
-        android:orientation="horizontal"
+    <FrameLayout
+        android:id="@+id/filter_spinner_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/movie_grid_poster_margin"
-        android:layout_marginLeft="@dimen/movie_grid_poster_margin"
-        android:layout_marginRight="@dimen/movie_grid_poster_margin"
-        android:padding="10dp"
-        android:background="@color/white">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_weight="40"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical">
-
-            <!-- genre spinner -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/black"
-                    android:text="Genre: " />
-
-                <android.support.v7.widget.AppCompatSpinner
-                    android:id="@+id/spinner_genre"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:spinnerMode="dialog"/>
-            </LinearLayout>
-
-
-            <!-- cert spinner -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/black"
-                    android:text="Rating: " />
-
-                <android.support.v7.widget.AppCompatSpinner
-                    android:id="@+id/spinner_cert"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:spinnerMode="dialog"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_weight="60"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical">
-
-            <!-- year spinner -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/black"
-                android:text="Year: "/>
-
-            <!-- sortby spinner -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/black"
-                android:text="Sort: "/>
-
-        </LinearLayout>
-    </LinearLayout>
-
+        android:layout_height="wrap_content"/>
 
 
     <!-- do not change the id below because SingleFragmentActivity depends on it -->
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
 

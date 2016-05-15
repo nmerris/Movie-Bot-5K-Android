@@ -49,7 +49,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
     public static final String N8LOG = "N8LOG "; // logtag prefix to use for entire app
     private final String LOGTAG = N8LOG + "SingleFragmentAct";
-    public boolean mTwoPane; // true if subclassing activity is hosting a dual pane layout
+    boolean mTwoPane; // true if subclassing activity is hosting a dual pane layout
+    FragmentManager mFragmentManager;
 
     /**
      * Loads a Fragment into a simple FrameLayout that fills entire screen for Activities that
@@ -96,12 +97,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
         mTwoPane = findViewById(R.id.container_second_pane) != null;
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
+        mFragmentManager = getSupportFragmentManager();
+        Fragment fragment = mFragmentManager.findFragmentById(R.id.fragment_container);
 
         if (fragment == null) {
             fragment = createFragment();
-            fragmentManager.beginTransaction().add(R.id.fragment_container, fragment).commit();
+            mFragmentManager.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
 
     } // end onCreate()

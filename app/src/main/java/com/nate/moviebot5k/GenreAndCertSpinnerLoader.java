@@ -12,8 +12,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
+import android.widget.Spinner;
 
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
@@ -27,7 +27,7 @@ public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<
     private Context mContext;
     private SharedPreferences mSharedPrefs;
     private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
-    private AppCompatSpinner mGenreSpinner, mCertSpinner;
+    private Spinner mGenreSpinner, mCertSpinner;
 
     // these loader ID's must not conflict with the ID's in MovieGridFragment!
     // because the same loader manager is used for all that fragment's loading
@@ -57,7 +57,7 @@ public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<
 
 
     public GenreAndCertSpinnerLoader(Context context, SimpleCursorAdapter genreAdapter,
-                                     SimpleCursorAdapter certAdapter, AppCompatSpinner genreSpinner, AppCompatSpinner certSpinner,
+                                     SimpleCursorAdapter certAdapter, Spinner genreSpinner, Spinner certSpinner,
                                      LoaderManager loaderManager) {
         
         mContext = context;

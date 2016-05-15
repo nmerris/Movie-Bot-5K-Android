@@ -49,13 +49,13 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
     private MoviePosterAdapter mMoviePosterAdapter;
-    private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
+//    private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
     private SharedPreferences mSharedPrefs;
 
 //    @Bind(R.id.spinner_year) AppCompatSpinner mYearSpinner;
 //    @Bind(R.id.spinner_sortby) AppCompatSpinner mSortbySpinner;
-    @Bind(R.id.spinner_genre) AppCompatSpinner mGenreSpinner;
-    @Bind(R.id.spinner_cert) AppCompatSpinner mCertSpinner;
+//    @Bind(R.id.spinner_genre) AppCompatSpinner mGenreSpinner;
+//    @Bind(R.id.spinner_cert) AppCompatSpinner mCertSpinner;
     @Bind(R.id.fragment_movie_grid_gridview) GridView mMoviePosterGridView;
 
 
@@ -147,7 +147,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
 
-        ButterKnife.bind(this, rootView);
+//        ButterKnife.bind(this, rootView);
 
 
         mMoviePosterGridView =
@@ -175,15 +175,15 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
         // set an adapter on the genre spinner
-        mGenreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
-        mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
-
-
-        // set an adapter on the cert spinner
-        mCertSpinnerAdapter = new CertSpinnerAdapter(getActivity());
-        mCertSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mCertSpinner.setAdapter(mCertSpinnerAdapter);
+//        mGenreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
+//        mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
+//
+//
+//        // set an adapter on the cert spinner
+//        mCertSpinnerAdapter = new CertSpinnerAdapter(getActivity());
+//        mCertSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        mCertSpinner.setAdapter(mCertSpinnerAdapter);
 
 
 
@@ -230,8 +230,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             // I originally planned to reuse the spinners in two diff fragments, but then made a big
             // design change, I'm just leaving it as-is, even though it would be better if all the
             // loading happened in this fragment.. it would be less code for sure
-            new GenreAndCertSpinnerLoader(getActivity(), mGenreSpinnerAdapter, mCertSpinnerAdapter,
-                    mGenreSpinner, mCertSpinner, getLoaderManager());
+//            new GenreAndCertSpinnerLoader(getActivity(), mGenreSpinnerAdapter, mCertSpinnerAdapter,
+//                    mGenreSpinner, mCertSpinner, getLoaderManager());
         }
 
         super.onActivityCreated(savedInstanceState);

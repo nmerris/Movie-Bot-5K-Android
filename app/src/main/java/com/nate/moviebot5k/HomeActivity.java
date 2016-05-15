@@ -23,13 +23,12 @@ public class HomeActivity extends SingleFragmentActivity
 
         // HomeActivity never shows movies from the favorites table, see FavoritesActivity
         // phone and tablet mode both always have a MovieGridFragment, so no need to check here
-        // SingleFragmentActivity will just put it in fragment_container
+        // SingleFragmentActivity will just put MovieGridFragment in fragment_container
         return MovieGridFragment.newInstance(false);
 
     }
 
 
-    // will return either activity_single_fragment or activity_master_detail depending on min screen width
     @Override
     protected int getLayoutResourceId() {
         return R.layout.activity_home;
@@ -44,9 +43,12 @@ public class HomeActivity extends SingleFragmentActivity
         Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(actionBarToolbar);
 
-//        actionBarToolbar.inflateMenu(R.menu.menu);
-
-
+        // create and add the movie filter spinner fragment if necessary
+        Fragment spinnerfragment = mFragmentManager.findFragmentById(R.id.filter_spinner_container);
+        if (spinnerfragment == null) {
+            spinnerfragment = new MovieFiltersSpinnerFragment();
+            mFragmentManager.beginTransaction().add(R.id.filter_spinner_container, spinnerfragment).commit();
+        }
 
     }
 
