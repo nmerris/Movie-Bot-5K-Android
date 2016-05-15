@@ -34,7 +34,8 @@
                 android:id="@+id/spinner_genre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:spinnerMode="dialog"/>
+                android:spinnerMode="dialog"
+                android:background="@drawable/spinner_dropdown_button"/>
         </LinearLayout>
 
 
