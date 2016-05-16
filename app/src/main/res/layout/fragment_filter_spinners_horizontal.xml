@@ -21,9 +21,9 @@
         android:gravity="center_vertical"
         android:paddingRight="12dp">
 
-        <!-- genre spinner -->
+        <!-- sortby spinner -->
         <Spinner
-            android:id="@+id/spinner_genre"
+            android:id="@+id/spinner_sortby"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:spinnerMode="dialog"
@@ -31,9 +31,9 @@
             android:layout_marginBottom="12dp"
             android:background="@drawable/spinner_dropdown_button"/>
 
-        <!-- sortby spinner -->
+        <!-- genre spinner -->
         <Spinner
-            android:id="@+id/spinner_sortby"
+            android:id="@+id/spinner_genre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:spinnerMode="dialog"

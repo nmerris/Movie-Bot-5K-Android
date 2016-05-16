@@ -74,7 +74,7 @@ public class MovieFiltersSpinnerFragment extends Fragment
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 
-        View rootView = inflater.inflate(R.layout.fragment_filter_spinners, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_filter_spinners_ref, container, false);
         ButterKnife.bind(this, rootView);
 
         ArrayAdapter<String> yrSpinnerAdapter = new YearSpinnerAdapter(getActivity()); // get all the selectable years

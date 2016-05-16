@@ -17,7 +17,7 @@ public class CertSpinnerAdapter extends SimpleCursorAdapter {
 
     public CertSpinnerAdapter(Context context) {
         super(context,
-                R.layout.spinner_item,
+                R.layout.spinner_item_textview,
                 null,
                 new String[]{MovieTheaterContract.CertsEntry.COLUMN_CERT_NAME},
                 new int[]{android.R.id.text1},

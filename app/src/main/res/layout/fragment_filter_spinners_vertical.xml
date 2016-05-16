@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/movie_grid_poster_margin"
+    android:layout_marginRight="@dimen/movie_grid_poster_margin"
+    android:paddingLeft="6dp"
+    android:paddingRight="6dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
+    android:background="@color/white">
+
+    <!-- sortby spinner -->
+    <Spinner
+        android:id="@+id/spinner_sortby"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dialog"
+        android:padding="0dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/spinner_dropdown_button"/>
+
+    <!-- genre spinner -->
+    <Spinner
+        android:id="@+id/spinner_genre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dialog"
+        android:padding="0dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/spinner_dropdown_button"/>
+
+    <!-- cert spinner -->
+    <Spinner
+        android:id="@+id/spinner_cert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dialog"
+        android:padding="0dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/spinner_dropdown_button"/>
+
+    <!-- year spinner -->
+    <Spinner
+        android:id="@+id/spinner_year"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dialog"
+        android:padding="0dp"
+        android:background="@drawable/spinner_dropdown_button"/>
+
+</LinearLayout>

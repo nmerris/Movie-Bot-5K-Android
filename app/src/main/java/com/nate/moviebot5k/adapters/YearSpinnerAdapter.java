@@ -13,7 +13,7 @@ public class YearSpinnerAdapter extends ArrayAdapter<String> {
 
     public YearSpinnerAdapter(Context context) {
         super(context,
-                R.layout.spinner_item,
+                R.layout.spinner_item_textview,
                 Utility.getMovieFilterYears(context)); // get all the selectable years);
     }
 

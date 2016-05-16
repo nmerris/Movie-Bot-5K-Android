@@ -12,7 +12,7 @@ public class SortbySpinnerAdapter extends ArrayAdapter<String> {
 
     public SortbySpinnerAdapter(Context context) {
         super(context,
-                R.layout.spinner_item,
+                R.layout.spinner_item_textview,
                 context.getResources().getStringArray(R.array.movie_filter_sortby_labels));
     }
 
