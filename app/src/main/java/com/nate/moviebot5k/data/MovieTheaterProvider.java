@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
-import com.nate.moviebot5k.SingleFragmentActivity;
+import com.nate.moviebot5k.ActivitySingleFragment;
 import com.nate.moviebot5k.data.MovieTheaterContract.MoviesEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
@@ -20,16 +20,16 @@ import com.nate.moviebot5k.data.MovieTheaterContract.CertsEntry;
  * Created by Nathan Merris on 5/4/2016.
  */
 public class MovieTheaterProvider extends ContentProvider {
-    private static final String LOGTAG = SingleFragmentActivity.N8LOG + "MovieThtrProvdr";
+    private static final String LOGTAG = ActivitySingleFragment.N8LOG + "MovieThtrProvdr";
 
     private MovieTheaterDbHelper mOpenHelper;
 
     // the URI matcher used by this ContentProvider
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     // and the constants that will be used in switch statements for various ContentProvider methods
-    static final int MOVIES_ALL = 1; // used in MovieGridFragment to display all movie posters
+    static final int MOVIES_ALL = 1; // used in FragmentMovieGrid to display all movie posters
     static final int MOVIE_WITH_MOVIE_ID = 2; // used in MovieDetailFragment to display 1 movie
-    static final int FAVORITES_ALL = 3; // used in MovieGridFragment to display all favorites posters
+    static final int FAVORITES_ALL = 3; // used in FragmentMovieGrid to display all favorites posters
     static final int FAVORITE_WITH_MOVIE_ID = 4; // used in MovieDetailFragment to display 1 movie
     static final int GENRES_ALL = 5; // used to populate genre spinner
     static final int CERTS_ALL = 6; // used to populate certifications spinner

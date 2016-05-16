@@ -1,16 +1,11 @@
 package com.nate.moviebot5k;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.widget.AdapterView;
@@ -22,7 +17,7 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
  * Created by Nathan Merris on 5/13/2016.
  */
 public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<Cursor> {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "GenreSpnnerLoader";
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "GenreSpnnerLoader";
 
 
     private Context mContext;
@@ -30,7 +25,7 @@ public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<
     private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
     private Spinner mGenreSpinner, mCertSpinner;
 
-    // these loader ID's must not conflict with the ID's in MovieGridFragment!
+    // these loader ID's must not conflict with the ID's in FragmentMovieGrid!
     // because the same loader manager is used for all that fragment's loading
     private static final int GENRES_TABLE_LOADER_ID = 10;
     private static final int CERTS_TABLE_LOADER_ID = 20;
@@ -114,7 +109,7 @@ public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<
 //            // the selected item is not in the list yet (because the loader has not returned the
 //            // cursor which contains the spinner drop down elements), the onItemSelected method
 //            // will think that the user changed the selection, while will trigger an unnecessary
-//            // API call when user navigates back to HomeActivity.. details details
+//            // API call when user navigates back to ActivityHome.. details details
 //            mGenreSpinner.setSelection(mSharedPrefs.
 //                    getInt(mContext.getString(R.string.key_movie_filter_genre_spinner_position), 0));
 //            // I don't think it matters if setOnItemSelectedListener is here

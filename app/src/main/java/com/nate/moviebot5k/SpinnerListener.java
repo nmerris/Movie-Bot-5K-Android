@@ -6,13 +6,12 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.TextView;
 
 /**
  * Created by Nathan Merris on 5/13/2016.
  */
 public class SpinnerListener implements AdapterView.OnItemSelectedListener {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "SpinnerListener";
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "SpinnerListener";
 
     private Context mContext;
     private SharedPreferences mSharedPrefs;
@@ -37,7 +36,7 @@ public class SpinnerListener implements AdapterView.OnItemSelectedListener {
 //                    // update the year filter
 //                    editor.putString(mContext.getString(R.string.key_movie_filter_year), selectedYearFilter);
 //                    // set fetch movies key to true so that MoviesFetcher is called when user goes back to
-//                    // HomeActivity which hosts MovieGridFragment, which launches the fetch task
+//                    // ActivityHome which hosts FragmentMovieGrid, which launches the fetch task
 //                    editor.putBoolean(mContext.getString(R.string.key_fetch_new_movies), true);
 //                    // store the position in the spinner so that it's the same next time user comes back here
 //                    editor.putInt(mContext.getString(R.string.key_movie_filter_year_spinner_position), position);
@@ -62,7 +61,7 @@ public class SpinnerListener implements AdapterView.OnItemSelectedListener {
 //                    editor.putString(mContext.getString(R.string.key_movie_filter_sortby_value), sortbyValues[position]);
 //
 //                    // set fetch movies key to true so that MoviesFetcher is called when user goes back to
-//                    // HomeActivity which hosts MovieGridFragment, which launches the fetch task
+//                    // ActivityHome which hosts FragmentMovieGrid, which launches the fetch task
 //                    editor.putBoolean(mContext.getString(R.string.key_fetch_new_movies), true);
 //                    // store the position in the spinner so that it's the same next time user comes back here
 //                    editor.putInt(mContext.getString(R.string.key_movie_filter_sortby_spinner_position), position);

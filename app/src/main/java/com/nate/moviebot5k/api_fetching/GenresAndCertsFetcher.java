@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.nate.moviebot5k.BuildConfig;
 import com.nate.moviebot5k.R;
-import com.nate.moviebot5k.SingleFragmentActivity;
+import com.nate.moviebot5k.ActivitySingleFragment;
 import com.nate.moviebot5k.Utility;
 import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.CertsEntry;
@@ -23,7 +23,7 @@ import java.util.Vector;
  * Created by Nathan Merris on 5/6/2016.
  */
 public class GenresAndCertsFetcher {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "GnresCertsFtcher";
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "GnresCertsFtcher";
 
     private Context mContext; // used to retrieve String resources for API queries
 

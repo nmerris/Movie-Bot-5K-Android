@@ -32,13 +32,13 @@
             android:orientation="vertical"
             android:layout_weight="45">
 
-            <!-- contains MovieFiltersSpinnerFragment -->
+            <!-- contains FragmentMovieFiltersSpinner -->
             <FrameLayout
                 android:id="@+id/filter_spinner_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- contains MovieGridFragment -->
+            <!-- contains FragmentMovieGrid -->
             <FrameLayout
                 android:id="@+id/fragment_container"
                 android:layout_width="match_parent"

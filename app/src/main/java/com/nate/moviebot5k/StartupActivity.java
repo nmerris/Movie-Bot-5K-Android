@@ -15,12 +15,12 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
  * Initializes this app the first time it is installed on device, and detects if internet is
- * available.  If internet is available, launches Intent to HomeActivity, if not it will check to
+ * available.  If internet is available, launches Intent to ActivityHome, if not it will check to
  * see if user has at least one favorite, and then asks user via an AlertDialog if they would like
  * to view their favorites.  If so, launches and Intent to FavoritesActivity.
  */
 public class StartupActivity extends AppCompatActivity {
-    private static final String LOGTAG = SingleFragmentActivity.N8LOG + "StartupActivity";
+    private static final String LOGTAG = ActivitySingleFragment.N8LOG + "StartupActivity";
 
 
     @Override
@@ -34,7 +34,7 @@ public class StartupActivity extends AppCompatActivity {
 
 
         // go fetch a new list of genres and certs in a background thread, the app will then either continue
-        // on to HomeActivity if successful, or the user will be presented with a choice to view
+        // on to ActivityHome if successful, or the user will be presented with a choice to view
         // their favorites (if they have any), or the app will just show a msg saying that it needs
         // to have internet connection to work (and that they have not favorites)
         new FetchGenresAndCertsTask(this).execute();
@@ -70,12 +70,12 @@ public class StartupActivity extends AppCompatActivity {
             Log.i(LOGTAG,"  in FetchGenresAndCertsTask.onPostExecute, numGenresFetched was: " + numGenresFetched);
 
             // if at least 10 genres was fetched, the assumption here is that it was successful
-            // so go ahead and launch HomeActivity
+            // so go ahead and launch ActivityHome
             if (numGenresFetched > 10) { // 10 is arbitrary
                 Log.i(LOGTAG, "    since there were at least 10 genres fetched, connection to" +
-                        " themoviedb must be ok, so about to launch intent to HomeActivity");
+                        " themoviedb must be ok, so about to launch intent to ActivityHome");
 
-                Intent intent = new Intent(context, HomeActivity.class);
+                Intent intent = new Intent(context, ActivityHome.class);
                 startActivity(intent);
                 finish();
 

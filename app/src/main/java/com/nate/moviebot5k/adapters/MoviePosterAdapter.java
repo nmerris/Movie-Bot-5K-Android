@@ -9,9 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.nate.moviebot5k.MovieGridFragment;
+import com.nate.moviebot5k.ActivitySingleFragment;
+import com.nate.moviebot5k.FragmentMovieGrid;
 import com.nate.moviebot5k.R;
-import com.nate.moviebot5k.SingleFragmentActivity;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
  * Created by Nathan Merris on 5/10/2016.
  */
 public class MoviePosterAdapter extends CursorAdapter {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "MovPosterAdapter";
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovPosterAdapter";
 
 
     public MoviePosterAdapter(Context context, Cursor c, int flags) {
@@ -68,11 +68,11 @@ public class MoviePosterAdapter extends CursorAdapter {
         // get the ViewHolder, no need for a key because it's the only object associated with the view
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-//        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(MovieGridFragment.MOVIES_TABLE_COL_POSTER_PATH));
-//        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(MovieGridFragment.MOVIES_TABLE_COL_MOVIE_ID));
+//        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH));
+//        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
 
         Picasso.with(context)
-                .load(cursor.getString(MovieGridFragment.MOVIES_TABLE_COL_POSTER_PATH))
+                .load(cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH))
                 .into(viewHolder.posterImageView);
 
         // TODO: use placeholder images? at least in case a movie has no image poster

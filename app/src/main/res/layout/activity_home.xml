@@ -13,7 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <!-- do not change the id below because SingleFragmentActivity depends on it -->
+        <!-- do not change the id below because ActivitySingleFragment depends on it -->
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"

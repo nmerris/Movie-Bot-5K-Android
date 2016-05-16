@@ -4,9 +4,8 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.util.Log;
 
-import com.nate.moviebot5k.SingleFragmentActivity;
+import com.nate.moviebot5k.ActivitySingleFragment;
 
 /**
  * Defines the table and column names for movie_theater SQLite database.
@@ -14,7 +13,7 @@ import com.nate.moviebot5k.SingleFragmentActivity;
  * Created by Nathan Merris on 5/4/2016.
  */
 public class MovieTheaterContract {
-    private static final String LOGTAG = SingleFragmentActivity.N8LOG + "MovieThetrContrct";
+    private static final String LOGTAG = ActivitySingleFragment.N8LOG + "MovieThetrContrct";
 
     public static final String CONTENT_AUTHORITY = "com.nate.moviebot5k";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
@@ -31,7 +30,7 @@ public class MovieTheaterContract {
     // not final because MoviesEntry and FavoritesEntry extend it
     private static class MoviesEntryColumns {
 
-        // populated in MovieGridFragment from /discover/movie themoviedb API endpoint
+        // populated in FragmentMovieGrid from /discover/movie themoviedb API endpoint
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_ADULT = "adult";
         public static final String COLUMN_OVERVIEW = "overview";
@@ -69,7 +68,7 @@ public class MovieTheaterContract {
         public static final String COLUMN_REVIEW_AUTHOR4 = "review_author4";
         public static final String COLUMN_REVIEW_CONTENT4 = "review_content4";
 
-        // populated in MovieGridFragment from /movie/id/videos API endpoint
+        // populated in FragmentMovieGrid from /movie/id/videos API endpoint
         public static final String COLUMN_VIDEO_KEY1 = "video_key1";
         public static final String COLUMN_VIDEO_NAME1 = "video_name1";
         public static final String COLUMN_VIDEO_SITE1 = "video_site1";
@@ -94,8 +93,8 @@ public class MovieTheaterContract {
 
     
     /**
-     * Defines the table contents that MovieGridFragment and MovieDetailFragment will access when
-     * hosted by HomeActivity and MovieDetailPagerActivity (in phone mode).
+     * Defines the table contents that FragmentMovieGrid and MovieDetailFragment will access when
+     * hosted by ActivityHome and MovieDetailPagerActivity (in phone mode).
      * Basically this will be the table that is used when user is NOT viewing their favorites.
      * It will only ever hold one set of data, and will be written over completely every time a
      * FetchMoviesTask returns at least 1 movie.
@@ -126,7 +125,7 @@ public class MovieTheaterContract {
 
 
     /**
-     * Defines the table contents that MovieGridFragment and MovieDetailFragment will access when
+     * Defines the table contents that FragmentMovieGrid and MovieDetailFragment will access when
      * hosted by FavoritesActivity and FavoritesPagerActivity (in phone mode).
      * Basically this will be the table that is used when user is viewing their favorites, which
      * can be done with or without an internet connection.  The data in this table is identical to

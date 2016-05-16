@@ -10,37 +10,23 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
-import com.nate.moviebot5k.adapters.CertSpinnerAdapter;
-import com.nate.moviebot5k.adapters.GenreSpinnerAdapter;
-import com.nate.moviebot5k.adapters.SortbySpinnerAdapter;
-import com.nate.moviebot5k.adapters.YearSpinnerAdapter;
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.adapters.MoviePosterAdapter;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 
 /**
  * Created by Nathan Merris on 5/9/2016.
  */
-public class MovieGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "MovGridFragment";
+public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovGridFragment";
 
     private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
     private static final int MOVIES_TABLE_LOADER_ID = 1;
@@ -66,12 +52,12 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
      *
      * @param useFavoritesTable set to true if host needs to display movies using data from the
      *                          favorites table, which can be used with no internet connection
-     * @return new MovieGridFragment <code>fragment</code>
+     * @return new FragmentMovieGrid <code>fragment</code>
      */
-    public static MovieGridFragment newInstance(boolean useFavoritesTable) {
+    public static FragmentMovieGrid newInstance(boolean useFavoritesTable) {
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, useFavoritesTable);
-        MovieGridFragment fragment = new MovieGridFragment();
+        FragmentMovieGrid fragment = new FragmentMovieGrid();
         fragment.setArguments(args);
         return fragment;
     }
@@ -209,7 +195,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     // define a projection for this fragment's Loaders, only want to query what we need for
     // the movie grid views.  NOTE: this is not going to restrict what actual data is fetched from
     // themoviedb during the API call, that will grab all the data it needs, the point here to just
-    // grab the data we need to make MovieGridFragment have what it needs to do it's thing
+    // grab the data we need to make FragmentMovieGrid have what it needs to do it's thing
     // NOTE: must include _id column, or Loader will not work
     private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
             MovieTheaterContract.MoviesEntry._ID,

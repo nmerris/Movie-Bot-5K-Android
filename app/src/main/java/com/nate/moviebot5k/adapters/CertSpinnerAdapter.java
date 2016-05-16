@@ -8,7 +8,7 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
  * A very simple spinner adapter that uses a simple_spinner_item layout.
- * Both MovieFiltersFragment and MovieGridFragment use the same spinner, so why not make an
+ * Both MovieFiltersFragment and FragmentMovieGrid use the same spinner, so why not make an
  * adapter that both of them can use?
  *
  * Created by Nathan Merris on 5/13/2016.

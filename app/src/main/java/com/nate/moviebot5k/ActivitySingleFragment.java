@@ -45,7 +45,7 @@ import android.util.Log;
  *
  * @author Nathan Merris
  */
-public abstract class SingleFragmentActivity extends AppCompatActivity
+public abstract class ActivitySingleFragment extends AppCompatActivity
 {
 
     public static final String N8LOG = "N8LOG "; // logtag prefix to use for entire app
@@ -55,30 +55,30 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
     /**
      * Loads a Fragment into a simple FrameLayout that fills entire screen for Activities that
-     * choose not to override SingleFragmentActivity.getLayoutResourceId.
+     * choose not to override ActivitySingleFragment.getLayoutResourceId.
      *
      * <p>
      * Activities that choose to override getLayoutResourceId must provide a layout resource
      * with a container with id name = 'fragment_container'.  There can be other fragment containers
      * in the provided layout resource, but the fragment returned in createFragment will always
      * be loaded into the container named 'fragment_container'.  Everything else in the layout
-     * is ignored by SingleFragmentActivity.
+     * is ignored by ActivitySingleFragment.
      * </p>
      *
      * @return the <code>Fragment</code> that implementing Activity needs to be loaded into 'fragment_container'
-     * @see SingleFragmentActivity#getLayoutResourceId()
+     * @see ActivitySingleFragment#getLayoutResourceId()
      */
     protected abstract Fragment createFragment();
 
 
     /**
-     * Loads the layout resource provided.  SingleFragmentActivity will look for a container with
+     * Loads the layout resource provided.  ActivitySingleFragment will look for a container with
      * id name = 'fragment_container' so the layout provided must respect that.  The Fragment that
-     * was provided by overriding SingleFragmentActivity.createFragment will be loaded into
+     * was provided by overriding ActivitySingleFragment.createFragment will be loaded into
      * 'fragment_container'.
      *
      * @return the layout resource id to load
-     * @see SingleFragmentActivity#createFragment()
+     * @see ActivitySingleFragment#createFragment()
      */
     @LayoutRes
     protected int getLayoutResourceId() {

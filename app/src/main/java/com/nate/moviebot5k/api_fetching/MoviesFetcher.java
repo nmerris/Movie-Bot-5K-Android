@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.nate.moviebot5k.BuildConfig;
 import com.nate.moviebot5k.R;
-import com.nate.moviebot5k.SingleFragmentActivity;
+import com.nate.moviebot5k.ActivitySingleFragment;
 import com.nate.moviebot5k.Utility;
 import com.nate.moviebot5k.data.MovieTheaterContract.MoviesEntry;
 
@@ -24,7 +24,7 @@ import java.util.Vector;
  * Created by Nathan Merris on 5/9/2016.
  */
 public class MoviesFetcher {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "MoviesFetcher";
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "MoviesFetcher";
 
     private Context mContext; // used to retrieve String resources for API queries
 
@@ -107,7 +107,7 @@ public class MoviesFetcher {
             // however if an exception is thrown, that implies a network or json error, so
             // do not set the fetch_new_movies bool to false because we want to try again in the hopes
             // that the user has network access in the future..  this is checked every time
-            // MovieGridFragment.onResume is called, which is where this task is fired from
+            // FragmentMovieGrid.onResume is called, which is where this task is fired from
             SharedPreferences.Editor editor = sharedPrefs.edit();
             editor.putBoolean(mContext.getString(R.string.key_fetch_new_movies), false);
             editor.commit();

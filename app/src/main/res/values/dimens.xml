@@ -22,7 +22,7 @@
 
     <dimen name="movie_detail_category_separation_padding_bottom">16dp</dimen>
 
-    <!-- AboutAppFragment layout-->
+    <!-- FragmentAboutApp layout-->
     <dimen name="about_app_heading_text_size">20sp</dimen>
     <dimen name="about_app_content_text_size">16sp</dimen>
     <dimen name="about_app_content_padding_bottom">16dp</dimen>

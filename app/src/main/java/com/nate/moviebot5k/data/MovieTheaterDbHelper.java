@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.nate.moviebot5k.SingleFragmentActivity;
+import com.nate.moviebot5k.ActivitySingleFragment;
 import com.nate.moviebot5k.data.MovieTheaterContract.MoviesEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
@@ -18,7 +18,7 @@ import com.nate.moviebot5k.data.MovieTheaterContract.CertsEntry;
  * Created by Nathan Merris on 5/4/2016.
  */
 public class MovieTheaterDbHelper extends SQLiteOpenHelper {
-    private static final String LOGTAG = SingleFragmentActivity.N8LOG + "MovTheatrDbHelper";
+    private static final String LOGTAG = ActivitySingleFragment.N8LOG + "MovTheatrDbHelper";
 
     // If you change the database schema, you must increment the database version.
     private static final int DATABASE_VERSION = 2;

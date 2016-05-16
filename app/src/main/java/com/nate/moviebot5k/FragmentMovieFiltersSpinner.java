@@ -31,9 +31,9 @@ import butterknife.ButterKnife;
 /**
  * Created by Nathan Merris on 5/11/2016.
  */
-public class MovieFiltersSpinnerFragment extends Fragment
+public class FragmentMovieFiltersSpinner extends Fragment
         implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
-    private final String LOGTAG = SingleFragmentActivity.N8LOG + "MovFiltsSpinFrg";
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovFiltsSpinFrg";
 
     @Bind(R.id.spinner_year) Spinner mYearSpinner;
     @Bind(R.id.spinner_sortby) Spinner mSortbySpinner;
@@ -44,7 +44,7 @@ public class MovieFiltersSpinnerFragment extends Fragment
     private SharedPreferences mSharedPrefs;
     private Callbacks mCallbacks;
 
-    // these loader ID's must not conflict with the ID's in MovieGridFragment!
+    // these loader ID's must not conflict with the ID's in FragmentMovieGrid!
     // because the same loader manager is used for all that fragment's loading
     private static final int GENRES_TABLE_LOADER_ID = 10;
     private static final int CERTS_TABLE_LOADER_ID = 20;
@@ -169,7 +169,7 @@ public class MovieFiltersSpinnerFragment extends Fragment
                     // update the year filter
                     editor.putString(getActivity().getString(R.string.key_movie_filter_year), selectedYearFilter);
                     // set fetch movies key to true so that MoviesFetcher is called when user goes back to
-                    // HomeActivity which hosts MovieGridFragment, which launches the fetch task
+                    // ActivityHome which hosts FragmentMovieGrid, which launches the fetch task
                     editor.putBoolean(getActivity().getString(R.string.key_fetch_new_movies), true);
                     // store the position in the spinner so that it's the same next time user comes back here
                     editor.putInt(getActivity().getString(R.string.key_movie_filter_year_spinner_position), position);
@@ -198,7 +198,7 @@ public class MovieFiltersSpinnerFragment extends Fragment
                     editor.putString(getActivity().getString(R.string.key_movie_filter_sortby_value), sortbyValues[position]);
 
                     // set fetch movies key to true so that MoviesFetcher is called when user goes back to
-                    // HomeActivity which hosts MovieGridFragment, which launches the fetch task
+                    // ActivityHome which hosts FragmentMovieGrid, which launches the fetch task
                     editor.putBoolean(getActivity().getString(R.string.key_fetch_new_movies), true);
                     // store the position in the spinner so that it's the same next time user comes back here
                     editor.putInt(getActivity().getString(R.string.key_movie_filter_sortby_spinner_position), position);
@@ -315,7 +315,7 @@ public class MovieFiltersSpinnerFragment extends Fragment
             // the selected item is not in the list yet (because the loader has not returned the
             // cursor which contains the spinner drop down elements), the onItemSelected method
             // will think that the user changed the selection, while will trigger an unnecessary
-            // API call when user navigates back to HomeActivity.. details details
+            // API call when user navigates back to ActivityHome.. details details
             mGenreSpinner.setSelection(mSharedPrefs.
                     getInt(getActivity().getString(R.string.key_movie_filter_genre_spinner_position), 0));
             // I don't think it matters if setOnItemSelectedListener is here

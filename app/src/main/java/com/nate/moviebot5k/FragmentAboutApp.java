@@ -11,7 +11,7 @@ import android.view.ViewGroup;
  *
  * @author Nathan Merris
  */
-public class AboutAppFragment extends Fragment {
+public class FragmentAboutApp extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
