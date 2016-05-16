@@ -156,38 +156,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         mMoviePosterGridView.setAdapter(mMoviePosterAdapter);
 
 
-
-//        ArrayAdapter<String> yrSpinnerAdapter = new YearSpinnerAdapter(getActivity()); // get all the selectable years
-//        yrSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mYearSpinner.setAdapter(yrSpinnerAdapter);
-//        // make sure the spinner starts at the same position as last time
-//        mYearSpinner.setSelection(mSharedPrefs.
-//                getInt(getString(R.string.key_movie_filter_year_spinner_position), 0));
-//        mYearSpinner.setOnItemSelectedListener(new SpinnerListener(getActivity()));
-//
-//
-//        ArrayAdapter<String> sortbySpinnerAdapter = new SortbySpinnerAdapter(getActivity());
-//        sortbySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mSortbySpinner.setAdapter(sortbySpinnerAdapter);
-//        mSortbySpinner.setSelection(mSharedPrefs.
-//                getInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0));
-//        mSortbySpinner.setOnItemSelectedListener(new SpinnerListener(getActivity()));
-
-
-        // set an adapter on the genre spinner
-//        mGenreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
-//        mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
-//
-//
-//        // set an adapter on the cert spinner
-//        mCertSpinnerAdapter = new CertSpinnerAdapter(getActivity());
-//        mCertSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mCertSpinner.setAdapter(mCertSpinnerAdapter);
-
-
-
-
         return rootView;
     }
 
