@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
 
-import com.nate.moviebot5k.GenreAndCertSpinnerLoader;
+import com.nate.moviebot5k.FragmentMovieFiltersSpinner;
 import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
@@ -32,7 +32,7 @@ public class GenreSpinnerAdapter extends SimpleCursorAdapter {
          // the selected genre spinner value (which is the genre name) to it's associated id in the db,
          // but finally realized it's much easier to just set a tag on each spinner textview..
         String genreIdString =
-                String.valueOf(cursor.getInt(GenreAndCertSpinnerLoader.GENRE_TABLE_COLUMN_GENRE_ID));
+                String.valueOf(cursor.getInt(FragmentMovieFiltersSpinner.GENRE_TABLE_COLUMN_GENRE_ID));
          view.setTag(genreIdString);
          super.bindView(view, context, cursor);
      }
