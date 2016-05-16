@@ -27,8 +27,8 @@ public class MovieFiltersSpinnerFragment extends Fragment
         /*implements AdapterView.OnItemSelectedListener*//*, LoaderManager.LoaderCallbacks<Cursor>*/ {
     private final String LOGTAG = SingleFragmentActivity.N8LOG + "MovFiltsSpinFrg";
 
-//    @Bind(R.id.spinner_year) AppCompatSpinner mYearSpinner;
-//    @Bind(R.id.spinner_sortby) AppCompatSpinner mSortbySpinner;
+    @Bind(R.id.spinner_year) Spinner mYearSpinner;
+    @Bind(R.id.spinner_sortby) Spinner mSortbySpinner;
     @Bind(R.id.spinner_genre) Spinner mGenreSpinner;
     @Bind(R.id.spinner_cert) Spinner mCertSpinner;
 
@@ -63,21 +63,21 @@ public class MovieFiltersSpinnerFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_filter_spinners, container, false);
         ButterKnife.bind(this, rootView);
 
-//        ArrayAdapter<String> yrSpinnerAdapter = new YearSpinnerAdapter(getActivity()); // get all the selectable years
-//        yrSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mYearSpinner.setAdapter(yrSpinnerAdapter);
-//        // make sure the spinner starts at the same position as last time
-//        mYearSpinner.setSelection(sharedPrefs.
-//                getInt(getString(R.string.key_movie_filter_year_spinner_position), 0));
-//        mYearSpinner.setOnItemSelectedListener(new SpinnerListener(getActivity()));
-//
-//
-//        ArrayAdapter<String> sortbySpinnerAdapter = new SortbySpinnerAdapter(getActivity());
-//        sortbySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mSortbySpinner.setAdapter(sortbySpinnerAdapter);
-//        mSortbySpinner.setSelection(sharedPrefs.
-//                getInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0));
-//        mSortbySpinner.setOnItemSelectedListener(new SpinnerListener(getActivity()));
+        ArrayAdapter<String> yrSpinnerAdapter = new YearSpinnerAdapter(getActivity()); // get all the selectable years
+        yrSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mYearSpinner.setAdapter(yrSpinnerAdapter);
+        // make sure the spinner starts at the same position as last time
+        mYearSpinner.setSelection(sharedPrefs.
+                getInt(getString(R.string.key_movie_filter_year_spinner_position), 0));
+        mYearSpinner.setOnItemSelectedListener(new SpinnerListener(getActivity()));
+
+
+        ArrayAdapter<String> sortbySpinnerAdapter = new SortbySpinnerAdapter(getActivity());
+        sortbySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSortbySpinner.setAdapter(sortbySpinnerAdapter);
+        mSortbySpinner.setSelection(sharedPrefs.
+                getInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0));
+        mSortbySpinner.setOnItemSelectedListener(new SpinnerListener(getActivity()));
 
 
         // set an adapter on the genre spinner

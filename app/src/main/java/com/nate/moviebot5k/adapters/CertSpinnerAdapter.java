@@ -3,6 +3,7 @@ package com.nate.moviebot5k.adapters;
 import android.content.Context;
 import android.support.v4.widget.SimpleCursorAdapter;
 
+import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
@@ -16,7 +17,7 @@ public class CertSpinnerAdapter extends SimpleCursorAdapter {
 
     public CertSpinnerAdapter(Context context) {
         super(context,
-                android.R.layout.simple_spinner_item,
+                R.layout.spinner_item,
                 null,
                 new String[]{MovieTheaterContract.CertsEntry.COLUMN_CERT_NAME},
                 new int[]{android.R.id.text1},

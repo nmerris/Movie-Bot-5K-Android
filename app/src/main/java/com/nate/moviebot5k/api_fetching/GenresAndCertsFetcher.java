@@ -132,8 +132,9 @@ public class GenresAndCertsFetcher {
 
             // extract the data from the json object and put it in a single ContentValues object
             values.put(CertsEntry.COLUMN_CERT_ORDER, certJsonObject.getInt("order"));
-            values.put(CertsEntry.COLUMN_CERT_NAME, certJsonObject.getString("certification"));
             values.put(CertsEntry.COLUMN_CERT_MEANING, certJsonObject.getString("meaning"));
+            values.put(CertsEntry.COLUMN_CERT_NAME, certJsonObject.getString("certification"));
+
 
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
