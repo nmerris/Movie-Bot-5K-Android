@@ -13,10 +13,11 @@ import android.view.View;
 
 
 public class HomeActivity extends SingleFragmentActivity
-    implements MovieGridFragment.Callbacks {
+    implements MovieGridFragment.Callbacks, MovieFiltersSpinnerFragment.Callbacks {
     private final String LOGTAG = N8LOG + "HomeActivity";
 
 
+    // see SingleFragmentActivity
     @Override
     protected Fragment createFragment() {
         Log.i(LOGTAG, "entered createFragment, about to return a NEW MovieGridFragment to SingleFragmentActivity");
@@ -32,9 +33,30 @@ public class HomeActivity extends SingleFragmentActivity
     }
 
 
+    // see SingleFragmentActivity
     @Override
     protected int getLayoutResourceId() {
         return R.layout.activity_home;
+    }
+
+
+    // user selected a movie to see the details, so replace the MovieDetailFragment, passing over
+    // the movieId of the movie that was just selected
+    @Override
+    public void onMovieSelected(int movieId) {
+        Log.i(LOGTAG, "entered onMovieSelected");
+
+        // TODO: load new detail fragment with arg movieId
+
+    }
+
+
+    // replace the current MovieGridFragment any time a filter parameter has changed
+    // NOTE: MGF checks sharedPrefs key fetch_new_movies to see if it should make an API call,
+    // so there is no need to pass over a fragment argument in this case
+    @Override
+    public void onFilterChanged() {
+
     }
 
 
@@ -43,6 +65,10 @@ public class HomeActivity extends SingleFragmentActivity
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
+        // create a TOOLBAR, which is NOT the same as an Actionbar aka Appbar, however, we can
+        // use it just like an old action bar by calling setSupportActionBar
+        // a toolbar is much more flexible and customizable than an action bar
+        // all cool coders use Toolbars
         Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(actionBarToolbar);
 
@@ -52,15 +78,6 @@ public class HomeActivity extends SingleFragmentActivity
             spinnerfragment = new MovieFiltersSpinnerFragment();
             mFragmentManager.beginTransaction().add(R.id.filter_spinner_container, spinnerfragment).commit();
         }
-
-    }
-
-
-    @Override
-    public void onMovieSelected(int movieId) {
-        Log.i(LOGTAG, "entered onMovieSelected");
-
-        // TODO: load new detail fragment with arg movieId
 
     }
 
@@ -79,11 +96,6 @@ public class HomeActivity extends SingleFragmentActivity
         Intent intent;
 
         switch(id) {
-/*            case R.id.action_movie_filters:
-                intent = new Intent(this, MovieFiltersActivity.class);
-                startActivity(intent);
-                break;*/
-
             case R.id.action_favorites:
 
                 // TODO: launch intent to FavoritesActivity
@@ -97,5 +109,6 @@ public class HomeActivity extends SingleFragmentActivity
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }

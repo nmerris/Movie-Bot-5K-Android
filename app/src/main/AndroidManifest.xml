@@ -34,16 +34,6 @@
                 android:value="com.nate.moviebot5k.HomeActivity" />
         </activity>
 
-        <activity
-            android:name=".MovieFiltersActivity"
-            android:label="@string/movie_filters_activity_label"
-            android:parentActivityName=".HomeActivity">
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nate.moviebot5k.HomeActivity" />
-        </activity>
-
 
         <provider
             android:authorities="@string/content_authority"

@@ -3,7 +3,6 @@ package com.nate.moviebot5k.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +50,7 @@ public class MoviePosterAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 //        Log.i(LOGTAG, "entered newView");
 
-        View view = LayoutInflater.from(context).inflate(R.layout.moviegrid_poster, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.moviegrid_poster_imageview, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
 
         // conveniently, you can stash any object with a view with setTag, and grab it later
