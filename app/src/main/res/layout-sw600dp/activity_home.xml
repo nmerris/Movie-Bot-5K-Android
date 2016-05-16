@@ -16,7 +16,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:background="@color/colorAccent">
 
-        <!-- TODO: the toolbar is much more interesting in tablet mode -->
+        <!-- TODO: the toolbar_phone is much more interesting in tablet mode -->
 
     </android.support.v7.widget.Toolbar>
 

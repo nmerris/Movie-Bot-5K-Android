@@ -59,19 +59,10 @@ public class HomeActivity extends SingleFragmentActivity
         Log.i(LOGTAG, "entered onFilterChanged, about to REPLACE MovieGridFragment");
 
         // create and REPLACE the movie filter spinner fragment
-//        Fragment movieGridFragment = mFragmentManager.findFragmentById(R.id.fragment_movie_grid_gridview);
-//            Fragment movieGridFragment = new MovieFiltersSpinnerFragment();
-//            movieGridFragment.setArguments();
-            mFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                    MovieGridFragment.newInstance(false)).commit();
+        mFragmentManager.beginTransaction().replace(R.id.fragment_container,
+                MovieGridFragment.newInstance(false)).commit();
 
 
-
-//        Fragment movieGridFragment = mFragmentManager.findFragmentById(R.id.fragment_movie_grid_gridview);
-//        if (movieGridFragment == null) {
-//            movieGridFragment = new MovieFiltersSpinnerFragment();
-//            mFragmentManager.beginTransaction().add(R.id.filter_spinner_container, movieGridFragment).commit();
-//        }
     }
 
 
@@ -80,12 +71,7 @@ public class HomeActivity extends SingleFragmentActivity
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
-        // create a TOOLBAR, which is NOT the same as an Actionbar aka Appbar, however, we can
-        // use it just like an old action bar by calling setSupportActionBar
-        // a toolbar is much more flexible and customizable than an action bar
-        // all cool coders use Toolbars
-        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(actionBarToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         // create and ADD the movie filter spinner fragment if necessary
         Fragment spinnerfragment = mFragmentManager.findFragmentById(R.id.filter_spinner_container);

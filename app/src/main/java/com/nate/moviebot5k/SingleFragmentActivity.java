@@ -6,6 +6,7 @@ import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -94,6 +95,13 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
         // load the layout resource, subclassing Activity may or may not provide it's own
         setContentView(getLayoutResourceId());
+
+        // create a TOOLBAR, which is NOT the same as an Actionbar aka Appbar, however, we can
+        // use it just like an old action bar by calling setSupportActionBar
+        // a toolbar_phone is much more flexible and customizable than an action bar
+        // all cool coders use Toolbars
+        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(actionBarToolbar);
 
         mTwoPane = findViewById(R.id.container_second_pane) != null;
 

@@ -3,21 +3,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <!-- TODO: extract toolbar for phone mode to single layout file and 'include' it elsewhere, like here -->
-    <android.support.v7.widget.Toolbar
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:background="@color/colorAccent">
-
-    </android.support.v7.widget.Toolbar>
+    <include layout="@layout/toolbar_phone"/>
 
     <!-- in phone landscape mode, the spinner filter fragment right of the movie grid -->
     <LinearLayout
