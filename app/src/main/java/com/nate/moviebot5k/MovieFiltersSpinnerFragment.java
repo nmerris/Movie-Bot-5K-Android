@@ -35,6 +35,20 @@ public class MovieFiltersSpinnerFragment extends Fragment
 //    private SharedPreferences mSharedPrefs;
     private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
 
+    /**
+     * Required interface for any activity that hosts this fragment
+     */
+    public interface Callbacks {
+
+        /**
+         *
+         *
+         */
+        void onFilterChanged();
+    }
+
+
+
 
 //    @Override
 //    public void onCreate(Bundle savedInstanceState) {

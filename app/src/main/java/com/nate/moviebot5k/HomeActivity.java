@@ -24,6 +24,9 @@ public class HomeActivity extends SingleFragmentActivity
         // HomeActivity never shows movies from the favorites table, see FavoritesActivity
         // phone and tablet mode both always have a MovieGridFragment, so no need to check here
         // SingleFragmentActivity will just put MovieGridFragment in fragment_container
+
+        // NOTE: MGF always just checks sharePrefs for fetch_new_movies boolean when it is created,
+        // so there is no need to pass it any arguments to tell it if it should or should not do a fetch
         return MovieGridFragment.newInstance(false);
 
     }
@@ -56,6 +59,8 @@ public class HomeActivity extends SingleFragmentActivity
     @Override
     public void onMovieSelected(int movieId) {
         Log.i(LOGTAG, "entered onMovieSelected");
+
+        // TODO: load new detail fragment with arg movieId
 
     }
 

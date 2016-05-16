@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
+    <!-- TODO: extract toolbar for phone mode to single layout file and 'include' it elsewhere, like here -->
     <android.support.v7.widget.Toolbar
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/toolbar"
@@ -16,44 +17,27 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:background="@color/colorAccent">
 
-        <!-- TODO: the toolbar is much more interesting in tablet mode -->
-
     </android.support.v7.widget.Toolbar>
 
+    <!-- in phone landscape mode, the spinner filter fragment right of the movie grid -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <!-- left pane in tablet mode -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="45">
-
-            <!-- contains MovieFiltersSpinnerFragment -->
-            <FrameLayout
-                android:id="@+id/filter_spinner_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <!-- contains MovieGridFragment -->
-            <FrameLayout
-                android:id="@+id/fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-
-        <!-- right pane in tablet mode -->
-        <!-- contains MovieDetailFragment -->
+        <!-- contains movie grid fragment -->
         <FrameLayout
-            android:id="@+id/container_second_pane"
+            android:id="@+id/fragment_container"
             android:layout_width="0dp"
-            android:layout_weight="55"
+            android:layout_weight="65"
+            android:layout_height="wrap_content"/>
+
+        <!-- contains filter spinners -->
+        <FrameLayout
+            android:id="@+id/filter_spinner_container"
+            android:layout_width="0dp"
+            android:layout_weight="35"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </LinearLayout>
-

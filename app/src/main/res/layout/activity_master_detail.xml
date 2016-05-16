@@ -23,3 +23,5 @@
         android:layout_weight="55"/>
 
 </LinearLayout>
+
+<!-- NOTE, THIS IS NOT BEING USED ANYMORE EVER SINCE I ADDED SPINNER FRAGMENT -->
