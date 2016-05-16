@@ -56,7 +56,22 @@ public class HomeActivity extends SingleFragmentActivity
     // so there is no need to pass over a fragment argument in this case
     @Override
     public void onFilterChanged() {
+        Log.i(LOGTAG, "entered onFilterChanged, about to REPLACE MovieGridFragment");
 
+        // create and REPLACE the movie filter spinner fragment
+//        Fragment movieGridFragment = mFragmentManager.findFragmentById(R.id.fragment_movie_grid_gridview);
+//            Fragment movieGridFragment = new MovieFiltersSpinnerFragment();
+//            movieGridFragment.setArguments();
+            mFragmentManager.beginTransaction().replace(R.id.fragment_container,
+                    MovieGridFragment.newInstance(false)).commit();
+
+
+
+//        Fragment movieGridFragment = mFragmentManager.findFragmentById(R.id.fragment_movie_grid_gridview);
+//        if (movieGridFragment == null) {
+//            movieGridFragment = new MovieFiltersSpinnerFragment();
+//            mFragmentManager.beginTransaction().add(R.id.filter_spinner_container, movieGridFragment).commit();
+//        }
     }
 
 
@@ -72,7 +87,7 @@ public class HomeActivity extends SingleFragmentActivity
         Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(actionBarToolbar);
 
-        // create and add the movie filter spinner fragment if necessary
+        // create and ADD the movie filter spinner fragment if necessary
         Fragment spinnerfragment = mFragmentManager.findFragmentById(R.id.filter_spinner_container);
         if (spinnerfragment == null) {
             spinnerfragment = new MovieFiltersSpinnerFragment();

@@ -13,6 +13,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import com.nate.moviebot5k.data.MovieTheaterContract;
@@ -56,19 +57,20 @@ public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<
 
 
 
-    public GenreAndCertSpinnerLoader(Context context, SimpleCursorAdapter genreAdapter,
+    public GenreAndCertSpinnerLoader(AdapterView.OnItemSelectedListener itemSelectedListener,
+                                     Context context, SimpleCursorAdapter genreAdapter,
                                      SimpleCursorAdapter certAdapter, Spinner genreSpinner, Spinner certSpinner,
                                      LoaderManager loaderManager) {
-        
-        mContext = context;
-        mGenreSpinnerAdapter = genreAdapter;
-        mCertSpinnerAdapter = certAdapter;
-        mGenreSpinner = genreSpinner;
-        mCertSpinner = certSpinner;
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        loaderManager.initLoader(GENRES_TABLE_LOADER_ID, null, this);
-        loaderManager.initLoader(CERTS_TABLE_LOADER_ID, null, this);
+//        mItemSelectedListener = itemSelectedListener;
+//        mContext = context;
+//        mGenreSpinnerAdapter = genreAdapter;
+//        mCertSpinnerAdapter = certAdapter;
+//        mGenreSpinner = genreSpinner;
+//        mCertSpinner = certSpinner;
+//        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+//
+//        loaderManager.initLoader(GENRES_TABLE_LOADER_ID, null, this);
+//        loaderManager.initLoader(CERTS_TABLE_LOADER_ID, null, this);
     }
 
 
@@ -76,26 +78,26 @@ public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i(LOGTAG, "entered onCreateLoader");
 
-        if(id == GENRES_TABLE_LOADER_ID) {
-            Log.i(LOGTAG, "  and about to return new GENRES_TABLE_LOADER");
-
-            return new CursorLoader(mContext,
-                    MovieTheaterContract.GenresEntry.CONTENT_URI,
-                    genresProjection,
-                    // the order in which the genres are listed doesn't matter
-                    // in any case they are returned in alphabetical order from themoviedb
-                    null, null, null);
-        }
-        else if(id == CERTS_TABLE_LOADER_ID) {
-            Log.i(LOGTAG, "  and about to return new CERTS_TABLE_LOADER");
-
-            return new CursorLoader(mContext,
-                    MovieTheaterContract.CertsEntry.CONTENT_URI,
-                    certsProjection,
-                    null, null,
-                    // here we  want the proper order, ie NR, G, PG, PG-13, etc
-                    MovieTheaterContract.CertsEntry.COLUMN_CERT_ORDER + " ASC");
-        }
+//        if(id == GENRES_TABLE_LOADER_ID) {
+//            Log.i(LOGTAG, "  and about to return new GENRES_TABLE_LOADER");
+//
+//            return new CursorLoader(mContext,
+//                    MovieTheaterContract.GenresEntry.CONTENT_URI,
+//                    genresProjection,
+//                    // the order in which the genres are listed doesn't matter
+//                    // in any case they are returned in alphabetical order from themoviedb
+//                    null, null, null);
+//        }
+//        else if(id == CERTS_TABLE_LOADER_ID) {
+//            Log.i(LOGTAG, "  and about to return new CERTS_TABLE_LOADER");
+//
+//            return new CursorLoader(mContext,
+//                    MovieTheaterContract.CertsEntry.CONTENT_URI,
+//                    certsProjection,
+//                    null, null,
+//                    // here we  want the proper order, ie NR, G, PG, PG-13, etc
+//                    MovieTheaterContract.CertsEntry.COLUMN_CERT_ORDER + " ASC");
+//        }
         return null;
     }
 
@@ -104,36 +106,36 @@ public class GenreAndCertSpinnerLoader implements LoaderManager.LoaderCallbacks<
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.i(LOGTAG, "entered onLoadFinished");
 
-        if(loader.getId() == GENRES_TABLE_LOADER_ID) {
-            mGenreSpinnerAdapter.swapCursor(data);
-
-            // must wait until load finished to setSelection in spinner, because the
-            // onItemSelected spinner callback fires immediately when it's set up, and if
-            // the selected item is not in the list yet (because the loader has not returned the
-            // cursor which contains the spinner drop down elements), the onItemSelected method
-            // will think that the user changed the selection, while will trigger an unnecessary
-            // API call when user navigates back to HomeActivity.. details details
-            mGenreSpinner.setSelection(mSharedPrefs.
-                    getInt(mContext.getString(R.string.key_movie_filter_genre_spinner_position), 0));
-            // I don't think it matters if setOnItemSelectedListener is here
-            mGenreSpinner.setOnItemSelectedListener(new SpinnerListener(mContext));
-        }
-        else if (loader.getId() == CERTS_TABLE_LOADER_ID) {
-            mCertSpinnerAdapter.swapCursor(data);
-            mCertSpinner.setSelection(mSharedPrefs.
-                    getInt(mContext.getString(R.string.key_movie_filter_cert_spinner_position), 0));
-            mCertSpinner.setOnItemSelectedListener(new SpinnerListener(mContext));
-        }
+//        if(loader.getId() == GENRES_TABLE_LOADER_ID) {
+//            mGenreSpinnerAdapter.swapCursor(data);
+//
+//            // must wait until load finished to setSelection in spinner, because the
+//            // onItemSelected spinner callback fires immediately when it's set up, and if
+//            // the selected item is not in the list yet (because the loader has not returned the
+//            // cursor which contains the spinner drop down elements), the onItemSelected method
+//            // will think that the user changed the selection, while will trigger an unnecessary
+//            // API call when user navigates back to HomeActivity.. details details
+//            mGenreSpinner.setSelection(mSharedPrefs.
+//                    getInt(mContext.getString(R.string.key_movie_filter_genre_spinner_position), 0));
+//            // I don't think it matters if setOnItemSelectedListener is here
+//            mGenreSpinner.setOnItemSelectedListener(mContext);
+//        }
+//        else if (loader.getId() == CERTS_TABLE_LOADER_ID) {
+//            mCertSpinnerAdapter.swapCursor(data);
+//            mCertSpinner.setSelection(mSharedPrefs.
+//                    getInt(mContext.getString(R.string.key_movie_filter_cert_spinner_position), 0));
+//            mCertSpinner.setOnItemSelectedListener(new SpinnerListener(mContext));
+//        }
     }
 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if(loader.getId() == GENRES_TABLE_LOADER_ID) {
-            mGenreSpinnerAdapter.swapCursor(null);
-        }
-        else if(loader.getId() == CERTS_TABLE_LOADER_ID) {
-            mCertSpinnerAdapter.swapCursor(null);
-        }
+//        if(loader.getId() == GENRES_TABLE_LOADER_ID) {
+//            mGenreSpinnerAdapter.swapCursor(null);
+//        }
+//        else if(loader.getId() == CERTS_TABLE_LOADER_ID) {
+//            mCertSpinnerAdapter.swapCursor(null);
+//        }
     }
 }

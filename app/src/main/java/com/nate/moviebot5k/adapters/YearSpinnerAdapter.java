@@ -1,6 +1,7 @@
 package com.nate.moviebot5k.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.nate.moviebot5k.R;
