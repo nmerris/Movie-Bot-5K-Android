@@ -34,6 +34,16 @@
                 android:value=".ActivityHome" />
         </activity>
 
+        <activity
+            android:name=".ActivityMovieDetailsPager"
+            android:parentActivityName=".ActivityHome">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ActivityHome" />
+        </activity>
+
+
 
         <provider
             android:authorities="@string/content_authority"

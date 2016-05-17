@@ -9,7 +9,8 @@ import android.view.MenuItem;
 
 
 public class ActivityHome extends ActivitySingleFragment
-    implements FragmentMovieGrid.Callbacks, FragmentMovieFiltersSpinner.Callbacks {
+    implements FragmentMovieGrid.Callbacks, FragmentMovieFiltersSpinner.Callbacks/*,
+        FragmentMovieDetails.Callbacks */{
     private final String LOGTAG = N8LOG + "ActivityHome";
 
 
@@ -36,14 +37,24 @@ public class ActivityHome extends ActivitySingleFragment
     }
 
 
-    // user selected a movie to see the details, so replace the MovieDetailFragment, passing over
-    // the movieId of the movie that was just selected
+
     @Override
     public void onMovieSelected(int movieId) {
         Log.i(LOGTAG, "entered onMovieSelected");
 
-        // TODO: load new detail fragment with arg movieId
-
+        if(mTwoPane) {
+            // in tablet mode, replace the movie detail fragment, which is in the second pane,
+            // and instruct it to not use the favorites table
+            mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+                    FragmentMovieDetails.newInstance(false)).commit();
+        }
+        else {
+            // in phone mode, launch an intent to movie details pager activity
+            // the movie to show has already been stored in sharedPrefs key currently_selected_movie_id
+            // so there is no need for an intent extra
+            Intent intent = new Intent(this, ActivityMovieDetailsPager.class);
+            startActivity(intent);
+        }
     }
 
 
@@ -54,12 +65,22 @@ public class ActivityHome extends ActivitySingleFragment
     public void onFilterChanged() {
         Log.i(LOGTAG, "entered onFilterChanged, about to REPLACE FragmentMovieGrid");
 
-        // create and REPLACE the movie filter spinner fragment
+        // create and REPLACE the movie filter spinner fragment, pass over false so that the
+        // favorites table will not be used
         mFragmentManager.beginTransaction().replace(R.id.fragment_container,
                 FragmentMovieGrid.newInstance(false)).commit();
 
 
     }
+
+
+//    // callback from FragmentMovieDetails
+//    @Override
+//    public void onFavoriteRemoved(int movieId) {
+//        Log.i(LOGTAG, "entered onFavoriteRemoved");
+//
+//
+//    }
 
 
     @Override
@@ -106,6 +127,8 @@ public class ActivityHome extends ActivitySingleFragment
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
 
 }

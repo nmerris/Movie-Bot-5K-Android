@@ -8,8 +8,6 @@ import android.support.v4.app.Fragment;
  */
 public class ActivityAboutApp extends ActivitySingleFragment {
 
-//    private final String LOGTAG = N8LOG + getClass().getSimpleName();
-
     @Override
     protected Fragment createFragment() {
         return new FragmentAboutApp();

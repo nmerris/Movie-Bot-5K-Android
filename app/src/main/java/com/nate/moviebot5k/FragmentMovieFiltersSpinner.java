@@ -44,10 +44,9 @@ public class FragmentMovieFiltersSpinner extends Fragment
     private SharedPreferences mSharedPrefs;
     private Callbacks mCallbacks;
 
-    // these loader ID's must not conflict with the ID's in FragmentMovieGrid!
-    // because the same loader manager is used for all that fragment's loading
-    private static final int GENRES_TABLE_LOADER_ID = 10;
-    private static final int CERTS_TABLE_LOADER_ID = 20;
+    // these loader ID's must not conflict with the ID's of other loaders!
+    private static final int GENRES_TABLE_LOADER_ID = R.id.loader_genre_spinner;
+    private static final int CERTS_TABLE_LOADER_ID = R.id.loader_cert_spinner;
 
     // genresProjection and the ints that follow must be changed together, order matters
     public static final String[] genresProjection = {

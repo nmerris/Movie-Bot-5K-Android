@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
@@ -21,6 +22,7 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.adapters.MoviePosterAdapter;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 
 /**
  * Created by Nathan Merris on 5/9/2016.
@@ -29,19 +31,14 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovGridFragment";
 
     private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
-    private static final int MOVIES_TABLE_LOADER_ID = 1;
-    private static final int FAVORITES_TABLE_LOADER_ID = 2;
+    private static final int MOVIES_TABLE_LOADER_ID = R.id.loader_movies_table_fragment_movie_grid;
+    private static final int FAVORITES_TABLE_LOADER_ID = R.id.loader_favorites_table_fragment_movie_grid;
 
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
     private MoviePosterAdapter mMoviePosterAdapter;
-//    private SimpleCursorAdapter mGenreSpinnerAdapter, mCertSpinnerAdapter;
     private SharedPreferences mSharedPrefs;
 
-//    @Bind(R.id.spinner_year) AppCompatSpinner mYearSpinner;
-//    @Bind(R.id.spinner_sortby) AppCompatSpinner mSortbySpinner;
-//    @Bind(R.id.spinner_genre) AppCompatSpinner mGenreSpinner;
-//    @Bind(R.id.spinner_cert) AppCompatSpinner mCertSpinner;
     @Bind(R.id.fragment_movie_grid_gridview) GridView mMoviePosterGridView;
 
 
@@ -108,8 +105,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-//        setHasOptionsMenu(true);
-
         if(savedInstanceState == null) {
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
@@ -132,15 +127,36 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
+        ButterKnife.bind(this, rootView);
 
-//        ButterKnife.bind(this, rootView);
-
-
-        mMoviePosterGridView =
-                (GridView) rootView.findViewById(R.id.fragment_movie_grid_gridview);
         Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
         mMoviePosterGridView.setAdapter(mMoviePosterAdapter);
 
+
+        // set a click listener on the adapter
+        mMoviePosterGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // get the movieId from the tag attached to the view that was just clicked
+                int movieId = (int) view.getTag(R.id.movie_poster_imageview_movie_id_key);
+
+                // store the currently selected movieId in sharedPrefs
+                // so when the user comes back to this app, the same movie will be on screen
+                SharedPreferences.Editor editor = mSharedPrefs.edit();
+                if(mUseFavorites) {
+                    editor.putInt(getString(R.string.key_currently_selected_favorite_id), movieId);
+                } else {
+                    editor.putInt(getString(R.string.key_currently_selected_movie_id), movieId);
+                }
+                editor.commit();
+
+                Log.i(LOGTAG, "just clicked on movie with ID: " + movieId);
+
+                // call back to the hosting Activity so it can do what it needs to do
+                mCallbacks.onMovieSelected(movieId);
+            }
+        });
 
         return rootView;
     }
@@ -180,12 +196,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         else {
             Log.i(LOGTAG, "  and about to initLoader MOVIES_TABLE_LOADER, and genre and cert spinner loaders also");
             getLoaderManager().initLoader(MOVIES_TABLE_LOADER_ID, null, this);
-
-            // I originally planned to reuse the spinners in two diff fragments, but then made a big
-            // design change, I'm just leaving it as-is, even though it would be better if all the
-            // loading happened in this fragment.. it would be less code for sure
-//            new GenreAndCertSpinnerLoader(getActivity(), mGenreSpinnerAdapter, mCertSpinnerAdapter,
-//                    mGenreSpinner, mCertSpinner, getLoaderManager());
         }
 
         super.onActivityCreated(savedInstanceState);

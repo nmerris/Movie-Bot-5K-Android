@@ -50,12 +50,15 @@ public class MoviePosterAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 //        Log.i(LOGTAG, "entered newView");
 
-        View view = LayoutInflater.from(context).inflate(R.layout.moviegrid_poster_imageview, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.imageview_moviegrid_poster, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
 
         // conveniently, you can stash any object with a view with setTag, and grab it later
-        // you can even store multiple objects if you use keys (not needed here)
-        view.setTag(viewHolder);
+        // you can even store multiple objects if you use keys
+        // here I'm tagging each view with the same viewholder, and its unique movieId
+        view.setTag(R.id.movie_poster_imageview_viewholder_key, viewHolder);
+        view.setTag(R.id.movie_poster_imageview_movie_id_key,
+                cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
 
         return view;
     }
@@ -63,10 +66,7 @@ public class MoviePosterAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-//        Log.i(LOGTAG, "entered bindView");
-
-        // get the ViewHolder, no need for a key because it's the only object associated with the view
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        ViewHolder viewHolder = (ViewHolder) view.getTag(R.id.movie_poster_imageview_viewholder_key);
 
 //        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH));
 //        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
@@ -77,6 +77,7 @@ public class MoviePosterAdapter extends CursorAdapter {
 
         // TODO: use placeholder images? at least in case a movie has no image poster
         // no wait.. poster and backdrop paths are both NOT NULL in the db, so that will never happen
+        // but might be good for slow data connections?
     }
 
 }

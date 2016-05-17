@@ -16,7 +16,7 @@ public class GenreSpinnerAdapter extends SimpleCursorAdapter {
 
     public GenreSpinnerAdapter(Context context) {
         super(context,
-                R.layout.spinner_item_textview,
+                R.layout.textview_spinner_item,
                 null,
                 new String[]{MovieTheaterContract.GenresEntry.COLUMN_GENRE_NAME},
                 new int[]{android.R.id.text1},
