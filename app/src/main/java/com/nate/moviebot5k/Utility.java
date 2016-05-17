@@ -1,18 +1,24 @@
 package com.nate.moviebot5k;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.util.Log;
+
+import com.nate.moviebot5k.data.MovieTheaterContract;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
  * Created by Nathan Merris on 5/6/2016.
  */
 public class Utility {
+
 
     // boilerplate networking code taken from Big Nerd Ranch Android Programming, 2nd ed
     // use getUrlBytes when downloading pics or other non-string data
@@ -64,5 +70,34 @@ public class Utility {
 
         return years;
     }
+    
+    
+    public static ArrayList<Integer> getMovieIdList(Context context) {
 
+        ArrayList<Integer> movieIds = new ArrayList<>();
+        Cursor cursor = context.getContentResolver().query(
+                MovieTheaterContract.MoviesEntry.CONTENT_URI,
+                new String[]{MovieTheaterContract.MoviesEntry._ID, MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID},
+                null, null,
+                "_id ASC");
+
+        if(cursor != null && cursor.moveToFirst()) {
+
+            do {
+                Log.i("UTILITY", "******** cursor _id is: " + cursor.getInt(0));
+                Log.i("UTILITY", "********    and added movieId to list: " + cursor.getInt(1));
+
+                movieIds.add(cursor.getInt(1));
+                cursor.moveToNext();
+
+            } while(!cursor.isAfterLast());
+
+            Log.i("UTILITY", "    and numMovies is: " + movieIds.size());
+
+            cursor.close();
+        }
+        return movieIds;
+    }
+
+    
 }

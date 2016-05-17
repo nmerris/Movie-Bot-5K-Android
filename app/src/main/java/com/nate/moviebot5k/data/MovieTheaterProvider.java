@@ -95,34 +95,35 @@ public class MovieTheaterProvider extends ContentProvider {
                         sortOrder);
                 break;
 
+            // this app will only ever query for one specific movie, by movieId,
             case MOVIE_WITH_MOVIE_ID:
                 Log.i(LOGTAG,"  uri matched to switch statement MOVIE_WITH_MOVIE_ID");
                 Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sMovieWithMovieIdSelection);
-                Log.i(LOGTAG,"    with the selectionArg (should be movieId) passed in: " + selectionArgs);
+                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
 
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MoviesEntry.TABLE_NAME,
                         projection,
                         sMovieWithMovieIdSelection,
-                        selectionArgs,
+                        new String[] {uri.getLastPathSegment()},
                         null,
                         null,
-                        sortOrder);
+                        null);
                 break;
 
             case FAVORITE_WITH_MOVIE_ID:
                 Log.i(LOGTAG,"  uri matched to switch statement FAVORITE_WITH_MOVIE_ID");
                 Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoriteWithMovieIdSelection);
-                Log.i(LOGTAG,"    with the selectionArg (should be movieId) passed in: " + selectionArgs);
+                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
 
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         FavoritesEntry.TABLE_NAME,
                         projection,
                         sFavoriteWithMovieIdSelection,
-                        selectionArgs,
+                        new String[] {uri.getLastPathSegment()},
                         null,
                         null,
-                        sortOrder);
+                        null);
                 break;
 
             default:

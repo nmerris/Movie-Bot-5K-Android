@@ -21,6 +21,8 @@ import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.adapters.MoviePosterAdapter;
 
+import java.util.ArrayList;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -38,6 +40,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
     private MoviePosterAdapter mMoviePosterAdapter;
     private SharedPreferences mSharedPrefs;
+    private ArrayList<Integer> mMovieIds;
 
     @Bind(R.id.fragment_movie_grid_gridview) GridView mMoviePosterGridView;
 
@@ -128,6 +131,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         ButterKnife.bind(this, rootView);
+        mMovieIds = Utility.getMovieIdList(getActivity());
 
         Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
         mMoviePosterGridView.setAdapter(mMoviePosterAdapter);
@@ -139,7 +143,9 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 // get the movieId from the tag attached to the view that was just clicked
-                int movieId = (int) view.getTag(R.id.movie_poster_imageview_movie_id_key);
+//                int movieId = (int) view.getTag(R.id.movie_poster_imageview_movie_id_key);
+                int movieId = mMovieIds.get(position);
+
 
                 // store the currently selected movieId in sharedPrefs
                 // so when the user comes back to this app, the same movie will be on screen
@@ -152,6 +158,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                 editor.commit();
 
                 Log.i(LOGTAG, "just clicked on movie with ID: " + movieId);
+
 
                 // call back to the hosting Activity so it can do what it needs to do
                 mCallbacks.onMovieSelected(movieId);

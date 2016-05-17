@@ -25,12 +25,13 @@ public class FragmentMovieDetails extends Fragment
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovDetlFrag";
 
     private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
+    private static final String BUNDLE_MOVIE_ID_KEY = "movie_id";
     private static final int FAVORITES_TABLE_LOADER_ID = R.id.loader_favorites_table_fragment_movie_details;
     private static final int MOVIES_TABLE_LOADER_ID = R.id.loader_movies_table_fragment_movie_details;
     private SharedPreferences mSharedPrefs;
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
 //    private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
-    private int mMovieId, mFavoriteId; // the id for the movie or favorite movie
+    private int mMovieId/*, mFavoriteId*/; // the id for the movie or favorite movie
 
 
     // movies table projection
@@ -39,9 +40,11 @@ public class FragmentMovieDetails extends Fragment
 
 
 
-    public static FragmentMovieDetails newInstance(boolean useFavoritesTable) {
+    // the movieId will be used to read data from either the favorites or movies table
+    public static FragmentMovieDetails newInstance(boolean useFavoritesTable, int movieId) {
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, useFavoritesTable);
+        args.putInt(BUNDLE_MOVIE_ID_KEY, movieId);
         FragmentMovieDetails fragment = new FragmentMovieDetails();
         fragment.setArguments(args);
         return fragment;
@@ -90,7 +93,16 @@ public class FragmentMovieDetails extends Fragment
 //        // so nullify it every time this fragment gets detached from it's hosting activity
 //        super.onDetach();
 //    }
-    
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putInt(BUNDLE_MOVIE_ID_KEY, mMovieId);
+        outState.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, mUseFavorites);
+
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,23 +110,29 @@ public class FragmentMovieDetails extends Fragment
         Log.i(LOGTAG, "entered onCreate");
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mMovieId = mSharedPrefs
-                .getInt(getString(R.string.key_currently_selected_movie_id), 0);
-        mFavoriteId = mSharedPrefs
-                .getInt(getString(R.string.key_currently_selected_favorite_id), 0);
+//        mMovieId = mSharedPrefs
+//                .getInt(getString(R.string.key_currently_selected_movie_id), 0);
+//        mFavoriteId = mSharedPrefs
+//                .getInt(getString(R.string.key_currently_selected_favorite_id), 0);
+
+
 
         // check if hosting activity has requested that this fragment use the favorites table
         if(savedInstanceState == null) {
-            Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
+            Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool and movieId int from frag argument");
+            mMovieId = getArguments().getInt(BUNDLE_MOVIE_ID_KEY);
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
+            Log.i(LOGTAG, "    mMovieId is now: " + mMovieId);
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
         // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
         else {
-            Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool from SIS Bundle");
+            Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool and movieId int from SIS Bundle");
+            mMovieId = savedInstanceState.getInt(BUNDLE_MOVIE_ID_KEY);
             mUseFavorites = savedInstanceState.getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
+            Log.i(LOGTAG, "    mMovieId is now: " + mMovieId);
         }
     }
 
@@ -129,8 +147,13 @@ public class FragmentMovieDetails extends Fragment
 
         // testing
         if(mUseFavorites) {
-            textTV.setText(String.valueOf(mFavoriteId));
+            // of course this would be read from favorites table in onLoadFinished
+            textTV.setText(String.valueOf(mMovieId));
+
+
+
         } else {
+            // and this would be read from movies table in onLoadFinished
             textTV.setText(String.valueOf(mMovieId));
         }
 
@@ -163,9 +186,24 @@ public class FragmentMovieDetails extends Fragment
                     MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
                     new String[] {MovieTheaterContract.MoviesEntry.COLUMN_RUNTIME},
                     null, null, null);
-            if(cursor.g(0) != null) {
 
+            if(cursor != null && cursor.moveToFirst()) {
+                Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
+                        ", has runtime column data: " + cursor.getInt(0));
+
+                // if runtime is != 0 then this movie must need detail data added to the movies table
+                // so launch a new fetch details task, this will fill in all the columns with data
+                // that was not obtained during the fetch task that FragmentMovieGrid launched
+                // before the user clicked the poster thumbnail to get here
+                if(cursor.getInt(0) != 0) {
+
+                    // TODO: launch fetchmoviedetails task
+
+                }
+                cursor.close();
             }
+
+
         }
 
 

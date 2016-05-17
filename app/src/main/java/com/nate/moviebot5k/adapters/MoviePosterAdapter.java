@@ -57,8 +57,8 @@ public class MoviePosterAdapter extends CursorAdapter {
         // you can even store multiple objects if you use keys
         // here I'm tagging each view with the same viewholder, and its unique movieId
         view.setTag(R.id.movie_poster_imageview_viewholder_key, viewHolder);
-        view.setTag(R.id.movie_poster_imageview_movie_id_key,
-                cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
+//        view.setTag(R.id.movie_poster_imageview_movie_id_key,
+//                cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
 
         return view;
     }
