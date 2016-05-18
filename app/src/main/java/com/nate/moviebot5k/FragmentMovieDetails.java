@@ -186,30 +186,26 @@ public class FragmentMovieDetails extends Fragment
         // a movie as a favorite, which can only be done if the full record, including the extra
         // details that are loaded in this fragment, had already been loaded to the movies table
         if(!mUseFavorites) {
+            Cursor cursor = getActivity().getContentResolver().query(
+                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
+                    new String[] {MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE},
+                    null, null, null);
 
+            if(cursor != null && cursor.moveToFirst()) {
+                Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
+                        ", has tagline column data: " + cursor.getString(0));
 
-
-//            Cursor cursor = getActivity().getContentResolver().query(
-//                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-//                    new String[] {MovieTheaterContract.MoviesEntry.COLUMN_RUNTIME},
-//                    null, null, null);
-//
-//            if(cursor != null && cursor.moveToFirst()) {
-//                Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
-//                        ", has runtime column data: " + cursor.getInt(0));
-//
-//                // if runtime == 0 then this movie must not have had details fetched yet,
-//                // so launch a new fetch details task, this will fill in all the columns with data
-//                // that was not obtained during the fetch task that FragmentMovieGrid launched
-//                // before the user clicked the poster thumbnail to get here
-//                if(cursor.getInt(0) == 0) {
-//                    new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
-//                }
-//                cursor.close();
-//            }
-
-            new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
-
+                // if tagline is null then this movie probably has not had details fetched yet,
+                // so launch a new fetch details task, this will fill in all the columns with data
+                // that was not obtained during the fetch task that FragmentMovieGrid launched
+                // before the user clicked the poster thumbnail to get here
+                // it's possible that themoviedb just doesn't have a tagline for this movie, in
+                // which case unnecessary api calls will be made, but that's fairly unusual
+                if(cursor.getString(0) == null) {
+                    new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
+                }
+                cursor.close();
+            }
 
         }
 
