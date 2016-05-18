@@ -71,7 +71,8 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_VOTE_AVG + " REAL NOT NULL, " +
                 MoviesEntry.COLUMN_BUDGET + " INTEGER, " +
                 MoviesEntry.COLUMN_REVENUE + " INTEGER, " +
-                MoviesEntry.COLUMN_RUNTIME + " INTEGER";
+                MoviesEntry.COLUMN_RUNTIME + " INTEGER, " +
+                MoviesEntry.COLUMN_TAGLINE + " TEXT";
                         
                         
 //                MoviesEntry.COLUMN_REVIEW_AUTHOR1 + " TEXT, " +

@@ -63,6 +63,7 @@ public class MovieTheaterContract {
         public static final String COLUMN_BUDGET = "budget";
         public static final String COLUMN_REVENUE = "revenue";
         public static final String COLUMN_RUNTIME = "runtime";
+        public static final String COLUMN_TAGLINE = "tagline";
 
         // populated in MovieDetailFragment from /movie/id/reviews API endpoint
 //        public static final String COLUMN_REVIEW_AUTHOR1 = "review_author1";

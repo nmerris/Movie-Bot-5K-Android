@@ -568,18 +568,28 @@ public class MovieTheaterProvider extends ContentProvider {
     }
 
 
-    /**
-     * This app never updates any data, it either just wipes it all out and replaces all of it,
-     * or it deletes or inserts a single record to favorites table.  This is because there are way
-     * too many movies in themoviedb to try to keep old records around.. An argument could be made
-     * that it would be more efficient to keep old movies around, but it just doesn't seem worth it.
-     *
-     * Calling this method will do nothing.  Do not call this method.
-     */
+    // only used to update the movies table with data for budget, revenue, runtime, and tagline
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        Log.e(LOGTAG, "Please do not call me, I do nothing.  I am error of Ruto.");
-        return 0;
+        Log.e(LOGTAG, "entered update");
+
+        int numUpdated = 0;
+        if(sUriMatcher.match(uri) == MOVIE_WITH_MOVIE_ID) {
+            Log.i(LOGTAG, "  and about to update movies table after matching uri to MOVIE_WITH_MOVIE_ID");
+            final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+            numUpdated = db.update(
+                    MoviesEntry.TABLE_NAME,
+                    values,
+                    sMovieWithMovieIdSelection, // "movie_id = ? "
+                    new String[]{ uri.getLastPathSegment() });
+        }
+        else {
+            throw new UnsupportedOperationException("This DB only allows updates to the movies table" +
+                    " with URI for movie record with movieId");
+        }
+
+        return numUpdated;
     }
 
 

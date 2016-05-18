@@ -65,6 +65,11 @@ public class MovieDetailsFetcher {
 
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
 
+            // parse and insert the movie details to the appropriate db tables
+            // ie the movies table will get 4 more columsn of data, and the credits, reviews, and
+            // videos tables will be updated with data, everything is tied to it's movieId as usual
+            parseJsonAndInsertToDb(jsonBody);
+
         } catch (IOException ioe) {
             Log.e(LOGTAG, "Failed to fetch items", ioe);
         } catch (JSONException je) {
@@ -77,13 +82,30 @@ public class MovieDetailsFetcher {
 
 
 
-    private int parseMoviesAndInsertToDb(JSONObject jsonBody) throws JSONException {
-        Log.i(LOGTAG, "entered parseMoviesAndInsertToDb");
+    private void parseJsonAndInsertToDb(JSONObject jsonBody) throws JSONException {
+        Log.i(LOGTAG, "entered parseJsonAndInsertToDb (in movie details fetcher)");
+
+//        Vector<ContentValues> valuesVector = new Vector<>();
+        ContentValues values = new ContentValues();
+        values.put(MovieTheaterContract.MoviesEntry.COLUMN_BUDGET, "budget");
+        values.put(MovieTheaterContract.MoviesEntry.COLUMN_REVENUE, "revenue");
+        values.put(MovieTheaterContract.MoviesEntry.COLUMN_RUNTIME, "runtime");
+        values.put(MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE, "tagline");
+        int numInserted = mContext.getContentResolver()
+                .update(MovieTheaterContract.MoviesEntry.CONTENT_URI,
+                        new ContentValues[]{ values });
+
+
+
+
+
 
         JSONArray moviesJsonArray = jsonBody.getJSONArray("results");
+
         int numMovies = moviesJsonArray.length();
         int numInserted = 0;
         Vector<ContentValues> valuesVector = new Vector<>(numMovies);
+
 
         for (int i = 0; i < numMovies; i++) {
             // get a single JSON object from jsonBody
@@ -189,7 +211,6 @@ public class MovieDetailsFetcher {
         }
 
         Log.d(LOGTAG, "        before return from parseMoviesAndInsertToDb, numInserted is: " + numInserted);
-        return numInserted;
     }
 
 
