@@ -40,13 +40,18 @@ public class MovieTheaterProvider extends ContentProvider {
     static final int GENRES_ALL = 5; // used to populate genre spinner
     static final int CERTS_ALL = 6; // used to populate certifications spinner
 
-    // the credits, reviews, and videos table will only ever be accessed by movieId for one movie
+    // the credits, reviews, and videos table will only ever be queried or have inserts called by movieId for one movie
     static final int CREDITS_WITH_MOVIE_ID = 7;
     static final int VIDEOS_WITH_MOVIE_ID = 8;
     static final int REVIEWS_WITH_MOVIE_ID = 9;
     static final int FAVORITES_CREDITS_WITH_MOVIE_ID = 10;
     static final int FAVORITES_VIDEOS_WITH_MOVIE_ID = 11;
     static final int FAVORITES_REVIEWS_WITH_MOVIE_ID = 12;
+    // following are used to clean up the entrire credits, videos, and reviews tables in StartupActivity
+    // there is no need to keep that data around for more than one app session
+    static final int CREDITS_ALL = 13;
+    static final int VIDEOS_ALL = 14;
+    static final int REVIEWS_ALL = 15;
 
     // SQL selection statements
     private static final String sMovieWithMovieIdSelection = MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
@@ -77,7 +82,11 @@ public class MovieTheaterProvider extends ContentProvider {
         matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_CREDITS + "/#", FAVORITES_CREDITS_WITH_MOVIE_ID);
         matcher.addURI(authority, MovieTheaterContract.PATH_REVIEWS + "/#", REVIEWS_WITH_MOVIE_ID);
         matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_REVIEWS + "/#", FAVORITES_REVIEWS_WITH_MOVIE_ID);
-        
+
+        matcher.addURI(authority, MovieTheaterContract.PATH_CREDITS, CREDITS_ALL);
+        matcher.addURI(authority, MovieTheaterContract.PATH_VIDEOS, VIDEOS_ALL);
+        matcher.addURI(authority, MovieTheaterContract.PATH_REVIEWS, REVIEWS_ALL);
+
         return matcher;
     }
 
@@ -223,6 +232,12 @@ public class MovieTheaterProvider extends ContentProvider {
                         null, null, null);
                 break;
 
+            case CREDITS_ALL:
+            case VIDEOS_ALL:
+            case REVIEWS_ALL:
+                throw new UnsupportedOperationException(
+                        "!!!!! DO NOT QUERY THE CREDITS, VIDEOS, OR REVIEWS TABLE WITHOUT A MOVIEID !!!!!" + uri);
+
             default:
                 throw new UnsupportedOperationException("I do not understand this URI: " + uri);
 
@@ -265,6 +280,13 @@ public class MovieTheaterProvider extends ContentProvider {
                 return ReviewsEntry.CONTENT_ITEM_TYPE;
             case FAVORITES_REVIEWS_WITH_MOVIE_ID:
                 return FavoritesReviewsEntry.CONTENT_ITEM_TYPE;
+
+            case CREDITS_ALL:
+                return CreditsEntry.CONTENT_TYPE;
+            case VIDEOS_ALL:
+                return VideosEntry.CONTENT_TYPE;
+            case REVIEWS_ALL:
+                return ReviewsEntry.CONTENT_TYPE;
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -398,6 +420,13 @@ public class MovieTheaterProvider extends ContentProvider {
                 Log.i(LOGTAG, "    number records inserted: " + returnCount);
                 break;
 
+
+            case CREDITS_ALL:
+            case VIDEOS_ALL:
+            case REVIEWS_ALL:
+                throw new UnsupportedOperationException("!!!! DO NOT BULKINSERT TO THE ENTIRE CREDITS, VIDEOS, OR" +
+                        "REVIEWS TABLE.. YOU MUST ALWAYS INCLUDE A URI WITH THE MOVIEID ON THE END !!!!");
+
             default:
                 Log.i(LOGTAG, "  UhOh.. somehow super.bulkInsert is about to be called, should never happen");
                 super.bulkInsert(uri, values);
@@ -458,13 +487,14 @@ public class MovieTheaterProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         int rowsDeleted;
 
-        // this makes delete all rows return the number of rows deleted
-//        if(selection == null) selection = "1";
-
         switch (sUriMatcher.match(uri)) {
             case MOVIES_ALL:
             case CERTS_ALL:
             case GENRES_ALL:
+            case CREDITS_ALL:
+            case VIDEOS_ALL:
+            case REVIEWS_ALL:
+
                 Log.i(LOGTAG, "  about to wipe out all records from table: " + uri.getLastPathSegment());
                 // get the table name from the uri and wipe all the records
                 // passing "1" to where clause will make db.delete return the number of rows deleted
@@ -501,6 +531,24 @@ public class MovieTheaterProvider extends ContentProvider {
                 Log.i(LOGTAG, "    ********** about to call getContentResolver.notifyChange on ONLY the uri passed in, which points to a single favorites records");
                 Log.i(LOGTAG, "         Is this okay?  do I need to notifyChange on the entire favorites table?  URI passed in: " + uri);
                 getContext().getContentResolver().notifyChange(uri, null);
+                break;
+
+
+
+            case FAVORITES_CREDITS_WITH_MOVIE_ID:
+                rowsDeleted = 0;
+                Log.i(LOGTAG, "  in DELETE, no implementation for FAVORITES_CREDITS_WITH_MOVIE_ID yet, should prob. make sure delete for FAVORITE_WITH_MOVIE_ID works fist");
+                break;
+
+            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
+                rowsDeleted = 0;
+                Log.i(LOGTAG, "  in DELETE, no implementation for FAVORITES_VIDEOS_WITH_MOVIE_ID yet, should prob. make sure delete for FAVORITE_WITH_MOVIE_ID works fist");
+
+                break;
+
+            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
+                rowsDeleted = 0;
+                Log.i(LOGTAG, "  in DELETE, no implementation for FAVORITES_REVIEWS_WITH_MOVIE_ID yet, should prob. make sure delete for FAVORITE_WITH_MOVIE_ID works fist");
                 break;
 
             default:
