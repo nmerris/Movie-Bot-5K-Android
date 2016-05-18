@@ -571,11 +571,12 @@ public class MovieTheaterProvider extends ContentProvider {
     // only used to update the movies table with data for budget, revenue, runtime, and tagline
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        Log.e(LOGTAG, "entered update");
+        Log.i(LOGTAG, "entered update");
 
         int numUpdated = 0;
         if(sUriMatcher.match(uri) == MOVIE_WITH_MOVIE_ID) {
             Log.i(LOGTAG, "  and about to update movies table after matching uri to MOVIE_WITH_MOVIE_ID");
+            Log.i(LOGTAG, "    and am ignoring selection and selectionArgs, will just get movieId from URI");
             final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
             numUpdated = db.update(
