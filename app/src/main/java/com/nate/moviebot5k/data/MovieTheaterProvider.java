@@ -253,8 +253,18 @@ public class MovieTheaterProvider extends ContentProvider {
             case CERTS_ALL:
                 return CertsEntry.CONTENT_TYPE;
 
-
-
+            case CREDITS_WITH_MOVIE_ID:
+                return CreditsEntry.CONTENT_ITEM_TYPE;
+            case FAVORITES_CREDITS_WITH_MOVIE_ID:
+                return FavoritesCreditsEntry.CONTENT_ITEM_TYPE;
+            case VIDEOS_WITH_MOVIE_ID:
+                return VideosEntry.CONTENT_ITEM_TYPE;
+            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
+                return FavoritesVideosEntry.CONTENT_ITEM_TYPE;
+            case REVIEWS_WITH_MOVIE_ID:
+                return ReviewsEntry.CONTENT_ITEM_TYPE;
+            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
+                return FavoritesReviewsEntry.CONTENT_ITEM_TYPE;
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -349,36 +359,73 @@ public class MovieTheaterProvider extends ContentProvider {
 
 
     // overriding to make it more efficient with beginTransaction and endTransaction
-    // bulkInsert should be used every time for movies, certs, and genres tables
+    // bulkInsert should be used every time for movies, certs, genres, reviews, videos, credits..
+    // basically everything except when a single record is being inserted to the favorites table
+    // unlike insert, here bukInsert does not do any special copying, it's up to the caller to
+    // figure out what ContentValues to insert, and where
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
         Log.i(LOGTAG, "entered bulkInsert");
 
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int returnCount = 0;
-        int match = sUriMatcher.match(uri);
+//        int match = sUriMatcher.match(uri);
 
-        if(match == MOVIES_ALL || match == GENRES_ALL || match == CERTS_ALL) {
-            // is this okay?  using getLastPathSegment to get the table name?
-            Log.i(LOGTAG, "  uri.getLastPathSegment, ie table name to insert into: " + uri.getLastPathSegment());
-            db.beginTransaction();
+        switch (sUriMatcher.match(uri)){
 
-            try {
-                for (ContentValues value : values) {
-                    long _id = db.insert(uri.getLastPathSegment(), null, value);
-                    if (_id != -1) returnCount++;
+            case MOVIES_ALL:
+            case GENRES_ALL:
+            case CERTS_ALL:
+            case CREDITS_WITH_MOVIE_ID:
+            case FAVORITES_CREDITS_WITH_MOVIE_ID:
+            case VIDEOS_WITH_MOVIE_ID:
+            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
+            case REVIEWS_WITH_MOVIE_ID:
+            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
+                Log.i(LOGTAG, "  uri.getLastPathSegment, ie table name to bulkInsert into: " + uri.getLastPathSegment());
+                db.beginTransaction();
+
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(uri.getLastPathSegment(), null, value);
+                        if (_id != -1) returnCount++;
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
                 }
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
 
-            Log.i(LOGTAG, "    number records inserted: " + returnCount);
+                Log.i(LOGTAG, "    number records inserted: " + returnCount);
+                break;
+
+            default:
+                Log.i(LOGTAG, "  UhOh.. somehow super.bulkInsert is about to be called, should never happen");
+                super.bulkInsert(uri, values);
         }
-        else {
-            Log.i(LOGTAG, "  UhOh.. somehow super.bulkInsert is about to be called, should never happen");
-            super.bulkInsert(uri, values);
-        }
+
+
+//        if(match == MOVIES_ALL || match == GENRES_ALL || match == CERTS_ALL || match == CREDITS_WITH_MOVIE_ID) {
+//            // is this okay?  using getLastPathSegment to get the table name?
+//            Log.i(LOGTAG, "  uri.getLastPathSegment, ie table name to insert into: " + uri.getLastPathSegment());
+//            db.beginTransaction();
+//
+//            try {
+//                for (ContentValues value : values) {
+//                    long _id = db.insert(uri.getLastPathSegment(), null, value);
+//                    if (_id != -1) returnCount++;
+//                }
+//                db.setTransactionSuccessful();
+//            } finally {
+//                db.endTransaction();
+//            }
+//
+//            Log.i(LOGTAG, "    number records inserted: " + returnCount);
+//        }
+//        else {
+//            Log.i(LOGTAG, "  UhOh.. somehow super.bulkInsert is about to be called, should never happen");
+//            super.bulkInsert(uri, values);
+//        }
+
 
         // notify any content observers that the table data has changed, will be either
         // movies, genres, or certifications in this case
