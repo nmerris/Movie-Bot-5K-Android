@@ -3,6 +3,7 @@ package com.nate.moviebot5k;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
+import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
@@ -197,12 +199,10 @@ public class FragmentMovieDetails extends Fragment
                 // that was not obtained during the fetch task that FragmentMovieGrid launched
                 // before the user clicked the poster thumbnail to get here
                 if(cursor.getInt(0) == 0) {
-                    new MovieDetailsFetcher(getActivity()).fetchMovieDetails();
+                    new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
                 }
                 cursor.close();
             }
-
-
         }
 
 
@@ -219,12 +219,14 @@ public class FragmentMovieDetails extends Fragment
             getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
         }
         else {
-            Log.i(LOGTAG, "  and about to initLoader MOVIES_TABLE_LOADER, and genre and cert spinner loaders also");
+            Log.i(LOGTAG, "  and about to initLoader FAVORITES_TABLE_LOADER, NOT IMPLEMENTED YET");
             getLoaderManager().initLoader(MOVIES_TABLE_LOADER_ID, null, this);
         }
 
         super.onActivityCreated(savedInstanceState);
     }
+
+
 
 
     @Override
@@ -243,4 +245,30 @@ public class FragmentMovieDetails extends Fragment
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
+
+
+
+    private class FetchMovieDetailsTask extends AsyncTask<Void, Void, Void> {
+        Context context;
+        int movieId;
+
+        private FetchMovieDetailsTask(Context c, int movieId) {
+            context = c;
+            this.movieId = movieId;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Log.i(LOGTAG, "just entered FetchMoviesTask.doInBackground");
+            return new MovieDetailsFetcher(context, mMovieId).fetchMovieDetails();
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute");
+        }
+    }
+
+
 }

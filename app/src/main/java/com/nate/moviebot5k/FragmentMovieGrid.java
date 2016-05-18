@@ -131,7 +131,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         ButterKnife.bind(this, rootView);
-        mMovieIds = Utility.getMovieIdList(getActivity());
+//        mMovieIds = Utility.getMovieIdList(getActivity());
 
         Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
         mMoviePosterGridView.setAdapter(mMoviePosterAdapter);
@@ -276,6 +276,9 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.i(LOGTAG, "entered onLoadFinished");
 
+        // update the ArrayList that contains the movieIds this fragment is showing
+        mMovieIds = Utility.getMovieIdList(getActivity());
+
         // swap the cursor so the adapter can load the new images
         mMoviePosterAdapter.swapCursor(data);
 
@@ -308,7 +311,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         protected void onPostExecute(Integer numMoviesFetched) {
             Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, numMovies fetched was: " + numMoviesFetched);
 
-            
+            // TODO: I think I was going to return num movies fetched here, and then display a msg if it was 0
         }
     }
 

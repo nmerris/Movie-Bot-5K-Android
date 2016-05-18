@@ -32,6 +32,8 @@ public class StartupActivity extends AppCompatActivity {
         initializeSharedPrefs();
         //showDebugLog();
 
+        clearCreditsVideosReviewsTables();
+
 
         // go fetch a new list of genres and certs in a background thread, the app will then either continue
         // on to ActivityHome if successful, or the user will be presented with a choice to view
@@ -40,6 +42,21 @@ public class StartupActivity extends AppCompatActivity {
         new FetchGenresAndCertsTask(this).execute();
 
 
+    }
+
+
+    // NOTE: the movies table is wiped out every time a new api call is successfully made in FragmentMovieGrid
+    // the reason these tables are wiped out here are because we want to their data around while the user
+    // is currently in an 'app session'.. it would not be efficient to wipe each of these tables out
+    // every time a new movie is clicked to view details.. it's possible the user might navigate back
+    // to the same movie details page they were recently on.. that being said, considering the almost
+    // limitless amount of movies that this app may see, it does not make sense to keep this data around
+    // forever, furthermore the reviews and videos might change from time to time
+    private void clearCreditsVideosReviewsTables() {
+        Log.i(LOGTAG, "about to clear out credits, videos, and reviews tables");
+        getContentResolver().delete(MovieTheaterContract.CreditsEntry.CONTENT_URI, null, null);
+        getContentResolver().delete(MovieTheaterContract.VideosEntry.CONTENT_URI, null, null);
+        getContentResolver().delete(MovieTheaterContract.ReviewsEntry.CONTENT_URI, null, null);
     }
 
 

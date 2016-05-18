@@ -27,23 +27,23 @@ public class MovieDetailsFetcher {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovDetlsFetchr";
 
     private Context mContext; // used to retrieve String resources for API queries
+    private int mMovieId; // the movieId this fetcher be fetchin'
 
-    public MovieDetailsFetcher(Context context) { mContext = context; }
+    public MovieDetailsFetcher(Context context, int movieId) {
+        mContext = context;
+        mMovieId = movieId;
+    }
 
 
-
-    public void fetchMovieDetails() {
+    // I can't believe that Void and void are different.......
+    // needs to be Void because the async task that launches it needs it to return Void
+    public Void fetchMovieDetails() {
         Log.i(LOGTAG, "entered fetchMovieDetails");
-
-        // compile a list to use as query params for the discover movie endpoint
-//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 
         // get the currently selected movieId to use for API queries
         int movieId = PreferenceManager.getDefaultSharedPreferences(mContext)
                 .getInt(mContext.getString(R.string.key_currently_selected_movie_id), 0);
         Log.i(LOGTAG, "  and the movieId to be used to fetch movie details is: " + movieId);
-
-
 
         try { // build the URL for themoviedb GET
             Uri.Builder builder = new Uri.Builder();
@@ -54,21 +54,16 @@ public class MovieDetailsFetcher {
                     .appendPath(String.valueOf(movieId)) // https://api.themoviedb.org/3/movie/{id}
                     .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
 
-                    // use the convenient append_to_response paramater to get all the json in one shot
+                    // use the convenient append_to_response parameter to get all the json in one shot
                     .appendQueryParameter("append_to_response", "videos,reviews,credits");
-
-
-
 
             String url = builder.build().toString();
             Log.i(LOGTAG, "  just built URL: " + url);
-
 
             String jsonString = Utility.getUrlString(url); // call getUrlString, which will query themoviedb API
             Log.i(LOGTAG, "    Received JSON: " + jsonString);
 
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
-
 
         } catch (IOException ioe) {
             Log.e(LOGTAG, "Failed to fetch items", ioe);
@@ -76,7 +71,7 @@ public class MovieDetailsFetcher {
             Log.e(LOGTAG, "Failed to parse JSON", je);
         }
 
-
+        return null;
     }
 
 
