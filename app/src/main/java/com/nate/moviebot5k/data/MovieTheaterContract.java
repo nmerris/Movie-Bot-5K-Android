@@ -26,6 +26,7 @@ public class MovieTheaterContract {
 
 
 
+
     // private but not final: private to protect it from malevolent code goblins outside this class,
     // not final because MoviesEntry and FavoritesEntry extend it
     private static class MoviesEntryColumns {

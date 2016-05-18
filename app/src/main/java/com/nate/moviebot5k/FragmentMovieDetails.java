@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
@@ -191,14 +192,12 @@ public class FragmentMovieDetails extends Fragment
                 Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
                         ", has runtime column data: " + cursor.getInt(0));
 
-                // if runtime is != 0 then this movie must need detail data added to the movies table
+                // if runtime == 0 then this movie must not have had details fetched yet,
                 // so launch a new fetch details task, this will fill in all the columns with data
                 // that was not obtained during the fetch task that FragmentMovieGrid launched
                 // before the user clicked the poster thumbnail to get here
-                if(cursor.getInt(0) != 0) {
-
-                    // TODO: launch fetchmoviedetails task
-
+                if(cursor.getInt(0) == 0) {
+                    new MovieDetailsFetcher(getActivity()).fetchMovieDetails();
                 }
                 cursor.close();
             }

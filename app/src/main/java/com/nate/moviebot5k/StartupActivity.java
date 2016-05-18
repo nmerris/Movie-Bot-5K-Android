@@ -129,11 +129,11 @@ public class StartupActivity extends AppCompatActivity {
         Log.i(LOGTAG, "entered initializeSharedPrefs, will report if they do not exist yet");
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
 
         // if any single sharedPrefs exists, then they all do and have already been initialized
         if(!sharedPreferences.contains(getString(R.string.key_movie_filter_year))) {
             Log.i(LOGTAG, "  sharedPrefs are being created for the first time, writing defaults...");
-            SharedPreferences.Editor editor = sharedPreferences.edit();
 
             // TODO: prob won't end up using num_favorites, easier to just check db each time
             editor.putInt(getString(R.string.key_num_favorites), 0);
@@ -159,7 +159,7 @@ public class StartupActivity extends AppCompatActivity {
             editor.putInt(getString(R.string.key_currently_selected_favorite_id),
                     getResources().getInteger(R.integer.default_currently_selected_favorite_id));
 
-            editor.putBoolean(getString(R.string.key_fetch_new_movies), true);
+//            editor.putBoolean(getString(R.string.key_fetch_new_movies), true);
 
             // all spinners start at zeroth position
             editor.putInt(getString(R.string.key_movie_filter_year_spinner_position), 0);
@@ -168,8 +168,14 @@ public class StartupActivity extends AppCompatActivity {
             editor.putInt(getString(R.string.key_movie_filter_genre_spinner_position), 0);
             editor.putInt(getString(R.string.key_favorites_sortby_spinner_position), 0);
 
-            editor.commit();
+//            editor.commit();
         }
+
+        // and it's always a good idea to fetch new movies when the app starts from dead
+        // because the movies in themoviedb database may have changed since app was last used
+        editor.putBoolean(getString(R.string.key_fetch_new_movies), true);
+        editor.commit();
+
     }
 
     // just pumps out a bunch of stuff that I used when writing this app, mostly db initialization

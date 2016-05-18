@@ -33,57 +33,32 @@ public class MovieDetailsFetcher {
 
 
     public void fetchMovieDetails() {
-        Log.i(LOGTAG, "entered fetchMovieDetails, only possible to get here if key_fetch_new_movies in sharedPrefs is TRUE");
+        Log.i(LOGTAG, "entered fetchMovieDetails");
 
         // compile a list to use as query params for the discover movie endpoint
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-        String selectedCert = sharedPrefs
-                .getString(mContext.getString(R.string.key_movie_filter_cert), "");
-        String selectedYear = sharedPrefs
-                .getString(mContext.getString(R.string.key_movie_filter_year), "");
-        String selectedGenre = sharedPrefs
-                .getString(mContext.getString(R.string.key_movie_filter_genre_id), "");
-        String selectedSortBy = sharedPrefs
-                .getString(mContext.getString(R.string.key_movie_filter_sortby_value), "");
+        // get the currently selected movieId to use for API queries
+        int movieId = PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getInt(mContext.getString(R.string.key_currently_selected_movie_id), 0);
+        Log.i(LOGTAG, "  and the movieId to be used to fetch movie details is: " + movieId);
 
-        try { // build the URL for themoviedb GET for genres
+
+
+        try { // build the URL for themoviedb GET
             Uri.Builder builder = new Uri.Builder();
             builder.scheme(mContext.getString(R.string.themoviedb_scheme))
                     .authority(mContext.getString(R.string.themoviedb_authority))
                     .appendPath("3")
-                    .appendPath("discover")
-                    .appendPath("movie") // https://api.themoviedb.org/3/discover/movie/
-                    .appendQueryParameter("certification_country", "US"); // US movies only
+                    .appendPath("movie")
+                    .appendPath(String.valueOf(movieId)) // https://api.themoviedb.org/3/movie/{id}
+                    .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
 
-            if(!selectedCert.equals(mContext.getString(R.string.default_movie_filter_cert))) {
-                // if "Any Certification" is not currently selected, query by whatever is selected
-                builder.appendQueryParameter("certification", selectedCert);
-            }
+                    // use the convenient append_to_response paramater to get all the json in one shot
+                    .appendQueryParameter("append_to_response", "videos,reviews,credits");
 
-            if(!selectedYear.equals(mContext.getString(R.string.default_movie_filter_year))) {
-                // if "Any Year" is not currently selected, then query by whatever is selected
-                builder.appendQueryParameter("primary_release_year", selectedYear);
-            }
 
-            if(!selectedGenre.equals(mContext.getString(R.string.default_movie_filter_genre_id))) {
-                // if "Any Genre" is not currently selected, query by the genre id that is selected
-                builder.appendQueryParameter("with_genres", selectedGenre);
-            }
 
-            // if you don't specify a min number of votes, you end up with really bogus
-            // results, esp when querying by highest rated, because even a single vote of
-            // 10/10 for some oddball movie will be returned..
-            if(selectedCert.equals("NC-17")) // there are few NC-17 movies, so lower min vote count
-                builder.appendQueryParameter("vote_count.gte", "15");
-            else // arbitrarily set the min num votes for all other
-                builder.appendQueryParameter("vote_count.gte", "20");
-
-            // every query will have a sort by parameter
-            builder.appendQueryParameter("sort_by", selectedSortBy);
-
-            // every query will have an API key
-            builder.appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY);
 
             String url = builder.build().toString();
             Log.i(LOGTAG, "  just built URL: " + url);
@@ -94,32 +69,17 @@ public class MovieDetailsFetcher {
 
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
 
-            // if this code is reached, there must not have been any exceptions thrown,
-            // so set key_fetch_new_movies to false.. we don't really care if zero movies was return,
-            // this could only happen if the user has filter criteria that is too restrictive, in
-            // which case they will need to adjust their filter, and will be shown a msg
-            // however if an exception is thrown, that implies a network or json error, so
-            // do not set the fetch_new_movies bool to false because we want to try again in the hopes
-            // that the user has network access in the future..  this is checked every time
-            // FragmentMovieGrid.onResume is called, which is where this task is fired from
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-            editor.putBoolean(mContext.getString(R.string.key_fetch_new_movies), false);
-            editor.commit();
-            Log.i(LOGTAG, "      fetch had no exceptions, don't care if zero movies fetched, so just set sharedPrefs key_fetch_new_movies to ****FALSE****");
-
 
         } catch (IOException ioe) {
             Log.e(LOGTAG, "Failed to fetch items", ioe);
-            Log.i(LOGTAG, "  so sharedPrefs key_fetch_new_movies should still be true, here's what it is: "
-                    + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
         } catch (JSONException je) {
             Log.e(LOGTAG, "Failed to parse JSON", je);
-            Log.i(LOGTAG, "  so sharedPrefs key_fetch_new_movies should still be true, here's what it is: "
-                    + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
         }
 
 
     }
+
+
 
 
     private int parseMoviesAndInsertToDb(JSONObject jsonBody) throws JSONException {

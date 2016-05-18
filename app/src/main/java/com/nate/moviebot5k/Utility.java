@@ -84,15 +84,15 @@ public class Utility {
         if(cursor != null && cursor.moveToFirst()) {
 
             do {
-                Log.i("UTILITY", "******** cursor _id is: " + cursor.getInt(0));
-                Log.i("UTILITY", "********    and added movieId to list: " + cursor.getInt(1));
+//                Log.i("UTILITY", "******** cursor _id is: " + cursor.getInt(0));
+//                Log.i("UTILITY", "********    and added movieId to list: " + cursor.getInt(1));
 
                 movieIds.add(cursor.getInt(1));
                 cursor.moveToNext();
 
             } while(!cursor.isAfterLast());
 
-            Log.i("UTILITY", "    and numMovies is: " + movieIds.size());
+//            Log.i("UTILITY", "    and numMovies is: " + movieIds.size());
 
             cursor.close();
         }
