@@ -21,7 +21,12 @@ public class MovieTheaterContract {
     public static final String PATH_FAVORITES = "favorites";
     public static final String PATH_GENRES = "genres";
     public static final String PATH_CERTS = "certifications";
-
+    public static final String PATH_CREDITS = "credits";
+    public static final String PATH_VIDEOS = "videos";
+    public static final String PATH_REVIEWS = "reviews";
+    public static final String PATH_FAVORITES_CREDITS = "favorites_credits";
+    public static final String PATH_FAVORITES_VIDEOS = "favorites_videos";
+    public static final String PATH_FAVORITES_REVIEWS = "favorites_reviews";
 
 
 
@@ -60,36 +65,65 @@ public class MovieTheaterContract {
         public static final String COLUMN_RUNTIME = "runtime";
 
         // populated in MovieDetailFragment from /movie/id/reviews API endpoint
-        public static final String COLUMN_REVIEW_AUTHOR1 = "review_author1";
-        public static final String COLUMN_REVIEW_CONTENT1 = "review_content1";
-        public static final String COLUMN_REVIEW_AUTHOR2 = "review_author2";
-        public static final String COLUMN_REVIEW_CONTENT2 = "review_content2";
-        public static final String COLUMN_REVIEW_AUTHOR3 = "review_author3";
-        public static final String COLUMN_REVIEW_CONTENT3 = "review_content3";
-        public static final String COLUMN_REVIEW_AUTHOR4 = "review_author4";
-        public static final String COLUMN_REVIEW_CONTENT4 = "review_content4";
+//        public static final String COLUMN_REVIEW_AUTHOR1 = "review_author1";
+//        public static final String COLUMN_REVIEW_CONTENT1 = "review_content1";
+//        public static final String COLUMN_REVIEW_AUTHOR2 = "review_author2";
+//        public static final String COLUMN_REVIEW_CONTENT2 = "review_content2";
+//        public static final String COLUMN_REVIEW_AUTHOR3 = "review_author3";
+//        public static final String COLUMN_REVIEW_CONTENT3 = "review_content3";
+//        public static final String COLUMN_REVIEW_AUTHOR4 = "review_author4";
+//        public static final String COLUMN_REVIEW_CONTENT4 = "review_content4";
 
         // populated in FragmentMovieGrid from /movie/id/videos API endpoint
-        public static final String COLUMN_VIDEO_KEY1 = "video_key1";
-        public static final String COLUMN_VIDEO_NAME1 = "video_name1";
-        public static final String COLUMN_VIDEO_SITE1 = "video_site1";
-        public static final String COLUMN_VIDEO_SIZE1 = "video_size1";
-        public static final String COLUMN_VIDEO_TYPE1 = "video_type1";
-        public static final String COLUMN_VIDEO_KEY2 = "video_key2";
-        public static final String COLUMN_VIDEO_NAME2 = "video_name2";
-        public static final String COLUMN_VIDEO_SITE2 = "video_site2";
-        public static final String COLUMN_VIDEO_SIZE2 = "video_size2";
-        public static final String COLUMN_VIDEO_TYPE2 = "video_type2";
-        public static final String COLUMN_VIDEO_KEY3 = "video_key3";
-        public static final String COLUMN_VIDEO_NAME3 = "video_name3";
-        public static final String COLUMN_VIDEO_SITE3 = "video_site3";
-        public static final String COLUMN_VIDEO_SIZE3 = "video_size3";
-        public static final String COLUMN_VIDEO_TYPE3 = "video_type3";
-        public static final String COLUMN_VIDEO_KEY4 = "video_key4";
-        public static final String COLUMN_VIDEO_NAME4 = "video_name4";
-        public static final String COLUMN_VIDEO_SITE4 = "video_site4";
-        public static final String COLUMN_VIDEO_SIZE4 = "video_size4";
-        public static final String COLUMN_VIDEO_TYPE4 = "video_type4";
+//        public static final String COLUMN_VIDEO_KEY1 = "video_key1";
+//        public static final String COLUMN_VIDEO_NAME1 = "video_name1";
+//        public static final String COLUMN_VIDEO_SITE1 = "video_site1";
+//        public static final String COLUMN_VIDEO_SIZE1 = "video_size1";
+//        public static final String COLUMN_VIDEO_TYPE1 = "video_type1";
+//        public static final String COLUMN_VIDEO_KEY2 = "video_key2";
+//        public static final String COLUMN_VIDEO_NAME2 = "video_name2";
+//        public static final String COLUMN_VIDEO_SITE2 = "video_site2";
+//        public static final String COLUMN_VIDEO_SIZE2 = "video_size2";
+//        public static final String COLUMN_VIDEO_TYPE2 = "video_type2";
+//        public static final String COLUMN_VIDEO_KEY3 = "video_key3";
+//        public static final String COLUMN_VIDEO_NAME3 = "video_name3";
+//        public static final String COLUMN_VIDEO_SITE3 = "video_site3";
+//        public static final String COLUMN_VIDEO_SIZE3 = "video_size3";
+//        public static final String COLUMN_VIDEO_TYPE3 = "video_type3";
+//        public static final String COLUMN_VIDEO_KEY4 = "video_key4";
+//        public static final String COLUMN_VIDEO_NAME4 = "video_name4";
+//        public static final String COLUMN_VIDEO_SITE4 = "video_site4";
+//        public static final String COLUMN_VIDEO_SIZE4 = "video_size4";
+//        public static final String COLUMN_VIDEO_TYPE4 = "video_type4";
+    }
+    
+    
+    // both FavoritesReviewsEntry and ReviewsEntry use these same columns
+    private static class ReviewsEntryColumns {
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_AUTHOR = "author";
+        public static final String COLUMN_CONTENT = "content";
+    }
+    
+    
+    // both FavoritesCreditsEntry and CreditsEntry use these same columns
+    private static class CreditsEntryColumns {
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_CHARACTER = "character";
+        public static final String COLUMN_PERFORMER_NAME = "performer_name";
+        public static final String COLUMN_ORDER = "order";
+        public static final String COLUMN_PROFILE_PATH = "profile_path";
+    }
+    
+    
+    // both FavoritesVideosEntry and VideosEntry use these same columsn
+    private static class VideosEntryColumns {
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_KEY = "key";
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_SITE = "site";
+        public static final String COLUMN_SIZE = "size";
+        public static final String COLUMN_TYPE = "type";
     }
 
     
@@ -153,7 +187,7 @@ public class MovieTheaterContract {
 
 
         // returns a favorte Uri (a single record in this table) given a MOVIE id
-        // TODO: this is not going to work, needs to use .appendQueryParameter
+        // TODO: this is not going to work, needs to use .appendQueryParameter (??)
         // .withAppendedId will only work for the primary key _id, I think
         public static Uri buildFavoriteUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
@@ -161,7 +195,96 @@ public class MovieTheaterContract {
 
     }
 
+    
 
+    // I am choosing not to store performer profile images locally, so if in favorites mode and
+    // no internet, there will not be an image of the actor/actress.. I need to get this project done
+    // with enough time, that could be implemented
+    public static final class CreditsEntry extends CreditsEntryColumns implements BaseColumns {
+
+        // "content://com.nate.moviebot5k/credits"
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_CREDITS).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CREDITS;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CREDITS;
+        public static final String TABLE_NAME = "credits";
+
+    }
+
+    public static final class FavoritesCreditsEntry extends CreditsEntryColumns implements BaseColumns {
+
+        // "content://com.nate.moviebot5k/favorites_credits"
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_FAVORITES_CREDITS).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
+        public static final String TABLE_NAME = "favorites_credits";
+
+    }
+
+
+
+    public static final class VideosEntry extends VideosEntryColumns implements BaseColumns {
+
+        // "content://com.nate.moviebot5k/videos"
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_VIDEOS).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
+        public static final String TABLE_NAME = "videos";
+
+    }
+
+    public static final class FavoritesVideosEntry extends VideosEntryColumns implements BaseColumns {
+
+        // "content://com.nate.moviebot5k/favorites_videos"
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_FAVORITES_VIDEOS).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_VIDEOS;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_VIDEOS;
+        public static final String TABLE_NAME = "favorites_videos";
+
+    }
+
+
+
+    public static final class ReviewsEntry extends ReviewsEntryColumns implements BaseColumns {
+
+        // "content://com.nate.moviebot5k/reviews"
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_REVIEWS).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
+        public static final String TABLE_NAME = "reviews";
+
+    }
+
+    public static final class FavoritesReviewsEntry extends ReviewsEntryColumns implements BaseColumns {
+
+        // "content://com.nate.moviebot5k/favorites_reviews"
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_FAVORITES_REVIEWS).build();
+        public static final String CONTENT_TYPE = ContentResolver
+                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_REVIEWS;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver
+                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_REVIEWS;
+        public static final String TABLE_NAME = "favorites_reviews";
+
+    }
+    
+    
+    
+    
     /**
      * Defines the table contents that are used to populate the Genres movie filter spinner.
      * The data is updated once each time the app is started from dead, in StartupActivity.
