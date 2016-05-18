@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import com.nate.moviebot5k.data.MovieTheaterContract;
@@ -58,6 +59,10 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         // TODO: get rid of some of these variables that are only used once
         setContentView(R.layout.activity_movie_details_pager);
         ButterKnife.bind(this);
+
+        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(actionBarToolbar);
+
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
 
