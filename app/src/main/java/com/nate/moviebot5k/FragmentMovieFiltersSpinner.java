@@ -52,7 +52,7 @@ public class FragmentMovieFiltersSpinner extends Fragment
     public static final String[] genresProjection = {
             MovieTheaterContract.GenresEntry._ID,
             MovieTheaterContract.GenresEntry.COLUMN_GENRE_ID,
-            MovieTheaterContract.GenresEntry.COLUMN_GENRE_NAME
+            MovieTheaterContract.GenresEntry.COLUMN_NAME
     };
     public static final int GENRE_TABLE_COLUMN_ID = 0;
     public static final int GENRE_TABLE_COLUMN_GENRE_ID = 1;
@@ -61,8 +61,8 @@ public class FragmentMovieFiltersSpinner extends Fragment
     // certsProjection and the ints that follow must be changed together, order matters
     public static final String[] certsProjection = {
             MovieTheaterContract.CertsEntry._ID,
-            MovieTheaterContract.CertsEntry.COLUMN_CERT_ORDER,
-            MovieTheaterContract.CertsEntry.COLUMN_CERT_NAME
+            MovieTheaterContract.CertsEntry.COLUMN_ORDER,
+            MovieTheaterContract.CertsEntry.COLUMN_NAME
     };
     public static final int CERTS_TABLE_COLUMN_ID = 0;
     public static final int CERTS_TABLE_COLUMN_CERTS_ORDER = 1;
@@ -296,7 +296,7 @@ public class FragmentMovieFiltersSpinner extends Fragment
                     certsProjection,
                     null, null,
                     // here we  want the proper order, ie NR, G, PG, PG-13, etc
-                    MovieTheaterContract.CertsEntry.COLUMN_CERT_ORDER + " ASC");
+                    MovieTheaterContract.CertsEntry.COLUMN_ORDER + " ASC");
         }
         return null;
     }

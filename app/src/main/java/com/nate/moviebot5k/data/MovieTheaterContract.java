@@ -110,8 +110,8 @@ public class MovieTheaterContract {
     private static class CreditsEntryColumns {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_CHARACTER = "character";
-        public static final String COLUMN_PERFORMER_NAME = "performer_name";
-        public static final String COLUMN_ORDER = "order";
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_ORDER = "credits_order";
         public static final String COLUMN_PROFILE_PATH = "profile_path";
     }
     
@@ -300,7 +300,7 @@ public class MovieTheaterContract {
         public static final String TABLE_NAME = "genres";
 
         public static final String COLUMN_GENRE_ID = "genre_id";
-        public static final String COLUMN_GENRE_NAME = "genre_name";
+        public static final String COLUMN_NAME = "genre_name";
 
 
         // should not need any build methods.. genres table is only ever wiped out completely and
@@ -308,7 +308,7 @@ public class MovieTheaterContract {
 
 //        public static Uri buildGenreUriFromGenreName(String genreName) {
 //            return CONTENT_URI.buildUpon()
-//                    .appendQueryParameter(COLUMN_GENRE_NAME, genreName).build();
+//                    .appendQueryParameter(COLUMN_NAME, genreName).build();
 //        }
 
     }
@@ -328,9 +328,9 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CERTS;
         public static final String TABLE_NAME = "certifications";
 
-        public static final String COLUMN_CERT_ORDER = "certification_order";
-        public static final String COLUMN_CERT_NAME = "certification_name";
-        public static final String COLUMN_CERT_MEANING = "certification_meaning";
+        public static final String COLUMN_ORDER = "certification_order";
+        public static final String COLUMN_NAME = "certification_name";
+        public static final String COLUMN_MEANING = "certification_meaning";
 
         // should not need any build methods, same reason as GenresEntry
 

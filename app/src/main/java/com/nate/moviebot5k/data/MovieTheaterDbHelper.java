@@ -121,24 +121,6 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
 
 
 
-        final String SQL_CREDITS_COLUMNS =
-                CreditsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
-                        CreditsEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
-                        CreditsEntry.COLUMN_CHARACTER + " TEXT, " +
-                        CreditsEntry.COLUMN_PERFORMER_NAME + " TEXT NOT NULL, " +
-                        CreditsEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
-                        CreditsEntry.COLUMN_PROFILE_PATH + " TEXT";
-        
-        final String SQL_CREATE_CREDITS_TABLE = "CREATE TABLE " + CreditsEntry.TABLE_NAME + "(" +
-                SQL_CREDITS_COLUMNS + ");";
-        Log.i(LOGTAG, "onCreate credits table SQL: " + SQL_CREATE_CREDITS_TABLE);
-        db.execSQL(SQL_CREATE_CREDITS_TABLE);
-
-        final String SQL_CREATE_FAVORITES_CREDITS_TABLE = "CREATE TABLE " + FavoritesCreditsEntry.TABLE_NAME + "(" +
-                SQL_CREDITS_COLUMNS + ");";
-        Log.i(LOGTAG, "onCreate favorites_credits table SQL: " + SQL_CREATE_FAVORITES_CREDITS_TABLE);
-        db.execSQL(SQL_CREATE_FAVORITES_CREDITS_TABLE);
-
 
 
         final String SQL_VIDEOS_COLUMNS =
@@ -159,6 +141,28 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 SQL_VIDEOS_COLUMNS + ");";
         Log.i(LOGTAG, "onCreate favorites_videos table SQL: " + SQL_CREATE_FAVORITES_VIDEOS_TABLE);
         db.execSQL(SQL_CREATE_FAVORITES_VIDEOS_TABLE);
+
+
+
+
+        final String SQL_CREDITS_COLUMNS =
+                CreditsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
+                        CreditsEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
+                        CreditsEntry.COLUMN_CHARACTER + " TEXT, " +
+                        CreditsEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                        CreditsEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
+                        CreditsEntry.COLUMN_PROFILE_PATH + " TEXT";
+        
+        final String SQL_CREATE_CREDITS_TABLE = "CREATE TABLE " + CreditsEntry.TABLE_NAME + "(" +
+                SQL_CREDITS_COLUMNS + ");";
+        Log.i(LOGTAG, "onCreate credits table SQL: " + SQL_CREATE_CREDITS_TABLE);
+        db.execSQL(SQL_CREATE_CREDITS_TABLE);
+
+        final String SQL_CREATE_FAVORITES_CREDITS_TABLE = "CREATE TABLE " + FavoritesCreditsEntry.TABLE_NAME + "(" +
+                SQL_CREDITS_COLUMNS + ");";
+        Log.i(LOGTAG, "onCreate favorites_credits table SQL: " + SQL_CREATE_FAVORITES_CREDITS_TABLE);
+        db.execSQL(SQL_CREATE_FAVORITES_CREDITS_TABLE);
+
 
 
 
@@ -185,16 +189,16 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_GENRES_TABLE = "CREATE TABLE " + GenresEntry.TABLE_NAME + "(" +
                 GenresEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
                 GenresEntry.COLUMN_GENRE_ID + " INTEGER NOT NULL, " +
-                GenresEntry.COLUMN_GENRE_NAME + " TEXT NOT NULL);";
+                GenresEntry.COLUMN_NAME + " TEXT NOT NULL);";
         Log.i(LOGTAG, "onCreate genres table SQL: " + SQL_CREATE_GENRES_TABLE);
         db.execSQL(SQL_CREATE_GENRES_TABLE);
         
         // create a table for certifications, similar to genres table (like G, PG, PG-13, etc)
         final String SQL_CREATE_CERTS_TABLE = "CREATE TABLE " + CertsEntry.TABLE_NAME + "(" +
                 CertsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
-                CertsEntry.COLUMN_CERT_ORDER + " INTEGER NOT NULL, " +
-                CertsEntry.COLUMN_CERT_NAME + " TEXT NOT NULL, " +
-                CertsEntry.COLUMN_CERT_MEANING + " TEXT);";
+                CertsEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
+                CertsEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                CertsEntry.COLUMN_MEANING + " TEXT);";
         Log.i(LOGTAG, "onCreate certifications table SQL: " + SQL_CREATE_CERTS_TABLE);
         db.execSQL(SQL_CREATE_CERTS_TABLE);
                 

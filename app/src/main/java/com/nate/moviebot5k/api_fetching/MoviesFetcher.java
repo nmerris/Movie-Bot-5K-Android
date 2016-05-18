@@ -200,7 +200,7 @@ public class MoviesFetcher {
             
 
             // print the data for all the NON NULL columns
-            Log.d(LOGTAG, "  added movie id: " + jsonObject.getLong("id"));
+            Log.d(LOGTAG, "  added movie id: " + jsonObject.getLong("id") + "  title: " + jsonObject.getString("title"));
 //            Log.d(LOGTAG, "  and overview: " + jsonObject.getString("overview"));
 //            Log.d(LOGTAG, "  and release_date: " + jsonObject.getString("release_date"));
 //            Log.d(LOGTAG, "  and movie title: " + jsonObject.getString("title"));

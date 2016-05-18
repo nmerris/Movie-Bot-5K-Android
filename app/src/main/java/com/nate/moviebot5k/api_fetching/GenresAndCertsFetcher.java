@@ -118,9 +118,9 @@ public class GenresAndCertsFetcher {
 
         // first add the 'Any Rating' record
         ContentValues anyCertCV = new ContentValues();
-        anyCertCV.put(CertsEntry.COLUMN_CERT_ORDER, 0); // want it to be at top of list of certs
-        anyCertCV.put(CertsEntry.COLUMN_CERT_NAME, mContext.getString(R.string.default_movie_filter_cert));
-        anyCertCV.put(CertsEntry.COLUMN_CERT_MEANING, mContext.getString(R.string.default_movie_filter_cert));
+        anyCertCV.put(CertsEntry.COLUMN_ORDER, 0); // want it to be at top of list of certs
+        anyCertCV.put(CertsEntry.COLUMN_NAME, mContext.getString(R.string.default_movie_filter_cert));
+        anyCertCV.put(CertsEntry.COLUMN_MEANING, mContext.getString(R.string.default_movie_filter_cert));
         valuesVector.add(anyCertCV);
 
         // iterate through all the genres and convert each one to a ContentValues that certs
@@ -131,15 +131,15 @@ public class GenresAndCertsFetcher {
             ContentValues values = new ContentValues();
 
             // extract the data from the json object and put it in a single ContentValues object
-            values.put(CertsEntry.COLUMN_CERT_ORDER, certJsonObject.getInt("order"));
-            values.put(CertsEntry.COLUMN_CERT_MEANING, certJsonObject.getString("meaning"));
-            values.put(CertsEntry.COLUMN_CERT_NAME, certJsonObject.getString("certification"));
+            values.put(CertsEntry.COLUMN_ORDER, certJsonObject.getInt("order"));
+            values.put(CertsEntry.COLUMN_MEANING, certJsonObject.getString("meaning"));
+            values.put(CertsEntry.COLUMN_NAME, certJsonObject.getString("certification"));
 
 
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
 
-//            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
+            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
 //            Log.d(LOGTAG, "  and certification order: " + certJsonObject.getInt("order"));
         }
 
@@ -194,7 +194,7 @@ public class GenresAndCertsFetcher {
         // first add the 'Any Genre' record
         ContentValues anyGenreCV = new ContentValues();
         anyGenreCV.put(GenresEntry.COLUMN_GENRE_ID, mContext.getString(R.string.default_movie_filter_genre_id));
-        anyGenreCV.put(GenresEntry.COLUMN_GENRE_NAME, mContext.getString(R.string.spinner_genre_any_genre_label));
+        anyGenreCV.put(GenresEntry.COLUMN_NAME, mContext.getString(R.string.spinner_genre_any_genre_label));
         valuesVector.add(anyGenreCV);
 
         // iterate through all the genres and convert each one to a ContentValues that genres
@@ -209,13 +209,13 @@ public class GenresAndCertsFetcher {
             
             // extract the data from the json object and put it in a single ContentValues object
             cv.put(GenresEntry.COLUMN_GENRE_ID, genreJsonObject.getInt("id"));
-            cv.put(GenresEntry.COLUMN_GENRE_NAME, genreJsonObject.getString("name"));
+            cv.put(GenresEntry.COLUMN_NAME, genreJsonObject.getString("name"));
 
             // add the single object to the ContentValues Vector
             valuesVector.add(cv);
 
-            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id"));
-            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
+            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id") + "  name: " + genreJsonObject.getString("name"));
+//            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
         }
 
 
