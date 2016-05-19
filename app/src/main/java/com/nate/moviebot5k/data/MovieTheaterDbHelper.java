@@ -73,33 +73,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_REVENUE + " INTEGER, " +
                 MoviesEntry.COLUMN_RUNTIME + " INTEGER, " +
                 MoviesEntry.COLUMN_TAGLINE + " TEXT";
-                        
-                        
-//                MoviesEntry.COLUMN_REVIEW_AUTHOR1 + " TEXT, " +
-//                MoviesEntry.COLUMN_REVIEW_CONTENT1 + " TEXT, " +
-//                MoviesEntry.COLUMN_REVIEW_AUTHOR2 + " TEXT, " +
-//                // the view will have to deal with a movie with no review or video
-//                MoviesEntry.COLUMN_REVIEW_CONTENT2 + " TEXT, " +
-//                MoviesEntry.COLUMN_REVIEW_AUTHOR3 + " TEXT, " +
-//                MoviesEntry.COLUMN_REVIEW_CONTENT3 + " TEXT, " +
-//                MoviesEntry.COLUMN_REVIEW_AUTHOR4 + " TEXT, " +
-//                MoviesEntry.COLUMN_REVIEW_CONTENT4 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_KEY1 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_NAME1 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_SITE1 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_TYPE1 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_KEY2 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_NAME2 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_SITE2 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_TYPE2 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_KEY3 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_NAME3 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_SITE3 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_TYPE3 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_KEY4 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_NAME4 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_SITE4 + " TEXT, " +
-//                MoviesEntry.COLUMN_VIDEO_TYPE4 + " TEXT";
+
         
         // create a table to hold the currently 'showing' movies
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MoviesEntry.TABLE_NAME + "(" + 

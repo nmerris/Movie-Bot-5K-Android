@@ -27,6 +27,9 @@ public class MovieTheaterContract {
     public static final String PATH_FAVORITES_CREDITS = "favorites_credits";
     public static final String PATH_FAVORITES_VIDEOS = "favorites_videos";
     public static final String PATH_FAVORITES_REVIEWS = "favorites_reviews";
+    
+//    public static final String PATH_MOVIE_DETAILS = PATH_MOVIES + "/details";
+//    public static final String PATH_FAVORITE_DETAILS = PATH_FAVORITES + "/details";
 
 
 
@@ -64,38 +67,6 @@ public class MovieTheaterContract {
         public static final String COLUMN_REVENUE = "revenue";
         public static final String COLUMN_RUNTIME = "runtime";
         public static final String COLUMN_TAGLINE = "tagline";
-
-        // populated in MovieDetailFragment from /movie/id/reviews API endpoint
-//        public static final String COLUMN_REVIEW_AUTHOR1 = "review_author1";
-//        public static final String COLUMN_REVIEW_CONTENT1 = "review_content1";
-//        public static final String COLUMN_REVIEW_AUTHOR2 = "review_author2";
-//        public static final String COLUMN_REVIEW_CONTENT2 = "review_content2";
-//        public static final String COLUMN_REVIEW_AUTHOR3 = "review_author3";
-//        public static final String COLUMN_REVIEW_CONTENT3 = "review_content3";
-//        public static final String COLUMN_REVIEW_AUTHOR4 = "review_author4";
-//        public static final String COLUMN_REVIEW_CONTENT4 = "review_content4";
-
-        // populated in FragmentMovieGrid from /movie/id/videos API endpoint
-//        public static final String COLUMN_VIDEO_KEY1 = "video_key1";
-//        public static final String COLUMN_VIDEO_NAME1 = "video_name1";
-//        public static final String COLUMN_VIDEO_SITE1 = "video_site1";
-//        public static final String COLUMN_VIDEO_SIZE1 = "video_size1";
-//        public static final String COLUMN_VIDEO_TYPE1 = "video_type1";
-//        public static final String COLUMN_VIDEO_KEY2 = "video_key2";
-//        public static final String COLUMN_VIDEO_NAME2 = "video_name2";
-//        public static final String COLUMN_VIDEO_SITE2 = "video_site2";
-//        public static final String COLUMN_VIDEO_SIZE2 = "video_size2";
-//        public static final String COLUMN_VIDEO_TYPE2 = "video_type2";
-//        public static final String COLUMN_VIDEO_KEY3 = "video_key3";
-//        public static final String COLUMN_VIDEO_NAME3 = "video_name3";
-//        public static final String COLUMN_VIDEO_SITE3 = "video_site3";
-//        public static final String COLUMN_VIDEO_SIZE3 = "video_size3";
-//        public static final String COLUMN_VIDEO_TYPE3 = "video_type3";
-//        public static final String COLUMN_VIDEO_KEY4 = "video_key4";
-//        public static final String COLUMN_VIDEO_NAME4 = "video_name4";
-//        public static final String COLUMN_VIDEO_SITE4 = "video_site4";
-//        public static final String COLUMN_VIDEO_SIZE4 = "video_size4";
-//        public static final String COLUMN_VIDEO_TYPE4 = "video_type4";
     }
     
     
@@ -145,6 +116,8 @@ public class MovieTheaterContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
         public static final String TABLE_NAME = "movies";
+        
+        public static final String DETAILS_PATH = "details";
 
         
         // returns a movie Uri (a single record in this table) given a MOVIE id
@@ -155,6 +128,12 @@ public class MovieTheaterContract {
         // NOTE: movieId is not the same as the primary key, which is just _id
         public static Uri buildMovieUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
+        
+        // use to get the joined table of movie details joined with videos, reviews, and credits tables
+        public static Uri buildMovieDetailsUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId).buildUpon()
+                    .appendPath(DETAILS_PATH).build();
         }
         
     }
@@ -180,6 +159,8 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
         public static final String TABLE_NAME = "favorites";
 
+        public static final String DETAILS_PATH = "details";
+
 
         // 2 additional columns needed to store local poster and backdrop image file paths
         // so that the favorites table can be accessed while offline
@@ -192,6 +173,12 @@ public class MovieTheaterContract {
         // .withAppendedId will only work for the primary key _id, I think
         public static Uri buildFavoriteUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
+
+        // use to get the joined table of favorite details joined with videos, reviews, and credits tables
+        public static Uri buildFavoriteDetailsUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId).buildUpon()
+                    .appendPath(DETAILS_PATH).build();
         }
 
     }
@@ -228,6 +215,10 @@ public class MovieTheaterContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
         public static final String TABLE_NAME = "favorites_credits";
+
+        // 1 additional column needed to store the local file location for the image associated
+        // with the actor/actress for each credits record
+        public static final String COLUMN_PROFILE_FILE_PATH = "profile_file_path";
 
         public static Uri buildFavoritesCreditsUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);

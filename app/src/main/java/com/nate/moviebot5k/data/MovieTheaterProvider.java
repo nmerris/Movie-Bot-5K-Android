@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
@@ -20,6 +21,8 @@ import com.nate.moviebot5k.data.MovieTheaterContract.VideosEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesVideosEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.ReviewsEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesReviewsEntry;
+
+import java.util.List;
 
 
 /**
@@ -53,15 +56,100 @@ public class MovieTheaterProvider extends ContentProvider {
     static final int FAVORITES_VIDEOS_ALL = 17;
     static final int FAVORITES_REVIEWS_ALL = 18;
 
+    static final int MOVIE_WITH_DETAILS = 19;
+    static final int FAVORITE_WITH_DETAILS = 20;
+
     // SQL selection statements
-    private static final String sMovieWithMovieIdSelection = MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
-    private static final String sFavoriteWithMovieIdSelection = FavoritesEntry.COLUMN_MOVIE_ID + " = ? ";
+//    private static final String sMovieWithMovieIdSelection = MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
+//    private static final String sFavoriteWithMovieIdSelection = FavoritesEntry.COLUMN_MOVIE_ID + " = ? ";
+
+    private static final String sMovieWithMovieIdSelection = MoviesEntry.TABLE_NAME + "." + MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
+    private static final String sFavoriteWithMovieIdSelection = FavoritesEntry.TABLE_NAME + "." + FavoritesEntry.COLUMN_MOVIE_ID + " = ? ";
+
     private static final String sCreditsWithMovieIdSelection = CreditsEntry.COLUMN_MOVIE_ID + " = ? ";
     private static final String sFavoritesCreditsWithMovieIdSelection = FavoritesCreditsEntry.COLUMN_MOVIE_ID + " = ? ";
     private static final String sVideosWithMovieIdSelection = VideosEntry.COLUMN_MOVIE_ID + " = ? ";
     private static final String sFavoritesVideosWithMovieIdSelection = FavoritesVideosEntry.COLUMN_MOVIE_ID + " = ? ";
     private static final String sReviewsWithMovieIdSelection = ReviewsEntry.COLUMN_MOVIE_ID + " = ? ";
     private static final String sFavoritesReviewsWithMovieIdSelection = ReviewsEntry.COLUMN_MOVIE_ID + " = ? ";
+
+    private static final SQLiteQueryBuilder sMovieDetails;
+    private static final SQLiteQueryBuilder sFavoriteDetails;
+
+
+    // inner join of tables to be used to retrieve all movie data for the details view
+    static {
+        sMovieDetails = new SQLiteQueryBuilder();
+
+        sMovieDetails.setTables(
+                // "movies INNER JOIN reviews ON movies.movie_id = reviews.movie_id"
+                MoviesEntry.TABLE_NAME + " INNER JOIN " +
+                ReviewsEntry.TABLE_NAME + " ON " + MoviesEntry.TABLE_NAME + "." +
+                MoviesEntry.COLUMN_MOVIE_ID + " = " + ReviewsEntry.TABLE_NAME + "." +
+                ReviewsEntry.COLUMN_MOVIE_ID +
+                // "INNER JOIN credits ON movies.movie_id = credits.movie_id"
+                " INNER JOIN " + CreditsEntry.TABLE_NAME + " ON " + MoviesEntry.TABLE_NAME + "." +
+                MoviesEntry.COLUMN_MOVIE_ID + " = " + CreditsEntry.TABLE_NAME +
+                "." + CreditsEntry.COLUMN_MOVIE_ID +
+                // "INNER JOIN videos ON movies.movie_id = videos.movie_id"
+                " INNER JOIN " + VideosEntry.TABLE_NAME + " ON " + MoviesEntry.TABLE_NAME + "." +
+                MoviesEntry.COLUMN_MOVIE_ID + " = " + VideosEntry.TABLE_NAME +
+                "." + VideosEntry.COLUMN_MOVIE_ID);
+
+        // testing
+        Log.i(LOGTAG, "********* sMovieDetails SQL: " + MoviesEntry.TABLE_NAME + " INNER JOIN " +
+                ReviewsEntry.TABLE_NAME + " ON " + MoviesEntry.TABLE_NAME + "." +
+                MoviesEntry.COLUMN_MOVIE_ID + " = " + ReviewsEntry.TABLE_NAME + "." +
+                ReviewsEntry.COLUMN_MOVIE_ID +
+                // "INNER JOIN credits ON movies.movie_id = credits.movie_id"
+                " INNER JOIN " + CreditsEntry.TABLE_NAME + " ON " + MoviesEntry.TABLE_NAME + "." +
+                MoviesEntry.COLUMN_MOVIE_ID + " = " + CreditsEntry.TABLE_NAME +
+                "." + CreditsEntry.COLUMN_MOVIE_ID +
+                // "INNER JOIN videos ON movies.movie_id = videos.movie_id"
+                " INNER JOIN " + VideosEntry.TABLE_NAME + " ON " + MoviesEntry.TABLE_NAME + "." +
+                MoviesEntry.COLUMN_MOVIE_ID + " = " + VideosEntry.TABLE_NAME +
+                "." + VideosEntry.COLUMN_MOVIE_ID);
+
+    }
+
+    static {
+        sFavoriteDetails = new SQLiteQueryBuilder();
+
+        sFavoriteDetails.setTables(
+                // "favorites INNER JOIN reviews ON favorites.movie_id = reviews.movie_id"
+                FavoritesEntry.TABLE_NAME + " INNER JOIN " +
+                        ReviewsEntry.TABLE_NAME + " ON " + FavoritesEntry.TABLE_NAME + "." +
+                        FavoritesEntry.COLUMN_MOVIE_ID + " = " + ReviewsEntry.TABLE_NAME + "." +
+                        ReviewsEntry.COLUMN_MOVIE_ID +
+                        // "INNER JOIN credits ON favorites.movie_id = credits.movie_id"
+                        " INNER JOIN " + CreditsEntry.TABLE_NAME + " ON " + FavoritesEntry.TABLE_NAME + "." +
+                        FavoritesEntry.COLUMN_MOVIE_ID + " = " + CreditsEntry.TABLE_NAME +
+                        "." + CreditsEntry.COLUMN_MOVIE_ID +
+                        // "INNER JOIN videos ON favorites.movie_id = videos.movie_id"
+                        " INNER JOIN " + VideosEntry.TABLE_NAME + " ON " + FavoritesEntry.TABLE_NAME + "." +
+                        FavoritesEntry.COLUMN_MOVIE_ID + " = " + VideosEntry.TABLE_NAME +
+                        "." + VideosEntry.COLUMN_MOVIE_ID);
+
+        // testing
+        Log.i(LOGTAG, "********* sFavoriteDetails SQL: " + FavoritesEntry.TABLE_NAME + " INNER JOIN " +
+                ReviewsEntry.TABLE_NAME + " ON " + FavoritesEntry.TABLE_NAME + "." +
+                FavoritesEntry.COLUMN_MOVIE_ID + " = " + ReviewsEntry.TABLE_NAME + "." +
+                ReviewsEntry.COLUMN_MOVIE_ID +
+                // "INNER JOIN credits ON favorites.movie_id = credits.movie_id"
+                " INNER JOIN " + CreditsEntry.TABLE_NAME + " ON " + FavoritesEntry.TABLE_NAME + "." +
+                FavoritesEntry.COLUMN_MOVIE_ID + " = " + CreditsEntry.TABLE_NAME +
+                "." + CreditsEntry.COLUMN_MOVIE_ID +
+                // "INNER JOIN videos ON favorites.movie_id = videos.movie_id"
+                " INNER JOIN " + VideosEntry.TABLE_NAME + " ON " + FavoritesEntry.TABLE_NAME + "." +
+                FavoritesEntry.COLUMN_MOVIE_ID + " = " + VideosEntry.TABLE_NAME +
+                "." + VideosEntry.COLUMN_MOVIE_ID);
+
+    }
+
+
+
+
+
 
 
     static UriMatcher buildUriMatcher() {
@@ -89,6 +177,9 @@ public class MovieTheaterProvider extends ContentProvider {
         matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_CREDITS, FAVORITES_CREDITS_ALL);
         matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_VIDEOS, FAVORITES_VIDEOS_ALL);
         matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_REVIEWS, FAVORITES_REVIEWS_ALL);
+
+        matcher.addURI(authority, MovieTheaterContract.PATH_MOVIES + "/#/" + MoviesEntry.DETAILS_PATH, MOVIE_WITH_DETAILS);
+        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES + "/#/" + FavoritesEntry.DETAILS_PATH, FAVORITE_WITH_DETAILS);
 
         return matcher;
     }
@@ -196,43 +287,67 @@ public class MovieTheaterProvider extends ContentProvider {
                         null, null, null);
                 break;
 
-            case FAVORITES_CREDITS_WITH_MOVIE_ID:
-                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_CREDITS_WITH_MOVIE_ID");
-                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesCreditsWithMovieIdSelection);
-                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
+//            case FAVORITES_CREDITS_WITH_MOVIE_ID:
+//                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_CREDITS_WITH_MOVIE_ID");
+//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesCreditsWithMovieIdSelection);
+//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
+//
+//                retCursor = mOpenHelper.getReadableDatabase().query(
+//                        FavoritesCreditsEntry.TABLE_NAME,
+//                        projection,
+//                        sFavoritesCreditsWithMovieIdSelection,
+//                        new String[] {uri.getLastPathSegment()},
+//                        null, null, null);
+//                break;
+//
+//            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
+//                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_VIDEOS_WITH_MOVIE_ID");
+//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesVideosWithMovieIdSelection);
+//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
+//
+//                retCursor = mOpenHelper.getReadableDatabase().query(
+//                        FavoritesVideosEntry.TABLE_NAME,
+//                        projection,
+//                        sFavoritesVideosWithMovieIdSelection,
+//                        new String[] {uri.getLastPathSegment()},
+//                        null, null, null);
+//                break;
+//
+//            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
+//                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_REVIEWS_WITH_MOVIE_ID");
+//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesReviewsWithMovieIdSelection);
+//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
+//
+//                retCursor = mOpenHelper.getReadableDatabase().query(
+//                        FavoritesReviewsEntry.TABLE_NAME,
+//                        projection,
+//                        sFavoritesReviewsWithMovieIdSelection,
+//                        new String[] {uri.getLastPathSegment()},
+//                        null, null, null);
+//                break;
 
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        FavoritesCreditsEntry.TABLE_NAME,
+            case MOVIE_WITH_DETAILS:
+                Log.i(LOGTAG, "  uri matched to switch statement MOVIE_WITH_DETAILS");
+
+                // testing
+                List<String> pathSegments = uri.getPathSegments();
+                for(int i = 0; i < pathSegments.size(); i++) {
+                    Log.i(LOGTAG, "    and uri path segment at: " + i + " is: " + pathSegments.get(i));
+                }
+
+                retCursor = sMovieDetails.query(mOpenHelper.getReadableDatabase(),
                         projection,
-                        sFavoritesCreditsWithMovieIdSelection,
-                        new String[] {uri.getLastPathSegment()},
-                        null, null, null);
+                        sMovieWithMovieIdSelection, // "movies.movie_id = ? "
+                        new String[]{ pathSegments.get(1) }, // movieId
+                        null, null,
+                        sortOrder);
                 break;
 
-            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
-                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_VIDEOS_WITH_MOVIE_ID");
-                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesVideosWithMovieIdSelection);
-                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
+            case FAVORITE_WITH_DETAILS:
 
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        FavoritesVideosEntry.TABLE_NAME,
-                        projection,
-                        sFavoritesVideosWithMovieIdSelection,
-                        new String[] {uri.getLastPathSegment()},
-                        null, null, null);
-                break;
+                // TODO: implement this same way as above after making sure above works
+                retCursor = null;
 
-            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
-                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_REVIEWS_WITH_MOVIE_ID");
-                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesReviewsWithMovieIdSelection);
-                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        FavoritesReviewsEntry.TABLE_NAME,
-                        projection,
-                        sFavoritesReviewsWithMovieIdSelection,
-                        new String[] {uri.getLastPathSegment()},
-                        null, null, null);
                 break;
 
             case CREDITS_ALL:

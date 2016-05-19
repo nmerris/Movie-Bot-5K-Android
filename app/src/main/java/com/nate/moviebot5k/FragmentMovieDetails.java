@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
-import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
@@ -38,7 +38,20 @@ public class FragmentMovieDetails extends Fragment
 
 
     // movies table projection
-
+    private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
+            MovieTheaterContract.FavoritesEntry._ID,
+            MovieTheaterContract.FavoritesEntry.COLUMN_MOVIE_ID,
+            MovieTheaterContract.FavoritesEntry.COLUMN_POSTER_FILE_PATH,
+            MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY,
+            MovieTheaterContract.FavoritesEntry.COLUMN_VOTE_AVG,
+            MovieTheaterContract.FavoritesEntry.COLUMN_REVENUE
+    };
+    public static final int MOVIES_TABLE_COL_ID = 0;
+    public static final int MOVIES_TABLE_COL_MOVIE_ID = 1;
+    public static final int MOVIES_TABLE_COL_POSTER_FILE_PATH = 2;
+    public static final int MOVIES_TABLE_COL_POPULARITY = 3;
+    public static final int MOVIES_TABLE_COL_VOTE_AVG = 4;
+    public static final int MOVIES_TABLE_COL_REVENUE = 5;
 
 
 
@@ -113,23 +126,30 @@ public class FragmentMovieDetails extends Fragment
         Log.i(LOGTAG, "entered onCreate");
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        mMovieId = mSharedPrefs
-//                .getInt(getString(R.string.key_currently_selected_movie_id), 0);
-//        mFavoriteId = mSharedPrefs
-//                .getInt(getString(R.string.key_currently_selected_favorite_id), 0);
 
 
-
-        // check if hosting activity has requested that this fragment use the favorites table
+        // if this fragment is being created from new (ie it's hosting activity has performed a
+        // fragment transaction), then get the movieId from the frag arg and then check to see if
+        // a fetch details async task should be fired, if it does fire it will restart the loader
+        // when it is done, which will be the second time that has happened because it would have
+        // already happened on onActivityCreated when the loader is initialized.. seems acceptable
         if(savedInstanceState == null) {
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool and movieId int from frag argument");
             mMovieId = getArguments().getInt(BUNDLE_MOVIE_ID_KEY);
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
             Log.i(LOGTAG, "    mMovieId is now: " + mMovieId);
+
+            // if this fragment is null, might need to fetch movie details, will only happen if the db
+            // does not have details data for current mMovieId
+            fireFetchDetailsTaskIfNecessary();
+
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
         // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
+        // the loader will restart next when onCreateView is called, there is no need to check if a
+        // fetch details task needs to happen because that would have already happened when this fragment
+        // was initially created
         else {
             Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool and movieId int from SIS Bundle");
             mMovieId = savedInstanceState.getInt(BUNDLE_MOVIE_ID_KEY);
@@ -141,22 +161,17 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-
         View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
 
 
-        TextView textTV =  (TextView) rootView.findViewById(R.id.test_movie_id_textview);
 
+        TextView textTV =  (TextView) rootView.findViewById(R.id.test_movie_id_textview);
         // testing
         if(mUseFavorites) {
-            // of course this would be read from favorites table in onLoadFinished
+            // of course this would be read from cursor  in onLoadFinished
             textTV.setText(String.valueOf(mMovieId));
-
-
-
         } else {
-            // and this would be read from movies table in onLoadFinished
+            // and this would be read from cursor in onLoadFinished
             textTV.setText(String.valueOf(mMovieId));
         }
 
@@ -168,11 +183,13 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public void onResume() {
-        Log.i(LOGTAG, "entered onResume");
-        Log.e(LOGTAG, "  and mMovieId is: " + mMovieId);
+//        Log.i(LOGTAG, "entered onResume");
+//        Log.e(LOGTAG, "  and mMovieId is: " + mMovieId);
 
 
-        fireFetchDetailsTaskIfNecessary();
+        // TODO: I think this can be moved to onCreate, since this fragment is only ever created from scratch
+        // when it's host does a frag txn
+//        fireFetchDetailsTaskIfNecessary();
 
 
         super.onResume();
@@ -200,20 +217,54 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.i(LOGTAG, "entered onCreateLoader");
+
+        if(id == MOVIES_TABLE_LOADER_ID) {
+            Log.i(LOGTAG, "  and about to return new MOVIES_TABLE_LOADER");
+
+            return new CursorLoader(
+                    getActivity(),
+                    MovieTheaterContract.MoviesEntry.buildMovieDetailsUriFromMovieId(mMovieId),
+                    null, // projection todo create this
+                    null, // selection is ignored by content provider
+                    null, // selectionArgs ignored by CP
+                    null); // sort order
+        }
+        else if(id == FAVORITES_TABLE_LOADER_ID) {
+            Log.i(LOGTAG, "  and about to return new FAVORITES_TABLE_LOADER");
+
+            return new CursorLoader(
+                    getActivity(),
+                    MovieTheaterContract.FavoritesEntry.buildFavoriteDetailsUriFromMovieId(mMovieId),
+                    null, // todo create this, like above but with extra columns for backdrop and profile pic file paths local
+                    null, null, // ignored
+                    null); // sort order
+        }
+        
+        
         return null;
     }
 
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.i(LOGTAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entered onLoadFinished");
 
+
+        if(data != null && data.moveToFirst()) {
+
+            String author = data.getString(data.getColumnIndex(MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR));
+            Log.e(LOGTAG, "  author column data: " + author);
+
+
+        }
+        
+        
     }
 
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
+    public void onLoaderReset(Loader<Cursor> loader) {}
 
 
 
@@ -221,10 +272,12 @@ public class FragmentMovieDetails extends Fragment
     private class FetchMovieDetailsTask extends AsyncTask<Void, Void, Void> {
         Context context;
         int movieId;
+        LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks;
 
-        private FetchMovieDetailsTask(Context c, int movieId) {
+        private FetchMovieDetailsTask(Context c, int movieId, LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks) {
             context = c;
             this.movieId = movieId;
+            this.loaderCallbacks = loaderCallbacks;
         }
 
         @Override
@@ -235,7 +288,15 @@ public class FragmentMovieDetails extends Fragment
 
         @Override
         protected void onPostExecute(Void v) {
-            Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute");
+            Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader");
+
+            // now that the db has been updated with new movie detail data,
+            // restart the loader that lives in the class that contains this inner class
+            if(mUseFavorites) {
+                getLoaderManager().restartLoader(FAVORITES_TABLE_LOADER_ID, null, loaderCallbacks);
+            } else {
+                getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, loaderCallbacks);
+            }
         }
     }
 
@@ -243,41 +304,7 @@ public class FragmentMovieDetails extends Fragment
     // TODO: clean this mess up
     private void fireFetchDetailsTaskIfNecessary() {
 
-        // check if the movies table already has the record with the EXTRA MOVIE DETAILS for the
-        // movieId that this fragment
-        // is showing, if it does then there is no need to make another API call because it must
-        // have already been done, otherwise start a fetch details task so the db will be updated as needed
-        // in addition to the reviews and videos that might be loaded in the fetch details task,
-        // there are 3 other columns that are populated: budget, revenue, and runtime.
-        // it's possible that an obscure movie will have no reviews or videos, so can't rely on those
-        // columns to check... of the other three columns, it seems to me that runtime is prob. going
-        // to be something that every movie in themoviedb's database will have data for, so I chose
-        // to condition the following fetch task on that column
-        // NOTE: if the favorites table is being used, an API fetch will never happen.. the only way
-        // the user can get here and be using the favorites table is if they had previously selected
-        // a movie as a favorite, which can only be done if the full record, including the extra
-        // details that are loaded in this fragment, had already been loaded to the movies table
         if(!mUseFavorites) {
-//            Cursor cursor = getActivity().getContentResolver().query(
-//                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-//                    new String[] {MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE},
-//                    null, null, null);
-//
-//            if(cursor != null && cursor.moveToFirst()) {
-//                Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
-//                        ", has tagline column data: " + cursor.getString(0));
-//
-//                // if tagline is null then this movie probably has not had details fetched yet,
-//                // so launch a new fetch details task, this will fill in all the columns with data
-//                // that was not obtained during the fetch task that FragmentMovieGrid launched
-//                // before the user clicked the poster thumbnail to get here
-//                // it's possible that themoviedb just doesn't have a tagline for this movie, in
-//                // which case unnecessary api calls will be made, but that's fairly unusual
-//                if(cursor.getString(0) == null) {
-//                    new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
-//                }
-//                cursor.close();
-//            }
 
             Cursor cursorCredits = getActivity().getContentResolver().query(
                     MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
@@ -286,6 +313,9 @@ public class FragmentMovieDetails extends Fragment
             Log.i(LOGTAG, "  cursorCredits.getCount: " + cursorCredits.getCount());
 
 
+            // the downside is that the following code will perform 3 db queries to check if a details
+            // task should be fired, the upside is that it eliminates the possibility of duplicate
+            // videos, credits, or reviews data ever being written to the db
             if(cursorCredits != null && cursorCredits.getCount() == 0) {
                 Cursor cursorVideos = getActivity().getContentResolver().query(
                         MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
@@ -306,36 +336,15 @@ public class FragmentMovieDetails extends Fragment
                         // yet been fetched, so go fetch it
 
                         Log.i(LOGTAG, "        about to fire a fetch details task because it appears that the details data for this movieId does not exist in the db");
-                        new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
+                        new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
                     }
                     cursorReviews.close();
                 }
                 cursorVideos.close();
             }
             cursorCredits.close();
-
-//
-//            if(cursor != null && cursor.moveToFirst()) {
-//                Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
-//                        ", has tagline column data: " + cursor.getString(0));
-//
-//                // if tagline is null then this movie probably has not had details fetched yet,
-//                // so launch a new fetch details task, this will fill in all the columns with data
-//                // that was not obtained during the fetch task that FragmentMovieGrid launched
-//                // before the user clicked the poster thumbnail to get here
-//                // it's possible that themoviedb just doesn't have a tagline for this movie, in
-//                // which case unnecessary api calls will be made, but that's fairly unusual
-//                if(cursor.getString(0) == null) {
-//                    new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
-//                }
-//                cursor.close();
-//            }
-
         }
-
-
-
-
+        
     }
 
 
