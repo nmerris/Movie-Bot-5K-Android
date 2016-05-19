@@ -210,9 +210,6 @@ public class FragmentMovieDetails extends Fragment
         }
 
 
-
-
-
         super.onResume();
     }
 

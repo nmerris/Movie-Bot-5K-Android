@@ -212,6 +212,10 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CREDITS;
         public static final String TABLE_NAME = "credits";
 
+        public static Uri buildCreditsUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
+
     }
 
     public static final class FavoritesCreditsEntry extends CreditsEntryColumns implements BaseColumns {
@@ -224,6 +228,10 @@ public class MovieTheaterContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
         public static final String TABLE_NAME = "favorites_credits";
+
+        public static Uri buildFavoritesCreditsUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
 
     }
 
@@ -240,6 +248,10 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
         public static final String TABLE_NAME = "videos";
 
+        public static Uri buildVideosUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
+
     }
 
     public static final class FavoritesVideosEntry extends VideosEntryColumns implements BaseColumns {
@@ -252,6 +264,10 @@ public class MovieTheaterContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_VIDEOS;
         public static final String TABLE_NAME = "favorites_videos";
+
+        public static Uri buildFavoritesVideosUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
 
     }
 
@@ -268,6 +284,10 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
         public static final String TABLE_NAME = "reviews";
 
+        public static Uri buildReviewsUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
+
     }
 
     public static final class FavoritesReviewsEntry extends ReviewsEntryColumns implements BaseColumns {
@@ -280,6 +300,10 @@ public class MovieTheaterContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_REVIEWS;
         public static final String TABLE_NAME = "favorites_reviews";
+
+        public static Uri buildFavoritesReviewsUriFromMovieId(long movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+        }
 
     }
     
