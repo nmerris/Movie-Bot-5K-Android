@@ -72,7 +72,9 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_BUDGET + " INTEGER, " +
                 MoviesEntry.COLUMN_REVENUE + " INTEGER, " +
                 MoviesEntry.COLUMN_RUNTIME + " INTEGER, " +
-                MoviesEntry.COLUMN_TAGLINE + " TEXT";
+                MoviesEntry.COLUMN_TAGLINE + " TEXT, " +
+                MoviesEntry.COLUMN_POSTER_FILE_PATH + " TEXT, " +
+                MoviesEntry.COLUMN_BACKDROP_FILE_PATH + " TEXT";
 
         
         // create a table to hold the currently 'showing' movies
@@ -84,16 +86,9 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         // create a table to hold favorites, same as movies except also has local poster
         // and backdrop paths for offline access, used by
         final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " + FavoritesEntry.TABLE_NAME + "(" +
-                SQL_MOVIES_COLUMNS + ", " +
-                // must allow null here because when copying record from movies to favorites
-                // in MovieProvider.insert, the initial sql command will leave these columns null
-                // but then immediately after that they will be filled in, so you can still enforce
-                // NOT NULL over there, just not directly in the database
-                FavoritesEntry.COLUMN_POSTER_FILE_PATH + " TEXT, " +
-                FavoritesEntry.COLUMN_BACKDROP_FILE_PATH + " TEXT);";
+                SQL_MOVIES_COLUMNS + ");";
         Log.i(LOGTAG, "onCreate favorites table SQL: " + SQL_CREATE_FAVORITES_TABLE);
         db.execSQL(SQL_CREATE_FAVORITES_TABLE);
-
 
 
 
@@ -126,7 +121,8 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                         CreditsEntry.COLUMN_CHARACTER + " TEXT, " +
                         CreditsEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                         CreditsEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
-                        CreditsEntry.COLUMN_PROFILE_PATH + " TEXT";
+                        CreditsEntry.COLUMN_PROFILE_PATH + " TEXT, " +
+                        CreditsEntry.COLUMN_PROFILE_FILE_PATH + " TEXT";
         
         final String SQL_CREATE_CREDITS_TABLE = "CREATE TABLE " + CreditsEntry.TABLE_NAME + "(" +
                 SQL_CREDITS_COLUMNS + ");";

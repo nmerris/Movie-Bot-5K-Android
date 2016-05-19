@@ -14,10 +14,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 /**
  * Created by Nathan Merris on 5/16/2016.
@@ -35,23 +39,84 @@ public class FragmentMovieDetails extends Fragment
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
 //    private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private int mMovieId/*, mFavoriteId*/; // the id for the movie or favorite movie
+    
+    @Bind(R.id.backdrop_imageview) ImageView mBackdropImageView;
+    @Bind(R.id.test_details_textview) TextView mDetailsTextView;
+    @Bind(R.id.test_videos_textview) TextView mVideosTextView;
+    @Bind(R.id.test_reviews_textview) TextView mReviewsTextView;
+    @Bind(R.id.test_credits_profile_1) ImageView mCreditsProfile1;
+    @Bind(R.id.test_credits_profile_2) ImageView mCreditsProfile2;
+    @Bind(R.id.test_credits_profile_3) ImageView mCreditsProfile3;
+    @Bind(R.id.test_credits_profile_4) ImageView mCreditsProfile4;
+    @Bind(R.id.test_credits_textview_1) TextView mCreditsTextView1;
+    @Bind(R.id.test_credits_textview_2) TextView mCreditsTextView2;
+    @Bind(R.id.test_credits_textview_3) TextView mCreditsTextView3;
+    @Bind(R.id.test_credits_textview_4) TextView mCreditsTextView4;
+    
 
 
-    // movies table projection
-    private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
-            MovieTheaterContract.FavoritesEntry._ID,
-            MovieTheaterContract.FavoritesEntry.COLUMN_MOVIE_ID,
-            MovieTheaterContract.FavoritesEntry.COLUMN_POSTER_FILE_PATH,
-            MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY,
-            MovieTheaterContract.FavoritesEntry.COLUMN_VOTE_AVG,
-            MovieTheaterContract.FavoritesEntry.COLUMN_REVENUE
+    // details projection, has columns from 4 diff db tables that have been joined
+    // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
+    private final String[] DETAILS_PROJECTION = {
+            MovieTheaterContract.MoviesEntry._ID,
+            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID, // only needed for testing
+            MovieTheaterContract.MoviesEntry.COLUMN_OVERVIEW,
+            MovieTheaterContract.MoviesEntry.COLUMN_RELEASE_DATE,
+            MovieTheaterContract.MoviesEntry.COLUMN_GENRE_NAME1,
+            MovieTheaterContract.MoviesEntry.COLUMN_GENRE_NAME2,
+            MovieTheaterContract.MoviesEntry.COLUMN_GENRE_NAME3,
+            MovieTheaterContract.MoviesEntry.COLUMN_GENRE_NAME4,
+            MovieTheaterContract.MoviesEntry.COLUMN_TITLE,
+            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH,
+            MovieTheaterContract.MoviesEntry.COLUMN_VOTE_AVG,
+            MovieTheaterContract.MoviesEntry.COLUMN_BUDGET,
+            MovieTheaterContract.MoviesEntry.COLUMN_REVENUE,
+            MovieTheaterContract.MoviesEntry.COLUMN_RUNTIME,
+            MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE,
+
+            MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR,
+            MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT,
+
+            MovieTheaterContract.CreditsEntry.COLUMN_CHARACTER,
+            MovieTheaterContract.CreditsEntry.COLUMN_NAME,
+            MovieTheaterContract.CreditsEntry.COLUMN_ORDER, // prob only need this for testing, should sortby this column on query
+            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH,
+
+            MovieTheaterContract.VideosEntry.COLUMN_KEY,
+            MovieTheaterContract.VideosEntry.COLUMN_SITE, // prob don't need this
+            MovieTheaterContract.VideosEntry.COLUMN_TYPE,
+
+            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
+            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH,
+            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH
     };
-    public static final int MOVIES_TABLE_COL_ID = 0;
-    public static final int MOVIES_TABLE_COL_MOVIE_ID = 1;
-    public static final int MOVIES_TABLE_COL_POSTER_FILE_PATH = 2;
-    public static final int MOVIES_TABLE_COL_POPULARITY = 3;
-    public static final int MOVIES_TABLE_COL_VOTE_AVG = 4;
-    public static final int MOVIES_TABLE_COL_REVENUE = 5;
+    private static final int COLUMN_MOVIE_ID = 1;
+    private static final int COLUMN_OVERVIEW = 2;
+    private static final int COLUMN_RELEASE_DATE = 3;
+    private static final int COLUMN_GENRE_NAME1 = 4;
+    private static final int COLUMN_GENRE_NAME2 = 5;
+    private static final int COLUMN_GENRE_NAME3 = 6;
+    private static final int COLUMN_GENRE_NAME4 = 7;
+    private static final int COLUMN_MOVIE_TITLE = 8;
+    private static final int COLUMN_BACKDROP_PATH = 9;
+    private static final int COLUMN_VOTE_AVG = 10;
+    private static final int COLUMN_BUDGET = 11;
+    private static final int COLUMN_REVENUE = 12;
+    private static final int COLUMN_RUNTIME = 13;
+    private static final int COLUMN_TAGLINE = 14;
+    private static final int COLUMN_REVIEW_AUTHOR = 15;
+    private static final int COLUMN_REVIEW_CONTENT = 16;
+    private static final int COLUMN_CHARACTER = 17;
+    private static final int COLUMN_CAST_NAME = 18;
+    private static final int COLUMN_CREDITS_ORDER = 19;
+    private static final int COLUMN_PROFILE_PATH = 20;
+    private static final int COLUMN_VIDEO_KEY = 21;
+    private static final int COLUMN_VIDEO_SITE = 22;
+    private static final int COLUMN_VIDEO_TYPE = 23;
+    private static final int COLUMN_POSTER_FILE_PATH = 24;
+    private static final int COLUMN_BACKDROP_FILE_PATH = 25;
+    private static final int COLUMN_PROFILE_FILE_PATH = 26;
+
 
 
 
@@ -163,17 +228,18 @@ public class FragmentMovieDetails extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
 
+        ButterKnife.bind(rootView);
 
 
-        TextView textTV =  (TextView) rootView.findViewById(R.id.test_movie_id_textview);
-        // testing
-        if(mUseFavorites) {
-            // of course this would be read from cursor  in onLoadFinished
-            textTV.setText(String.valueOf(mMovieId));
-        } else {
-            // and this would be read from cursor in onLoadFinished
-            textTV.setText(String.valueOf(mMovieId));
-        }
+//        TextView textTV =  (TextView) rootView.findViewById(R.id.test_movie_id_textview);
+//        // testing
+//        if(mUseFavorites) {
+//            // of course this would be read from cursor  in onLoadFinished
+//            textTV.setText(String.valueOf(mMovieId));
+//        } else {
+//            // and this would be read from cursor in onLoadFinished
+//            textTV.setText(String.valueOf(mMovieId));
+//        }
 
 
 
@@ -255,6 +321,12 @@ public class FragmentMovieDetails extends Fragment
 
             String author = data.getString(data.getColumnIndex(MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR));
             Log.e(LOGTAG, "  author column data: " + author);
+
+
+
+
+
+
 
 
         }

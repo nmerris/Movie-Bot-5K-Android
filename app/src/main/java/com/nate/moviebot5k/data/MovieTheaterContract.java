@@ -67,6 +67,10 @@ public class MovieTheaterContract {
         public static final String COLUMN_REVENUE = "revenue";
         public static final String COLUMN_RUNTIME = "runtime";
         public static final String COLUMN_TAGLINE = "tagline";
+
+        // stored local file path so that the favorites table can be accessed while offline
+        public static final String COLUMN_POSTER_FILE_PATH = "poster_file_path";
+        public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
     }
     
     
@@ -85,6 +89,9 @@ public class MovieTheaterContract {
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_ORDER = "credits_order";
         public static final String COLUMN_PROFILE_PATH = "profile_path";
+
+        // needed to store local profile image file paths so they can be accessed in offline mode
+        public static final String COLUMN_PROFILE_FILE_PATH = "profile_file_path";
     }
     
     
@@ -162,10 +169,10 @@ public class MovieTheaterContract {
         public static final String DETAILS_PATH = "details";
 
 
-        // 2 additional columns needed to store local poster and backdrop image file paths
-        // so that the favorites table can be accessed while offline
-        public static final String COLUMN_POSTER_FILE_PATH = "poster_file_path";
-        public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
+//        // 2 additional columns needed to store local poster and backdrop image file paths
+//        // so that the favorites table can be accessed while offline
+//        public static final String COLUMN_POSTER_FILE_PATH = "poster_file_path";
+//        public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
 
 
         // returns a favorte Uri (a single record in this table) given a MOVIE id
@@ -216,9 +223,9 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
         public static final String TABLE_NAME = "favorites_credits";
 
-        // 1 additional column needed to store the local file location for the image associated
-        // with the actor/actress for each credits record
-        public static final String COLUMN_PROFILE_FILE_PATH = "profile_file_path";
+//        // 1 additional column needed to store the local file location for the image associated
+//        // with the actor/actress for each credits record
+//        public static final String COLUMN_PROFILE_FILE_PATH = "profile_file_path";
 
         public static Uri buildFavoritesCreditsUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
