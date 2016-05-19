@@ -444,7 +444,7 @@ public class MovieTheaterProvider extends ContentProvider {
      */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        Log.i(LOGTAG, "entered insert");
+        Log.i(LOGTAG, "entered insert ******** HAVE NOT IMPLEMENTED INSERT FOR CREDITS, REVIEWS, OR VIDEOS YET!!!");
 
         if(sUriMatcher.match(uri) == FAVORITE_WITH_MOVIE_ID) {
             Log.i(LOGTAG, "  about to insert to favorites table: " + uri);

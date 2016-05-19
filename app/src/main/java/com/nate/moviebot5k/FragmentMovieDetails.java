@@ -58,8 +58,10 @@ public class FragmentMovieDetails extends Fragment
     // details projection, has columns from 4 diff db tables that have been joined
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] DETAILS_PROJECTION = {
-            MovieTheaterContract.MoviesEntry._ID,
-            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID, // only needed for testing
+//            MovieTheaterContract.MoviesEntry._ID,
+            "movies._id",
+//            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID, // only needed for testing
+            "movies.movie_id", // only needed for testing
             MovieTheaterContract.MoviesEntry.COLUMN_OVERVIEW,
             MovieTheaterContract.MoviesEntry.COLUMN_RELEASE_DATE,
             MovieTheaterContract.MoviesEntry.COLUMN_GENRE_NAME1,
@@ -78,7 +80,8 @@ public class FragmentMovieDetails extends Fragment
             MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT,
 
             MovieTheaterContract.CreditsEntry.COLUMN_CHARACTER,
-            MovieTheaterContract.CreditsEntry.COLUMN_NAME,
+//            MovieTheaterContract.CreditsEntry.COLUMN_NAME,
+            "credits.name",
             MovieTheaterContract.CreditsEntry.COLUMN_ORDER, // prob only need this for testing, should sortby this column on query
             MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH,
 
@@ -291,10 +294,10 @@ public class FragmentMovieDetails extends Fragment
             return new CursorLoader(
                     getActivity(),
                     MovieTheaterContract.MoviesEntry.buildMovieDetailsUriFromMovieId(mMovieId),
-                    null, // projection todo create this
+                    DETAILS_PROJECTION,
                     null, // selection is ignored by content provider
                     null, // selectionArgs ignored by CP
-                    null); // sort order
+                    null); // sort order .. maybe sort by credits_order column?
         }
         else if(id == FAVORITES_TABLE_LOADER_ID) {
             Log.i(LOGTAG, "  and about to return new FAVORITES_TABLE_LOADER");
@@ -319,11 +322,7 @@ public class FragmentMovieDetails extends Fragment
 
         if(data != null && data.moveToFirst()) {
 
-            String author = data.getString(data.getColumnIndex(MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR));
-            Log.e(LOGTAG, "  author column data: " + author);
-
-
-
+            mDetailsTextView.setText(data.);
 
 
 

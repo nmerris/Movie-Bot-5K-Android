@@ -112,6 +112,19 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
+
+
+
+            if(!mUseFavorites && mSharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
+                Log.i(LOGTAG, "  and since !mUseFavorites AND S.P. fetch new movies is TRUE, about to fire a FetchMoviesTask");
+
+                new FetchMoviesTask(getActivity(), this).execute();
+
+//                getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, this);
+            }
+
+
+
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
         // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
@@ -172,21 +185,21 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onResume() {
         Log.i(LOGTAG, "entered onResume");
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        // check if a new fetch movies task should be launched
-        // technically mUseFavorites should never be true if sharedPrefs key_fetch_new_movies is true,
-        // but it doesn't hurt to check it as well here before starting a fetch movies async task
-        if(!mUseFavorites && sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
-            Log.i(LOGTAG, "  and sharedPrefs fetch_new_movies was true, so about to get more movies");
-
-            new FetchMoviesTask(getActivity()).execute();
-
-            // restart the Loader for the movies table, it doesn't matter if the async task
-            // does not return any movies, it won't update the movies table in that case and the
-            // loader manager can just do nothing until it's restarted again
-            getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, this);
-        }
+//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//
+//        // check if a new fetch movies task should be launched
+//        // technically mUseFavorites should never be true if sharedPrefs key_fetch_new_movies is true,
+//        // but it doesn't hurt to check it as well here before starting a fetch movies async task
+//        if(!mUseFavorites && sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
+//            Log.i(LOGTAG, "  and sharedPrefs fetch_new_movies was true, so about to get more movies");
+//
+//            new FetchMoviesTask(getActivity()).execute();
+//
+//            // restart the Loader for the movies table, it doesn't matter if the async task
+//            // does not return any movies, it won't update the movies table in that case and the
+//            // loader manager can just do nothing until it's restarted again
+//            getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, this);
+//        }
         super.onResume();
     }
 
@@ -295,9 +308,11 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     private class FetchMoviesTask extends AsyncTask<Void, Void, Integer> {
 
         Context context;
+        LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks;
 
-        private FetchMoviesTask(Context c) {
+        private FetchMoviesTask(Context c, LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks) {
             context = c;
+            this.loaderCallbacks = loaderCallbacks;
         }
 
         @Override
@@ -310,6 +325,9 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         @Override
         protected void onPostExecute(Integer numMoviesFetched) {
             Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, numMovies fetched was: " + numMoviesFetched);
+
+            getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, loaderCallbacks);
+
 
             // TODO: I think I was going to return num movies fetched here, and then display a msg if it was 0
         }
