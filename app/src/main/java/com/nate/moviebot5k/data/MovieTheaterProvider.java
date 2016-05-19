@@ -40,18 +40,18 @@ public class MovieTheaterProvider extends ContentProvider {
     static final int GENRES_ALL = 5; // used to populate genre spinner
     static final int CERTS_ALL = 6; // used to populate certifications spinner
 
-    // the credits, reviews, and videos table will only ever be queried or have inserts called by movieId for one movie
     static final int CREDITS_WITH_MOVIE_ID = 7;
     static final int VIDEOS_WITH_MOVIE_ID = 8;
     static final int REVIEWS_WITH_MOVIE_ID = 9;
     static final int FAVORITES_CREDITS_WITH_MOVIE_ID = 10;
     static final int FAVORITES_VIDEOS_WITH_MOVIE_ID = 11;
     static final int FAVORITES_REVIEWS_WITH_MOVIE_ID = 12;
-    // following are used to clean up the entrire credits, videos, and reviews tables in StartupActivity
-    // there is no need to keep that data around for more than one app session
     static final int CREDITS_ALL = 13;
     static final int VIDEOS_ALL = 14;
     static final int REVIEWS_ALL = 15;
+    static final int FAVORITES_CREDITS_ALL = 16;
+    static final int FAVORITES_VIDEOS_ALL = 17;
+    static final int FAVORITES_REVIEWS_ALL = 18;
 
     // SQL selection statements
     private static final String sMovieWithMovieIdSelection = MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
@@ -86,6 +86,9 @@ public class MovieTheaterProvider extends ContentProvider {
         matcher.addURI(authority, MovieTheaterContract.PATH_CREDITS, CREDITS_ALL);
         matcher.addURI(authority, MovieTheaterContract.PATH_VIDEOS, VIDEOS_ALL);
         matcher.addURI(authority, MovieTheaterContract.PATH_REVIEWS, REVIEWS_ALL);
+        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_CREDITS, FAVORITES_CREDITS_ALL);
+        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_VIDEOS, FAVORITES_VIDEOS_ALL);
+        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_REVIEWS, FAVORITES_REVIEWS_ALL);
 
         return matcher;
     }
@@ -235,8 +238,11 @@ public class MovieTheaterProvider extends ContentProvider {
             case CREDITS_ALL:
             case VIDEOS_ALL:
             case REVIEWS_ALL:
+            case FAVORITES_CREDITS_ALL:
+            case FAVORITES_VIDEOS_ALL:
+            case FAVORITES_REVIEWS_ALL:
                 throw new UnsupportedOperationException(
-                        "!!!!! DO NOT QUERY THE CREDITS, VIDEOS, OR REVIEWS TABLE WITHOUT A MOVIEID !!!!!" + uri);
+                        "!!!!! DO NOT QUERY THE FAV/CREDITS, FAV/VIDEOS, OR FAV/REVIEWS TABLE WITHOUT A MOVIEID !!!!!" + uri);
 
             default:
                 throw new UnsupportedOperationException("I do not understand this URI: " + uri);
@@ -286,6 +292,12 @@ public class MovieTheaterProvider extends ContentProvider {
             case VIDEOS_ALL:
                 return VideosEntry.CONTENT_TYPE;
             case REVIEWS_ALL:
+                return ReviewsEntry.CONTENT_TYPE;
+            case FAVORITES_CREDITS_ALL:
+                return CreditsEntry.CONTENT_TYPE;
+            case FAVORITES_VIDEOS_ALL:
+                return VideosEntry.CONTENT_TYPE;
+            case FAVORITES_REVIEWS_ALL:
                 return ReviewsEntry.CONTENT_TYPE;
 
             default:
@@ -391,22 +403,21 @@ public class MovieTheaterProvider extends ContentProvider {
 
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int returnCount = 0;
-//        int match = sUriMatcher.match(uri);
 
         switch (sUriMatcher.match(uri)){
 
             case MOVIES_ALL:
             case GENRES_ALL:
             case CERTS_ALL:
-            case CREDITS_WITH_MOVIE_ID:
-            case FAVORITES_CREDITS_WITH_MOVIE_ID:
-            case VIDEOS_WITH_MOVIE_ID:
-            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
-            case REVIEWS_WITH_MOVIE_ID:
-            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
+            case CREDITS_ALL:
+            case VIDEOS_ALL:
+            case REVIEWS_ALL:
+            case FAVORITES_CREDITS_ALL:
+            case FAVORITES_VIDEOS_ALL:
+            case FAVORITES_REVIEWS_ALL:
                 Log.i(LOGTAG, "  uri.getLastPathSegment, ie table name to bulkInsert into: " + uri.getLastPathSegment());
-                db.beginTransaction();
 
+                db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insert(uri.getLastPathSegment(), null, value);
@@ -420,41 +431,19 @@ public class MovieTheaterProvider extends ContentProvider {
                 Log.i(LOGTAG, "    number records inserted: " + returnCount);
                 break;
 
-
-            case CREDITS_ALL:
-            case VIDEOS_ALL:
-            case REVIEWS_ALL:
-                throw new UnsupportedOperationException("!!!! DO NOT BULKINSERT TO THE ENTIRE CREDITS, VIDEOS, OR" +
-                        "REVIEWS TABLE.. YOU MUST ALWAYS INCLUDE A URI WITH THE MOVIEID ON THE END !!!!");
+            case CREDITS_WITH_MOVIE_ID:
+            case FAVORITES_CREDITS_WITH_MOVIE_ID:
+            case VIDEOS_WITH_MOVIE_ID:
+            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
+            case REVIEWS_WITH_MOVIE_ID:
+            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
+                throw new UnsupportedOperationException("!!!! DO NOT BULKINSERT TO THE CREDITS, VIDEOS, OR" +
+                        "REVIEWS TABLE WITH PATH ENDING IN MOVIE ID B/C EACH RECORD ALREADY HAS THE MOVIE_ID IN IT");
 
             default:
                 Log.i(LOGTAG, "  UhOh.. somehow super.bulkInsert is about to be called, should never happen");
                 super.bulkInsert(uri, values);
         }
-
-
-//        if(match == MOVIES_ALL || match == GENRES_ALL || match == CERTS_ALL || match == CREDITS_WITH_MOVIE_ID) {
-//            // is this okay?  using getLastPathSegment to get the table name?
-//            Log.i(LOGTAG, "  uri.getLastPathSegment, ie table name to insert into: " + uri.getLastPathSegment());
-//            db.beginTransaction();
-//
-//            try {
-//                for (ContentValues value : values) {
-//                    long _id = db.insert(uri.getLastPathSegment(), null, value);
-//                    if (_id != -1) returnCount++;
-//                }
-//                db.setTransactionSuccessful();
-//            } finally {
-//                db.endTransaction();
-//            }
-//
-//            Log.i(LOGTAG, "    number records inserted: " + returnCount);
-//        }
-//        else {
-//            Log.i(LOGTAG, "  UhOh.. somehow super.bulkInsert is about to be called, should never happen");
-//            super.bulkInsert(uri, values);
-//        }
-
 
         // notify any content observers that the table data has changed, will be either
         // movies, genres, or certifications in this case
@@ -573,7 +562,7 @@ public class MovieTheaterProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Log.i(LOGTAG, "entered update");
 
-        int numUpdated = 0;
+        int numUpdated;
         if(sUriMatcher.match(uri) == MOVIE_WITH_MOVIE_ID) {
             Log.i(LOGTAG, "  and about to update movies table after matching uri to MOVIE_WITH_MOVIE_ID");
             Log.i(LOGTAG, "    and am ignoring selection and selectionArgs, will just get movieId from URI");

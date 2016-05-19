@@ -126,7 +126,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
 
         final String SQL_VIDEOS_COLUMNS =
                 VideosEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
-                        VideosEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
+                        VideosEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                         VideosEntry.COLUMN_KEY + " TEXT NOT NULL, " +
                         VideosEntry.COLUMN_NAME + " TEXT, " +
                         VideosEntry.COLUMN_SITE + " TEXT, " +
@@ -148,7 +148,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREDITS_COLUMNS =
                 CreditsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
-                        CreditsEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
+                        CreditsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                         CreditsEntry.COLUMN_CHARACTER + " TEXT, " +
                         CreditsEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                         CreditsEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
@@ -169,7 +169,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
 
         final String SQL_REVIEWS_COLUMNS =
                 ReviewsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
-                        ReviewsEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
+                        ReviewsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                         ReviewsEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
                         ReviewsEntry.COLUMN_CONTENT + " TEXT NOT NULL";
 
