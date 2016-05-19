@@ -171,43 +171,8 @@ public class FragmentMovieDetails extends Fragment
         Log.i(LOGTAG, "entered onResume");
         Log.e(LOGTAG, "  and mMovieId is: " + mMovieId);
 
-        // check if the movies table already has the record with the EXTRA MOVIE DETAILS for the
-        // movieId that this fragment
-        // is showing, if it does then there is no need to make another API call because it must
-        // have already been done, otherwise start a fetch details task so the db will be updated as needed
-        // in addition to the reviews and videos that might be loaded in the fetch details task,
-        // there are 3 other columns that are populated: budget, revenue, and runtime.
-        // it's possible that an obscure movie will have no reviews or videos, so can't rely on those
-        // columns to check... of the other three columns, it seems to me that runtime is prob. going
-        // to be something that every movie in themoviedb's database will have data for, so I chose
-        // to condition the following fetch task on that column
-        // NOTE: if the favorites table is being used, an API fetch will never happen.. the only way
-        // the user can get here and be using the favorites table is if they had previously selected
-        // a movie as a favorite, which can only be done if the full record, including the extra
-        // details that are loaded in this fragment, had already been loaded to the movies table
-        if(!mUseFavorites) {
-            Cursor cursor = getActivity().getContentResolver().query(
-                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-                    new String[] {MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE},
-                    null, null, null);
 
-            if(cursor != null && cursor.moveToFirst()) {
-                Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
-                        ", has tagline column data: " + cursor.getString(0));
-
-                // if tagline is null then this movie probably has not had details fetched yet,
-                // so launch a new fetch details task, this will fill in all the columns with data
-                // that was not obtained during the fetch task that FragmentMovieGrid launched
-                // before the user clicked the poster thumbnail to get here
-                // it's possible that themoviedb just doesn't have a tagline for this movie, in
-                // which case unnecessary api calls will be made, but that's fairly unusual
-                if(cursor.getString(0) == null) {
-                    new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
-                }
-                cursor.close();
-            }
-
-        }
+        fireFetchDetailsTaskIfNecessary();
 
 
         super.onResume();
@@ -272,6 +237,105 @@ public class FragmentMovieDetails extends Fragment
         protected void onPostExecute(Void v) {
             Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute");
         }
+    }
+
+
+    // TODO: clean this mess up
+    private void fireFetchDetailsTaskIfNecessary() {
+
+        // check if the movies table already has the record with the EXTRA MOVIE DETAILS for the
+        // movieId that this fragment
+        // is showing, if it does then there is no need to make another API call because it must
+        // have already been done, otherwise start a fetch details task so the db will be updated as needed
+        // in addition to the reviews and videos that might be loaded in the fetch details task,
+        // there are 3 other columns that are populated: budget, revenue, and runtime.
+        // it's possible that an obscure movie will have no reviews or videos, so can't rely on those
+        // columns to check... of the other three columns, it seems to me that runtime is prob. going
+        // to be something that every movie in themoviedb's database will have data for, so I chose
+        // to condition the following fetch task on that column
+        // NOTE: if the favorites table is being used, an API fetch will never happen.. the only way
+        // the user can get here and be using the favorites table is if they had previously selected
+        // a movie as a favorite, which can only be done if the full record, including the extra
+        // details that are loaded in this fragment, had already been loaded to the movies table
+        if(!mUseFavorites) {
+//            Cursor cursor = getActivity().getContentResolver().query(
+//                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
+//                    new String[] {MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE},
+//                    null, null, null);
+//
+//            if(cursor != null && cursor.moveToFirst()) {
+//                Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
+//                        ", has tagline column data: " + cursor.getString(0));
+//
+//                // if tagline is null then this movie probably has not had details fetched yet,
+//                // so launch a new fetch details task, this will fill in all the columns with data
+//                // that was not obtained during the fetch task that FragmentMovieGrid launched
+//                // before the user clicked the poster thumbnail to get here
+//                // it's possible that themoviedb just doesn't have a tagline for this movie, in
+//                // which case unnecessary api calls will be made, but that's fairly unusual
+//                if(cursor.getString(0) == null) {
+//                    new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
+//                }
+//                cursor.close();
+//            }
+
+            Cursor cursorCredits = getActivity().getContentResolver().query(
+                    MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
+                    new String[] {MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID},
+                    null, null, null);
+            Log.i(LOGTAG, "  cursorCredits.getCount: " + cursorCredits.getCount());
+
+
+            if(cursorCredits != null && cursorCredits.getCount() == 0) {
+                Cursor cursorVideos = getActivity().getContentResolver().query(
+                        MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
+                        new String[] {MovieTheaterContract.VideosEntry.COLUMN_MOVIE_ID},
+                        null, null, null);
+                Log.i(LOGTAG, "    cursorVideos.getCount: " + cursorVideos.getCount());
+
+                if(cursorVideos != null && cursorVideos.getCount() == 0) {
+                    Cursor cursorReviews = getActivity().getContentResolver().query(
+                            MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
+                            new String[] {MovieTheaterContract.ReviewsEntry.COLUMN_MOVIE_ID},
+                            null, null, null);
+                    Log.i(LOGTAG, "      cursorReviews.getCount: " + cursorReviews.getCount());
+
+                    if(cursorReviews != null && cursorReviews.getCount() == 0) {
+                        // since the count for the rows for this movieId was 0 for credits, videos, and reviews
+                        // tables was zero, that must mean the detail data for this movieId has not
+                        // yet been fetched, so go fetch it
+
+                        Log.i(LOGTAG, "        about to fire a fetch details task because it appears that the details data for this movieId does not exist in the db");
+                        new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
+                    }
+                    cursorReviews.close();
+                }
+                cursorVideos.close();
+            }
+            cursorCredits.close();
+
+//
+//            if(cursor != null && cursor.moveToFirst()) {
+//                Log.i(LOGTAG, "  just checked movies table, found movieId: " + mMovieId +
+//                        ", has tagline column data: " + cursor.getString(0));
+//
+//                // if tagline is null then this movie probably has not had details fetched yet,
+//                // so launch a new fetch details task, this will fill in all the columns with data
+//                // that was not obtained during the fetch task that FragmentMovieGrid launched
+//                // before the user clicked the poster thumbnail to get here
+//                // it's possible that themoviedb just doesn't have a tagline for this movie, in
+//                // which case unnecessary api calls will be made, but that's fairly unusual
+//                if(cursor.getString(0) == null) {
+//                    new FetchMovieDetailsTask(getActivity(), mMovieId).execute();
+//                }
+//                cursor.close();
+//            }
+
+        }
+
+
+
+
     }
 
 
