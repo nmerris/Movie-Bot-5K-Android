@@ -9,9 +9,10 @@
     <string name="themoviedb_scheme" translatable="false">https</string>
     <string name="themoviedb_image_authority" translatable="false">image.tmdb.org</string>
 
-    <!-- see strings-sw720p for larger image sizes -->
+    <!-- see other strings resources for larger image sizes -->
     <string name="themoviedb_poster_size" translatable="false">w185</string>
     <string name="themoviedb_backdrop_size" translatable="false">w780</string>
+    <string name="themoviedb_profile_size" translatable="false">w45</string>
 
     <!-- menu -->
     <string name="action_movie_filters">Filters</string>

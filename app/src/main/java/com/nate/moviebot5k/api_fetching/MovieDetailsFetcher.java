@@ -128,46 +128,7 @@ public class MovieDetailsFetcher {
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_SITE, jsonObject.getString("site"));
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_SIZE, jsonObject.getInt("size"));
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_TYPE, jsonObject.getString("type"));
-
-//            // put the fully formed image URL's in the db, this URL will point to an image size that
-//            // is appropriate for the device this app is running on
-//            Uri.Builder backdropImageUrlBuilder = new Uri.Builder();
-//            backdropImageUrlBuilder.scheme(mContext.getString(R.string.themoviedb_scheme))
-//                    .authority(mContext.getString(R.string.themoviedb_image_authority))
-//                    .appendPath("t").appendPath("p")
-//                    .appendPath(mContext.getString(R.string.themoviedb_backdrop_size))
-//                    .build(); // https://image.tmdb.org/t/p/[image_size] to this point
-//
-//            String backdropImageUrl = backdropImageUrlBuilder.build().toString()
-//                    + jsonObject.getString("backdrop_path");
-//            values.put(MovieTheaterContract.VideosEntry.COLUMN_BACKDROP_PATH, backdropImageUrl); // NOT NULL COLUMN
-//
-//            Uri.Builder posterImageUrlBuilder = new Uri.Builder();
-//            posterImageUrlBuilder.scheme(mContext.getString(R.string.themoviedb_scheme))
-//                    .authority(mContext.getString(R.string.themoviedb_image_authority))
-//                    .appendPath("t").appendPath("p")
-//                    .appendPath(mContext.getString(R.string.themoviedb_poster_size))
-//                    .build(); // https://image.tmdb.org/t/p/[image_size] to this point
-//            String posterImageUrl = posterImageUrlBuilder.build().toString()
-//                    + jsonObject.getString("poster_path");
-//            values.put(MovieTheaterContract.VideosEntry.COLUMN_POSTER_PATH, posterImageUrl); // NOT NULL COLUMN
-//
-//
-//            // and get the genre ids out of the nested json array, ok to be NULL
-//            JSONArray genresJsonArray = jsonObject.getJSONArray("genre_ids");
-//            try {
-//                values.put(MovieTheaterContract.VideosEntry.COLUMN_GENRE_ID1, genresJsonArray.getInt(0));
-//                values.put(MovieTheaterContract.VideosEntry.COLUMN_GENRE_ID2, genresJsonArray.getInt(1));
-//                values.put(MovieTheaterContract.VideosEntry.COLUMN_GENRE_ID3, genresJsonArray.getInt(2));
-//                values.put(MovieTheaterContract.VideosEntry.COLUMN_GENRE_ID4, genresJsonArray.getInt(3));
-//            } catch (JSONException e) {
-////                Log.i(LOGTAG, "  there were less than 4 genres associated with this movie, this is not an error");
-//            }
-
-
-            // print the data for all the NON NULL columns
-
-
+            
             // testing
             Log.i(LOGTAG, "  added video table record with movie_id: " + mMovieId);
             Log.i(LOGTAG, "    and with key: " + jsonObject.getString("key"));
@@ -240,8 +201,64 @@ public class MovieDetailsFetcher {
 
 
 
+        // insert new records to the CREDITS table
+        JSONObject creditsJsonObject = jsonBody.getJSONObject("credits");
+        JSONArray creditsJsonArray = creditsJsonObject.getJSONArray("cast");
 
+        int numCredits = creditsJsonArray.length();
+        int numCreditsInserted = 0;
+        Vector<ContentValues> valuesCreditsVector = new Vector<>(numCredits);
 
+        for (int i = 0; i < numCredits; i++) {
+            // get a single JSON object from jsonBody
+            JSONObject jsonObject = creditsJsonArray.getJSONObject(i);
+            ContentValues valuesCredits = new ContentValues();
+
+            // put the movieId in to the ContentValues object
+            valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID, mMovieId);
+
+            // extract the data from the json object and put it in a single ContentValues object
+            valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_CHARACTER, jsonObject.getString("character"));
+            valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_NAME, jsonObject.getString("name"));
+            valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_ORDER, jsonObject.getInt("order"));
+
+            // create a fully formed URL for the actor/actress profile image path
+            Uri.Builder profileImageUrlBuilder = new Uri.Builder();
+            profileImageUrlBuilder.scheme(mContext.getString(R.string.themoviedb_scheme))
+                    .authority(mContext.getString(R.string.themoviedb_image_authority))
+                    .appendPath("t").appendPath("p")
+                    .appendPath(mContext.getString(R.string.themoviedb_profile_size))
+                    .build(); // https://image.tmdb.org/t/p/[image_size] to this point
+
+            String profileImageUrl = profileImageUrlBuilder.build().toString()
+                    + jsonObject.getString("profile_path");
+            valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH, profileImageUrl);
+
+            // testing
+            Log.i(LOGTAG, "  added credit table record with movie_id: " + mMovieId);
+            Log.i(LOGTAG, "    and with character: " + jsonObject.getString("character"));
+            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
+            Log.i(LOGTAG, "    and with profile path: " + profileImageUrl);
+            Log.i(LOGTAG, "    and with profile order: " + jsonObject.getInt("order"));
+
+            // add the single object to the ContentValues Vector
+            valuesCreditsVector.add(valuesCredits);
+        }
+
+        Log.i(LOGTAG, "      num credit records extracted from json array was: " + numCredits);
+
+        if(valuesCreditsVector.size() > 0) { // no point in doing anything if no data could be obtained
+            // TODO: can get rid of numDeleted after testing
+
+            Log.i(LOGTAG, "      about to call bulkInsert");
+            // insert the new data
+            ContentValues[] valuesCreditsArray = new ContentValues[valuesCreditsVector.size()];
+            valuesCreditsVector.toArray(valuesCreditsArray);
+
+            numCreditsInserted = mContext.getContentResolver()
+                    .bulkInsert(MovieTheaterContract.CreditsEntry.CONTENT_URI, valuesCreditsArray);
+        }
+        Log.d(LOGTAG, "        num credits inserted to credits table was: " + numCreditsInserted);
 
     }
     
