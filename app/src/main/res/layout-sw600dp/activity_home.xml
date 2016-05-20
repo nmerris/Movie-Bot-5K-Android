@@ -2,7 +2,6 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -15,17 +14,7 @@
         android:layout_weight="45">
 
         <!-- this is the action bar with menu and app title -->
-        <android.support.v7.widget.Toolbar
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:background="@color/colorAccent">
-
-        </android.support.v7.widget.Toolbar>
+        <include layout="@layout/toolbar_movie_grid"/>
 
         <!-- contains FragmentMovieFiltersSpinner -->
         <FrameLayout
@@ -48,41 +37,10 @@
         android:layout_weight="55"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/toolbar_details"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:background="@color/colorAccent">
+        <!-- the toolbar above the details view -->
+        <include layout="@layout/toolbar_details"/>
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:gravity="center_vertical">
-
-                <!-- it's cool to have the movie title and tagline in the toolbar! -->
-                <TextView
-                    android:id="@+id/toolbar_movie_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"/>
-
-                <TextView
-                    android:id="@+id/toolbar_movie_tagline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"/>
-
-            </LinearLayout>
-        </android.support.v7.widget.Toolbar>
-
-        <!-- the meaty part of the details screen -->
+        <!-- the meaty part of the details view -->
         <FrameLayout
             android:id="@+id/container_second_pane"
             android:layout_width="match_parent"

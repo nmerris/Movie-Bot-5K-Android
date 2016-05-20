@@ -133,11 +133,15 @@ public class ActivityHome extends ActivitySingleFragment
 
 
     @Override
-    public void onUpdateToolbar(String movieTitle) {
-        if(mTwoPane) {
+    public void onUpdateToolbar(String movieTitle, String movieTagline) {
 
+        // update the toolbar, but only if the details toolbar is present, which is only in tablet mode
+        if(mTwoPane) {
             TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
+            TextView movieTaglineTextView = (TextView) findViewById(R.id.toolbar_movie_tagline);
             movieTitleTextView.setText(movieTitle);
+            movieTaglineTextView.setText(movieTagline);
         }
     }
+
 }

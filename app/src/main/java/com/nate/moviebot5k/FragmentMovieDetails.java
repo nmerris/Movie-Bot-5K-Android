@@ -187,7 +187,7 @@ public class FragmentMovieDetails extends Fragment
         // NOTE TO SELF: I DON'T THINK I NEED THIS PARTICULAR CALLBACK, BUT I PROB. WILL NEED OTHERS
         // FOR LAUNCHING
 //        void onFavoriteRemoved(int movieId);
-        void onUpdateToolbar(String movieTitle);
+        void onUpdateToolbar(String movieTitle, String movieTagline);
     }
 
     @Override
@@ -409,7 +409,7 @@ public class FragmentMovieDetails extends Fragment
                     String tagline = data.getString(COLUMN_TAGLINE);
 
                     // callback to hosting activity so the toolbar title can be updated as needed
-                    mCallbacks.onUpdateToolbar(title);
+                    mCallbacks.onUpdateToolbar(title, tagline);
 
 
 //

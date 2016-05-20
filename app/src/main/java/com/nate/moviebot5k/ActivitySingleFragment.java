@@ -98,7 +98,7 @@ public abstract class ActivitySingleFragment extends AppCompatActivity
 
         // create a TOOLBAR, which is NOT the same as an Actionbar aka Appbar, however, we can
         // use it just like an old action bar by calling setSupportActionBar
-        // a toolbar_phone is much more flexible and customizable than an action bar
+        // a toolbar_movie_grid is much more flexible and customizable than an action bar
         // all cool coders use Toolbars
         Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(actionBarToolbar);

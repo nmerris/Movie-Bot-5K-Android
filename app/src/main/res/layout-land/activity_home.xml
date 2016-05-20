@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/toolbar_phone"/>
+    <include layout="@layout/toolbar_movie_grid"/>
 
     <!-- in phone landscape mode, the spinner filter fragment right of the movie grid -->
     <LinearLayout

@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
@@ -24,33 +25,17 @@ import butterknife.ButterKnife;
  * Created by Nathan Merris on 5/16/2016.
  */
 public class ActivityMovieDetailsPager extends AppCompatActivity
-        /*implements FragmentMovieDetails.Callbacks*/{
+        implements FragmentMovieDetails.Callbacks{
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovDetPager";
 
     @Bind(R.id.activity_movie_detail_view_pager) ViewPager mViewPager;
 
     private SharedPreferences mSharedPrefs;
-//    private Cursor mCursor;
     private int mNumMovies;
     ArrayList<Integer> mMovieIds = new ArrayList<>();
 
 
 
-//    @Override
-//    protected int getLayoutResourceId() {
-//        return R.layout.activity_movie_details_pager;
-//    }
-//
-//    @Override
-//    protected Fragment createFragment() {
-//
-//        int currentlySelectedMovieId = PreferenceManager.getDefaultSharedPreferences(this)
-//                .getInt(getString(R.string.key_currently_selected_movie_id), 0);
-//
-//        // create a new FMD and pass false to tell it not to use the favorites table
-//        return FragmentMovieDetails.newInstance(false, currentlySelectedMovieId);
-//
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +45,11 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         setContentView(R.layout.activity_movie_details_pager);
         ButterKnife.bind(this);
 
-        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
+        // in this activity, the details toolbar is also the action bar, unlike elsewhere
+        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar_details);
         setSupportActionBar(actionBarToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -105,6 +93,14 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         }
 
     } // end onCreate
+
+    @Override
+    public void onUpdateToolbar(String movieTitle, String movieTagline) {
+        TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
+        TextView movieTaglineTextView = (TextView) findViewById(R.id.toolbar_movie_tagline);
+        movieTitleTextView.setText(movieTitle);
+        movieTaglineTextView.setText(movieTagline);
+    }
 
 
     //    @Override
