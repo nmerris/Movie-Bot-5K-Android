@@ -88,12 +88,30 @@ public class MovieDetailsFetcher {
         Log.i(LOGTAG, "entered parseJsonAndInsertToDb (in movie details fetcher)");
 
 
-        // get the 4 relevant pieces of extra data and update the MOVIES table
+        // get the relevant pieces of extra data and update the MOVIES table
         ContentValues values = new ContentValues();
         values.put(MovieTheaterContract.MoviesEntry.COLUMN_BUDGET, jsonBody.getLong("budget")); // in dollars
         values.put(MovieTheaterContract.MoviesEntry.COLUMN_REVENUE, jsonBody.getLong("revenue")); // in dollars
         values.put(MovieTheaterContract.MoviesEntry.COLUMN_RUNTIME, jsonBody.getInt("runtime")); // in min
         values.put(MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE, jsonBody.getString("tagline"));
+
+
+        // populate up to 4 genre columns, I'm just ignoring more than that
+        JSONArray genresJsonArray = jsonBody.getJSONArray("genres");
+        try {
+            for(int i = 0; i < 3; i++) {
+                JSONObject jsonObject = genresJsonArray.getJSONObject(i);
+                values.put(MovieTheaterContract.MoviesEntry.GENRE_NAMEx + (i + 1),
+                        jsonObject.getString("name"));
+            }
+        } catch (JSONException e) {
+                Log.i(LOGTAG, "  there were less than 4 genre names associated with this movie, this is not an error");
+        }
+        
+        
+        
+        
+
         int numUpdated = mContext.getContentResolver()
                 .update(MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
                        values, null, null);

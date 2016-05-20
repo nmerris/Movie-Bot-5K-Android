@@ -39,6 +39,9 @@ public class MovieTheaterContract {
     // not final because MoviesEntry and FavoritesEntry extend it
     private static class MoviesEntryColumns {
 
+        // only used to more easily populate the genre names in MovieDetailsFetcher
+        public static final String GENRE_NAMEx = "genre_name";
+
         // populated in FragmentMovieGrid from /discover/movie themoviedb API endpoint
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_ADULT = "adult";
@@ -137,11 +140,11 @@ public class MovieTheaterContract {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
         }
         
-        // use to get the joined table of movie details joined with videos, reviews, and credits tables
-        public static Uri buildMovieDetailsUriFromMovieId(long movieId) {
-            return ContentUris.withAppendedId(CONTENT_URI, movieId).buildUpon()
-                    .appendPath(DETAILS_PATH).build();
-        }
+//        // use to get the joined table of movie details joined with videos, reviews, and credits tables
+//        public static Uri buildMovieDetailsUriFromMovieId(long movieId) {
+//            return ContentUris.withAppendedId(CONTENT_URI, movieId).buildUpon()
+//                    .appendPath(DETAILS_PATH).build();
+//        }
         
     }
 
@@ -182,11 +185,11 @@ public class MovieTheaterContract {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
         }
 
-        // use to get the joined table of favorite details joined with videos, reviews, and credits tables
-        public static Uri buildFavoriteDetailsUriFromMovieId(long movieId) {
-            return ContentUris.withAppendedId(CONTENT_URI, movieId).buildUpon()
-                    .appendPath(DETAILS_PATH).build();
-        }
+//        // use to get the joined table of favorite details joined with videos, reviews, and credits tables
+//        public static Uri buildFavoriteDetailsUriFromMovieId(long movieId) {
+//            return ContentUris.withAppendedId(CONTENT_URI, movieId).buildUpon()
+//                    .appendPath(DETAILS_PATH).build();
+//        }
 
     }
 

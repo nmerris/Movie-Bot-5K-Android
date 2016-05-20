@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- each movie poster in the gridview has two tags, one for it's viewholder,
-    the other for the movieId associated with it -->
-    <item type="id" name="movie_poster_imageview_viewholder_key"/>
-    <item type="id" name="movie_poster_imageview_movie_id_key" />
+<!-- each movie poster in the gridview has two tags, one for it's viewholder,
+the other for the movieId associated with it -->
+<item type="id" name="movie_poster_imageview_viewholder_key"/>
+<item type="id" name="movie_poster_imageview_movie_id_key" />
 
-    <!-- each loader needs its own unique id -->
-    <item type="id" name="loader_movies_table_fragment_movie_grid"/>
-    <item type="id" name="loader_favorites_table_fragment_movie_grid"/>
+<!-- each loader needs its own unique id -->
+<item type="id" name="loader_movies_table_fragment_movie_grid"/>
+<item type="id" name="loader_favorites_table_fragment_movie_grid"/>
 
-    <item type="id" name="loader_genre_spinner"/>
-    <item type="id" name="loader_cert_spinner"/>
+<item type="id" name="loader_genre_spinner"/>
+<item type="id" name="loader_cert_spinner"/>
 
-    <item type="id" name="loader_movies_table_fragment_movie_details"/>
-    <item type="id" name="loader_favorites_table_fragment_movie_details"/>
+<item type="id" name="loader_movies_fragment_movie_details"/>
+<item type="id" name="loader_videos_fragment_movie_details"/>
+<item type="id" name="loader_reviews_fragment_movie_details"/>
+<item type="id" name="loader_credits_fragment_movie_details"/>
+
+<item type="id" name="loader_favorites_movies_fragment_movie_details"/>
+<item type="id" name="loader_favorites_videos_fragment_movie_details"/>
+<item type="id" name="loader_favorites_reviews_fragment_movie_details"/>
+<item type="id" name="loader_favorites_credits_fragment_movie_details"/>
 
 </resources>
