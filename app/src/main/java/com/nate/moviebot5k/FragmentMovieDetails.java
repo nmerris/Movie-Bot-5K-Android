@@ -257,18 +257,26 @@ public class FragmentMovieDetails extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
 
-//        ButterKnife.bind(rootView);
+
+        if(rootView.findViewById(R.id.fragment_details_phone_mode_container) != null) {
+            // app is running in phone mode, so that means it's hosting activity is using a
+            // viewpager to show these fragments, and I had trouble keeping the toolbar in sync
+            // with the fragment that was below it.. see onLoadFinished for more yakking about that
+            // I wanted to keep the UP button functionality, that's why I'm casting this fragments
+            // hosting activity and setting THIS fragments phone mode toolbar as the actionbar
+            // I am aware that this breaks the fragments indepenence, but it seemed worth it, the
+            // other option would have been to build a up button from scratch and do everything
+            // in this fragment
+            Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar_details);
+            AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
+            appCompatActivity.setSupportActionBar(toolbar);
+            appCompatActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+            appCompatActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
 
-//        TextView textTV =  (TextView) rootView.findViewById(R.id.test_movie_id_textview);
-//        // testing
-//        if(mUseFavorites) {
-//            // of course this would be read from cursor  in onLoadFinished
-//            textTV.setText(String.valueOf(mMovieId));
-//        } else {
-//            // and this would be read from cursor in onLoadFinished
-//            textTV.setText(String.valueOf(mMovieId));
-//        }
+
+
 
 
 
@@ -295,7 +303,7 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public void onResume() {
-//        Log.i(LOGTAG, "entered onResume");
+        Log.e(LOGTAG, "entered onResume");
 //        Log.e(LOGTAG, "  and mMovieId is: " + mMovieId);
 
 
@@ -307,28 +315,28 @@ public class FragmentMovieDetails extends Fragment
         super.onResume();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(LOGTAG, "entered onActivityCreated");
-
-        // start the appropriate Loader depending on which Activity is hosting this fragment
-//        if(mUseFavorites) {
-//            Log.i(LOGTAG, "  and about to init all FAVORITES loaders");
-////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-//        }
-//        else {
-//            Log.i(LOGTAG, "  and about to init all NON-favorites loaders");
-//            getLoaderManager().initLoader(MOVIES_TABLE_LOADER_ID, null, this);
-//            getLoaderManager().initLoader(CREDITS_TABLE_LOADER_ID, null, this);
-//            getLoaderManager().initLoader(VIDEOS_TABLE_LOADER_ID, null, this);
-//            getLoaderManager().initLoader(REVIEWS_TABLE_LOADER_ID, null, this);
-//        }
-
-        super.onActivityCreated(savedInstanceState);
-    }
+//    @Override
+//    public void onActivityCreated(Bundle savedInstanceState) {
+//        Log.i(LOGTAG, "entered onActivityCreated");
+//
+//        // start the appropriate Loader depending on which Activity is hosting this fragment
+////        if(mUseFavorites) {
+////            Log.i(LOGTAG, "  and about to init all FAVORITES loaders");
+//////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+//////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+//////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+//////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+////        }
+////        else {
+////            Log.i(LOGTAG, "  and about to init all NON-favorites loaders");
+////            getLoaderManager().initLoader(MOVIES_TABLE_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(CREDITS_TABLE_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(VIDEOS_TABLE_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(REVIEWS_TABLE_LOADER_ID, null, this);
+////        }
+//
+//        super.onActivityCreated(savedInstanceState);
+//    }
 
 
 
@@ -408,25 +416,42 @@ public class FragmentMovieDetails extends Fragment
                     int runtime = data.getInt(COLUMN_RUNTIME);
                     String tagline = data.getString(COLUMN_TAGLINE);
 
-                    // callback to hosting activity so the toolbar title can be updated as needed
-                    mCallbacks.onUpdateToolbar(title, tagline);
+
+                    if(getView().findViewById(R.id.fragment_details_phone_mode_container) == null) {
+                        // app is running in tablet mode, let hosting activity deal with toolbar update
+                        mCallbacks.onUpdateToolbar(title, tagline);
+                    }
+                    else {
+                        // I could not figure out how to get the viewpager to work with regards
+                        // to updating the title and subtitle.. the problem is that the viewpager
+                        // stores the next closest fragments in a cache, and so this block of
+                        // was not being reached when you swiped back and forth between the same
+                        // two screens, so I figured out that having the toolbar contained within
+                        // this fragments layout would allow the title and subtitle (tagline)
+                        // to be PART of the cached viewpager screen, as opposed to part of the
+                        // hosting activities layout.  This makes for some kinda ugly code here and
+                        // in onCreateView, and the fragment now must assume that it's hosting
+                        // activity does not already have an action bar, so it's not technically
+                        // independent, but it does work and the view paging in phone mode
+                        // detail view is so much nicer this way!
+                        TextView toolbarTitleTextView = (TextView) getView().findViewById(R.id.toolbar_movie_title);
+                        TextView toolbarTaglineTextView = (TextView) getView().findViewById(R.id.toolbar_movie_tagline);
+                        toolbarTitleTextView.setText(title);
+                        toolbarTaglineTextView.setText(tagline);
+                    }
+
 
 
 //
-//                    Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-//                    toolbar.setTitle(title);
-//                    toolbar.setSubtitle(tagline);
 //
-//                    ((AppCompatActivity) getActivity()).getSupportActionBar()
-
-
-//                    getActivity().getActionBar().setTitle(title);
-//                    getActivity().getActionBar().setSubtitle(tagline);
+//                    TextView toolbTV = (TextView) getView().findViewById(R.id.toolbar_movie_title);
+//                    toolbTV.setText(title);
 
 
 
                     mDetailsTextView.setText("DETAILS FROM MOVIE TABLE: \n" +
                             genreName1 + " " + genreName2 + " " + genreName3 + " " + genreName4 + "\n" +
+                            "MOVIE_ID: " + mMovieId + "\n" +
                             overview + "\n" +
                             "Release Date: " + releaseDate + "\n" +
                             "Vote Avg: " + voteAvg + "\n" +

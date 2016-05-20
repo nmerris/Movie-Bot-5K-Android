@@ -46,10 +46,10 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         ButterKnife.bind(this);
 
         // in this activity, the details toolbar is also the action bar, unlike elsewhere
-        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar_details);
-        setSupportActionBar(actionBarToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+//        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar_details);
+//        setSupportActionBar(actionBarToolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -96,10 +96,10 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
 
     @Override
     public void onUpdateToolbar(String movieTitle, String movieTagline) {
-        TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
-        TextView movieTaglineTextView = (TextView) findViewById(R.id.toolbar_movie_tagline);
-        movieTitleTextView.setText(movieTitle);
-        movieTaglineTextView.setText(movieTagline);
+//        TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
+//        TextView movieTaglineTextView = (TextView) findViewById(R.id.toolbar_movie_tagline);
+//        movieTitleTextView.setText(movieTitle);
+//        movieTaglineTextView.setText(movieTagline);
     }
 
 
