@@ -11,6 +11,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +39,8 @@ public class FragmentMovieDetails extends Fragment
 
     private static final String BUNDLE_USE_FAVORITES_KEY = "use_favorites";
     private static final String BUNDLE_MOVIE_ID_KEY = "movie_id";
+    private Callbacks mCallbacks;
+
 
     private static final int FAVORITES_TABLE_LOADER_ID = R.id.loader_favorites_movies_fragment_movie_details;
     private static final int MOVIES_TABLE_LOADER_ID = R.id.loader_movies_fragment_movie_details;
@@ -158,47 +162,47 @@ public class FragmentMovieDetails extends Fragment
 
 
 
-//    /**
-//     * Required interface for any activity that hosts this fragment
-//     */
-//    public interface Callbacks {
-//        // if hosted by HomeActivity: nothing happens, just toggle favorites icon (same phone and tablet),
-//        //   when toggled 'on' add the record to favs table, when toggled 'off' remove same record
-//        // if hosted by FavoritesAct: (only possible in tablet) just toggle the fav icon and remove
-//        //   the record from fav table, or vice versa insert it, it's ok if the user just removed
-//        //   the last favorite, the favorites grid will be updated the next time they come back to
-//        //   to favorites activity because the db will not have any records, actually prob. just gray
-//        //   out the menu option to even allow user to navigate to fav act if they don't have any favs
-//        // if hosted by detail favorites pager act: (only possible in phone mode) just toggle the favorites icon,
-//        //   there is no need to remove it from the viewpager.. remove or add the record to the fav
-//        //   table each time it's toggled, basically same as if hosted by home activity, when user
-//        //   navigates back to favorites activity, the loader will refresh the grid and the removed
-//        //   favorite will just not be there, when user comes back to favorites pager act, the loader
-//        //   will similarly just not see the removed fav record in the fav table
-//        // if hosted by normal detail pager act: (only possible in phone mode) just toggle the fav icon,
-//        //   and remove or add back in the record to the favorites table, basically same as above
-//        /**
-//         * Hosting Activity should determine what happens when a movie is removed from users favorites.
-//         */
-//        // NOTE TO SELF: I DON'T THINK I NEED THIS PARTICULAR CALLBACK, BUT I PROB. WILL NEED OTHERS
-//        // FOR LAUNCHING
+    /**
+     * Required interface for any activity that hosts this fragment
+     */
+    public interface Callbacks {
+        // if hosted by HomeActivity: nothing happens, just toggle favorites icon (same phone and tablet),
+        //   when toggled 'on' add the record to favs table, when toggled 'off' remove same record
+        // if hosted by FavoritesAct: (only possible in tablet) just toggle the fav icon and remove
+        //   the record from fav table, or vice versa insert it, it's ok if the user just removed
+        //   the last favorite, the favorites grid will be updated the next time they come back to
+        //   to favorites activity because the db will not have any records, actually prob. just gray
+        //   out the menu option to even allow user to navigate to fav act if they don't have any favs
+        // if hosted by detail favorites pager act: (only possible in phone mode) just toggle the favorites icon,
+        //   there is no need to remove it from the viewpager.. remove or add the record to the fav
+        //   table each time it's toggled, basically same as if hosted by home activity, when user
+        //   navigates back to favorites activity, the loader will refresh the grid and the removed
+        //   favorite will just not be there, when user comes back to favorites pager act, the loader
+        //   will similarly just not see the removed fav record in the fav table
+        // if hosted by normal detail pager act: (only possible in phone mode) just toggle the fav icon,
+        //   and remove or add back in the record to the favorites table, basically same as above
+        /**
+         * Hosting Activity should determine what happens when a movie is removed from users favorites.
+         */
+        // NOTE TO SELF: I DON'T THINK I NEED THIS PARTICULAR CALLBACK, BUT I PROB. WILL NEED OTHERS
+        // FOR LAUNCHING
 //        void onFavoriteRemoved(int movieId);
-//    }
+        void onUpdateToolbar(String movieTitle);
+    }
 
+    @Override
+    public void onAttach(Context context) {
+        // associate the fragment's mCallbacks object with the activity it was just attached to
+        mCallbacks = (Callbacks) getActivity();
+        super.onAttach(context);
+    }
 
-//    @Override
-//    public void onAttach(Context context) {
-//        // associate the fragment's mCallbacks object with the activity it was just attached to
-//        mCallbacks = (Callbacks) getActivity();
-//        super.onAttach(context);
-//    }
-//
-//    @Override
-//    public void onDetach() {
-//        mCallbacks = null; // need to make sure this member variable is up to date with the correct activity
-//        // so nullify it every time this fragment gets detached from it's hosting activity
-//        super.onDetach();
-//    }
+    @Override
+    public void onDetach() {
+        mCallbacks = null; // need to make sure this member variable is up to date with the correct activity
+        // so nullify it every time this fragment gets detached from it's hosting activity
+        super.onDetach();
+    }
 
 
     @Override
@@ -404,6 +408,23 @@ public class FragmentMovieDetails extends Fragment
                     int runtime = data.getInt(COLUMN_RUNTIME);
                     String tagline = data.getString(COLUMN_TAGLINE);
 
+                    // callback to hosting activity so the toolbar title can be updated as needed
+                    mCallbacks.onUpdateToolbar(title);
+
+
+//
+//                    Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+//                    toolbar.setTitle(title);
+//                    toolbar.setSubtitle(tagline);
+//
+//                    ((AppCompatActivity) getActivity()).getSupportActionBar()
+
+
+//                    getActivity().getActionBar().setTitle(title);
+//                    getActivity().getActionBar().setSubtitle(tagline);
+
+
+
                     mDetailsTextView.setText("DETAILS FROM MOVIE TABLE: \n" +
                             genreName1 + " " + genreName2 + " " + genreName3 + " " + genreName4 + "\n" +
                             overview + "\n" +
@@ -412,7 +433,6 @@ public class FragmentMovieDetails extends Fragment
                             "Budget: " + budget + "\n" +
                             "Runtime: " + runtime + "\n");
 
-//                    getActivity().getActionBar().getCustomView()
 
 
 

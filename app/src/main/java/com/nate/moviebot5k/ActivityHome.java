@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 
 public class ActivityHome extends ActivitySingleFragment
-    implements FragmentMovieGrid.Callbacks, FragmentMovieFiltersSpinner.Callbacks/*,
-        FragmentMovieDetails.Callbacks */{
+    implements FragmentMovieGrid.Callbacks, FragmentMovieFiltersSpinner.Callbacks,
+        FragmentMovieDetails.Callbacks {
     private final String LOGTAG = N8LOG + "ActivityHome";
 
 
@@ -129,6 +132,12 @@ public class ActivityHome extends ActivitySingleFragment
     }
 
 
+    @Override
+    public void onUpdateToolbar(String movieTitle) {
+        if(mTwoPane) {
 
-
+            TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
+            movieTitleTextView.setText(movieTitle);
+        }
+    }
 }
