@@ -2,6 +2,7 @@ package com.nate.moviebot5k;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 
 import com.nate.moviebot5k.data.MovieTheaterContract;
@@ -97,6 +98,17 @@ public class Utility {
             cursor.close();
         }
         return movieIds;
+    }
+
+
+    public static Uri buildYouTubeUri(String youTubeKey) {
+        Uri.Builder youTubeUrl = new Uri.Builder();
+        youTubeUrl.scheme("https")
+                .authority("www.youtube.com")
+                .appendPath("watch")
+                .appendQueryParameter("v", youTubeKey);
+
+        return youTubeUrl.build();
     }
 
     

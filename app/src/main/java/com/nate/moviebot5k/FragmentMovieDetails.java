@@ -2,17 +2,18 @@ package com.nate.moviebot5k;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +24,6 @@ import android.widget.TextView;
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.squareup.picasso.Picasso;
-
-import java.io.File;
-import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -429,7 +427,7 @@ public class FragmentMovieDetails extends Fragment
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
         Log.i(LOGTAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entered onLoadFinished");
         View rootView = getView();
 
@@ -463,24 +461,7 @@ public class FragmentMovieDetails extends Fragment
                         // app is running in tablet mode, let hosting activity deal with toolbar update
                         mCallbacks.onUpdateToolbar(title, tagline);
                     }
-//                    else {
-//                        // I could not figure out how to get the viewpager to work with regards
-//                        // to updating the title and subtitle.. the problem is that the viewpager
-//                        // stores the next closest fragments in a cache, and so this block of
-//                        // was not being reached when you swiped back and forth between the same
-//                        // two screens, so I figured out that having the toolbar contained within
-//                        // this fragments layout would allow the title and subtitle (tagline)
-//                        // to be PART of the cached viewpager screen, as opposed to part of the
-//                        // hosting activities layout.  This makes for some kinda ugly code here and
-//                        // in onCreateView, and the fragment now must assume that it's hosting
-//                        // activity does not already have an action bar, so it's not technically
-//                        // independent, but it does work and the view paging in phone mode
-//                        // detail view is so much nicer this way!
-//                        TextView toolbarTitleTextView = (TextView) getView().findViewById(R.id.toolbar_movie_title);
-//                        TextView toolbarTaglineTextView = (TextView) getView().findViewById(R.id.toolbar_movie_tagline);
-//                        toolbarTitleTextView.setText(title);
-//                        toolbarTaglineTextView.setText(tagline);
-//                    }
+
 
                     mDetailsTextView.setText("DETAILS FROM MOVIE TABLE: \n" +
                             genreName1 + " " + genreName2 + " " + genreName3 + " " + genreName4 + "\n" +
@@ -513,9 +494,16 @@ public class FragmentMovieDetails extends Fragment
                         Picasso.with(getActivity())
                                 .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
                                 .into(mVideoThumbnailImageView1);
+                        // set a click listener on the ImageView video trailer thumbnail
+                        mVideoThumbnailImageView1.setOnClickListener(new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
 
+                        // set a click listener on the ... well this will be an share ICON in future
                         mVideosTextView1.setText(data.getString(COLUMN_VIDEO_NAME));
+                        mVideosTextView1.setOnClickListener(new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
+
                     }
+
+
                     // again testing, just doing 2 videos now, if there are even 2
                     if(data.moveToNext()) {
                         // video thumbnail image 2
@@ -612,6 +600,43 @@ public class FragmentMovieDetails extends Fragment
     public void onLoaderReset(Loader<Cursor> loader) {}
 
 
+
+
+
+    private class VideoViewListener implements View.OnClickListener {
+        private String key;
+
+        private VideoViewListener(String youTubeVideoKey) {
+            key = youTubeVideoKey;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Utility.buildYouTubeUri(key));
+            startActivity(intent);
+        }
+    }
+
+
+    private class VideoShareListener implements View.OnClickListener {
+        private String key;
+
+        private VideoShareListener(String youTubeVideoKey) {
+            key = youTubeVideoKey;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_TEXT,
+                    "Check out this video: " + Utility.buildYouTubeUri(key).toString());
+            intent.setType("text/plain");
+            if(intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivity(intent);
+            }
+        }
+    }
 
 
     private class FetchMovieDetailsTask extends AsyncTask<Void, Void, Void> {

@@ -169,8 +169,7 @@ public class MoviesFetcher {
             backdropImageUrlBuilder.scheme(mContext.getString(R.string.themoviedb_scheme))
                     .authority(mContext.getString(R.string.themoviedb_image_authority))
                     .appendPath("t").appendPath("p")
-                    .appendPath(mContext.getString(R.string.themoviedb_backdrop_size))
-                    .build(); // https://image.tmdb.org/t/p/[image_size] to this point
+                    .appendPath(mContext.getString(R.string.themoviedb_backdrop_size)); // https://image.tmdb.org/t/p/[image_size] to this point
 
             String backdropImageUrl = backdropImageUrlBuilder.build().toString()
                     + jsonObject.getString("backdrop_path");
@@ -180,8 +179,7 @@ public class MoviesFetcher {
             posterImageUrlBuilder.scheme(mContext.getString(R.string.themoviedb_scheme))
                     .authority(mContext.getString(R.string.themoviedb_image_authority))
                     .appendPath("t").appendPath("p")
-                    .appendPath(mContext.getString(R.string.themoviedb_poster_size))
-                    .build(); // https://image.tmdb.org/t/p/[image_size] to this point
+                    .appendPath(mContext.getString(R.string.themoviedb_poster_size)); // https://image.tmdb.org/t/p/[image_size] to this point
             String posterImageUrl = posterImageUrlBuilder.build().toString()
                     + jsonObject.getString("poster_path");
             values.put(MoviesEntry.COLUMN_POSTER_PATH, posterImageUrl); // NOT NULL COLUMN
