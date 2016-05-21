@@ -106,6 +106,7 @@ public class MovieTheaterContract {
         public static final String COLUMN_SITE = "site";
         public static final String COLUMN_SIZE = "size";
         public static final String COLUMN_TYPE = "type";
+        public static final String COLUMN_THUMBNAIL_URL = "thumbnail_url"; // using hqdefault size
     }
 
     

@@ -20,6 +20,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
+
             <ImageView
                 android:id="@+id/backdrop_imageview"
                 android:layout_width="match_parent"
@@ -36,19 +38,82 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textSize="20sp"
-                android:gravity="center" />
+                android:gravity="center"/>
 
-            <TextView
-                android:id="@+id/test_videos_textview"
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/video_thumbnail1_imageview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop"
+                    android:paddingLeft="0dp"
+                    android:paddingBottom="0dp"
+                    android:adjustViewBounds="true" />
+
+                <TextView
+                    android:id="@+id/test_videos1_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="VIDEO 1 NO DATA" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/video_thumbnail2_imageview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop"
+                    android:paddingLeft="0dp"
+                    android:paddingBottom="0dp"
+                    android:adjustViewBounds="true" />
+
+                <TextView
+                    android:id="@+id/test_videos2_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="VIDEO 1 NO DATA" />
+
+            </LinearLayout>
+
+
+<!--            <TextView
+                android:id="@+id/test_videos3_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:text="VIDEO 3 NO DATA"/>
+
+            <TextView
+                android:id="@+id/test_videos4_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="VIDEO 4 NO DATA"/>-->
+
+
 
             <TextView
                 android:id="@+id/test_reviews_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp" />
+                android:textSize="16sp"/>
+
 
 
             <LinearLayout
@@ -59,13 +124,13 @@
                 <ImageView
                     android:id="@+id/test_credits_profile_1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/test_credits_textview_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout

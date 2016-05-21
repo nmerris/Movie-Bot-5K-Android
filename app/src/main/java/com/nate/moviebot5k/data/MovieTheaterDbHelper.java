@@ -29,7 +29,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
     private static final String LOGTAG = ActivitySingleFragment.N8LOG + "MovTheatrDbHelper";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
     static final String DATABASE_NAME = "movie_theater.db";
 
 
@@ -100,7 +100,8 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                         VideosEntry.COLUMN_NAME + " TEXT, " +
                         VideosEntry.COLUMN_SITE + " TEXT, " +
                         VideosEntry.COLUMN_SIZE + " INTEGER, " +
-                        VideosEntry.COLUMN_TYPE + " TEXT";
+                        VideosEntry.COLUMN_TYPE + " TEXT, " +
+                        VideosEntry.COLUMN_THUMBNAIL_URL + " TEXT";
 
         final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " + VideosEntry.TABLE_NAME + "(" +
                 SQL_VIDEOS_COLUMNS + ");";

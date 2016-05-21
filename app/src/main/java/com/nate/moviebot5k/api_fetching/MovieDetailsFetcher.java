@@ -146,12 +146,18 @@ public class MovieDetailsFetcher {
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_SITE, jsonObject.getString("site"));
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_SIZE, jsonObject.getInt("size"));
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_TYPE, jsonObject.getString("type"));
-            
+
+            String youtubeVideoThumbnailUrl = "http://img.youtube.com/vi/" +
+                    jsonObject.getString("key") + "/hqdefault.jpg";
+            valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_THUMBNAIL_URL, youtubeVideoThumbnailUrl);
+
             // testing
             Log.i(LOGTAG, "  added video table record with movie_id: " + mMovieId);
             Log.i(LOGTAG, "    and with key: " + jsonObject.getString("key"));
             Log.i(LOGTAG, "    and with size: " + jsonObject.getInt("size"));
             Log.i(LOGTAG, "    and with type: " + jsonObject.getString("type"));
+            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
+            Log.e(LOGTAG, "    and with thumbnail URL: " + youtubeVideoThumbnailUrl);
 
             valuesVidsVector.add(valuesVideos);
         }
@@ -253,11 +259,11 @@ public class MovieDetailsFetcher {
             valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH, profileImageUrl);
 
             // testing
-            Log.i(LOGTAG, "  added credit table record with movie_id: " + mMovieId);
-            Log.i(LOGTAG, "    and with character: " + jsonObject.getString("character"));
-            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
-            Log.i(LOGTAG, "    and with profile path: " + profileImageUrl);
-            Log.i(LOGTAG, "    and with profile order: " + jsonObject.getInt("order"));
+//            Log.i(LOGTAG, "  added credit table record with movie_id: " + mMovieId);
+//            Log.i(LOGTAG, "    and with character: " + jsonObject.getString("character"));
+//            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
+//            Log.i(LOGTAG, "    and with profile path: " + profileImageUrl);
+//            Log.i(LOGTAG, "    and with profile order: " + jsonObject.getInt("order"));
 
             // add the single object to the ContentValues Vector
             valuesCreditsVector.add(valuesCredits);

@@ -12,7 +12,8 @@
     <!-- see other strings resources for larger image sizes -->
     <string name="themoviedb_poster_size" translatable="false">w185</string>
     <string name="themoviedb_backdrop_size" translatable="false">w780</string>
-    <string name="themoviedb_profile_size" translatable="false">w45</string>
+    <!--<string name="themoviedb_profile_size" translatable="false">w45</string>-->
+    <string name="themoviedb_profile_size" translatable="false">w185</string>
 
     <!-- menu -->
     <string name="action_movie_filters">Filters</string>
