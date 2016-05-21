@@ -40,6 +40,7 @@ public class FragmentMovieDetails extends Fragment
 
     private static final String BUNDLE_USE_FAVORITES_KEY = "use_favorites";
     private static final String BUNDLE_MOVIE_ID_KEY = "movie_id";
+    private static final String BUNDLE_MTWO_PANE = "mtwopane_mode";
     private Callbacks mCallbacks;
 
 
@@ -56,7 +57,8 @@ public class FragmentMovieDetails extends Fragment
     private SharedPreferences mSharedPrefs;
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
 //    private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
-    private int mMovieId/*, mFavoriteId*/; // the id for the movie or favorite movie
+    private int mMovieId; // the id for the movie or favorite movie
+    private boolean mTwoPane;
     
     @Bind(R.id.backdrop_imageview) ImageView mBackdropImageView;
     @Bind(R.id.test_details_textview) TextView mDetailsTextView;
@@ -164,9 +166,10 @@ public class FragmentMovieDetails extends Fragment
 
 
     // the movieId will be used to read data from either the favorites or movies table
-    public static FragmentMovieDetails newInstance(boolean useFavoritesTable, int movieId) {
+    public static FragmentMovieDetails newInstance(boolean useFavoritesTable, int movieId, boolean mTwoPane) {
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_USE_FAVORITES_KEY, useFavoritesTable);
+        args.putBoolean(BUNDLE_MTWO_PANE, mTwoPane);
         args.putInt(BUNDLE_MOVIE_ID_KEY, movieId);
         FragmentMovieDetails fragment = new FragmentMovieDetails();
         fragment.setArguments(args);
@@ -223,6 +226,7 @@ public class FragmentMovieDetails extends Fragment
 
         outState.putInt(BUNDLE_MOVIE_ID_KEY, mMovieId);
         outState.putBoolean(BUNDLE_USE_FAVORITES_KEY, mUseFavorites);
+        outState.putBoolean(BUNDLE_MTWO_PANE, mTwoPane);
 
         super.onSaveInstanceState(outState);
     }
@@ -244,6 +248,7 @@ public class FragmentMovieDetails extends Fragment
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool and movieId int from frag argument");
             mMovieId = getArguments().getInt(BUNDLE_MOVIE_ID_KEY);
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_KEY);
+            mTwoPane = getArguments().getBoolean(BUNDLE_MTWO_PANE);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
             Log.i(LOGTAG, "    mMovieId is now: " + mMovieId);
 
@@ -261,6 +266,7 @@ public class FragmentMovieDetails extends Fragment
             Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool and movieId int from SIS Bundle");
             mMovieId = savedInstanceState.getInt(BUNDLE_MOVIE_ID_KEY);
             mUseFavorites = savedInstanceState.getBoolean(BUNDLE_USE_FAVORITES_KEY);
+            mTwoPane = savedInstanceState.getBoolean(BUNDLE_MTWO_PANE);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
             Log.i(LOGTAG, "    mMovieId is now: " + mMovieId);
         }
@@ -271,25 +277,25 @@ public class FragmentMovieDetails extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
 
 
-        if(rootView.findViewById(R.id.fragment_details_phone_mode_container) != null) {
-            // app is running in phone mode, so that means it's hosting activity is using a
-            // viewpager to show these fragments, and I had trouble keeping the toolbar in sync
-            // with the fragment that was below it.. see onLoadFinished for more yakking about that
-            // I wanted to keep the UP button functionality, that's why I'm casting this fragments
-            // hosting activity and setting THIS fragments phone mode toolbar as the actionbar
-            // I am aware that this breaks the fragments indepenence, but it seemed worth it, the
-            // other option would have been to build a up button from scratch and do everything
-            // in this fragment
-            Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar_details);
-            AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
-            appCompatActivity.setSupportActionBar(toolbar);
-            appCompatActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-            
-            // TODO: darn it!  now the home button doesn't work... fix it, actually it works only some of the time
-            // man this viewpager is screwing things up......
-            // ?
-            appCompatActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+//        if(rootView.findViewById(R.id.fragment_details_phone_mode_container) != null) {
+//            // app is running in phone mode, so that means it's hosting activity is using a
+//            // viewpager to show these fragments, and I had trouble keeping the toolbar in sync
+//            // with the fragment that was below it.. see onLoadFinished for more yakking about that
+//            // I wanted to keep the UP button functionality, that's why I'm casting this fragments
+//            // hosting activity and setting THIS fragments phone mode toolbar as the actionbar
+//            // I am aware that this breaks the fragments indepenence, but it seemed worth it, the
+//            // other option would have been to build a up button from scratch and do everything
+//            // in this fragment
+//            Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar_details);
+//            AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
+//            appCompatActivity.setSupportActionBar(toolbar);
+//            appCompatActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+//
+//            // TODO: darn it!  now the home button doesn't work... fix it, actually it works only some of the time
+//            // man this viewpager is screwing things up......
+//            // ?
+//            appCompatActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        }
 
 
 
@@ -320,7 +326,7 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public void onResume() {
-        Log.e(LOGTAG, "entered onResume");
+        Log.e(LOGTAG, "entered onResume and mMovieId is: " + mMovieId);
 //        Log.e(LOGTAG, "  and mMovieId is: " + mMovieId);
 
 
@@ -453,28 +459,28 @@ public class FragmentMovieDetails extends Fragment
                     String tagline = data.getString(COLUMN_TAGLINE);
 
                     // update the toolbar title and subtitle
-                    if(getView().findViewById(R.id.fragment_details_phone_mode_container) == null) {
+                    if(mTwoPane) {
                         // app is running in tablet mode, let hosting activity deal with toolbar update
                         mCallbacks.onUpdateToolbar(title, tagline);
                     }
-                    else {
-                        // I could not figure out how to get the viewpager to work with regards
-                        // to updating the title and subtitle.. the problem is that the viewpager
-                        // stores the next closest fragments in a cache, and so this block of
-                        // was not being reached when you swiped back and forth between the same
-                        // two screens, so I figured out that having the toolbar contained within
-                        // this fragments layout would allow the title and subtitle (tagline)
-                        // to be PART of the cached viewpager screen, as opposed to part of the
-                        // hosting activities layout.  This makes for some kinda ugly code here and
-                        // in onCreateView, and the fragment now must assume that it's hosting
-                        // activity does not already have an action bar, so it's not technically
-                        // independent, but it does work and the view paging in phone mode
-                        // detail view is so much nicer this way!
-                        TextView toolbarTitleTextView = (TextView) getView().findViewById(R.id.toolbar_movie_title);
-                        TextView toolbarTaglineTextView = (TextView) getView().findViewById(R.id.toolbar_movie_tagline);
-                        toolbarTitleTextView.setText(title);
-                        toolbarTaglineTextView.setText(tagline);
-                    }
+//                    else {
+//                        // I could not figure out how to get the viewpager to work with regards
+//                        // to updating the title and subtitle.. the problem is that the viewpager
+//                        // stores the next closest fragments in a cache, and so this block of
+//                        // was not being reached when you swiped back and forth between the same
+//                        // two screens, so I figured out that having the toolbar contained within
+//                        // this fragments layout would allow the title and subtitle (tagline)
+//                        // to be PART of the cached viewpager screen, as opposed to part of the
+//                        // hosting activities layout.  This makes for some kinda ugly code here and
+//                        // in onCreateView, and the fragment now must assume that it's hosting
+//                        // activity does not already have an action bar, so it's not technically
+//                        // independent, but it does work and the view paging in phone mode
+//                        // detail view is so much nicer this way!
+//                        TextView toolbarTitleTextView = (TextView) getView().findViewById(R.id.toolbar_movie_title);
+//                        TextView toolbarTaglineTextView = (TextView) getView().findViewById(R.id.toolbar_movie_tagline);
+//                        toolbarTitleTextView.setText(title);
+//                        toolbarTaglineTextView.setText(tagline);
+//                    }
 
                     mDetailsTextView.setText("DETAILS FROM MOVIE TABLE: \n" +
                             genreName1 + " " + genreName2 + " " + genreName3 + " " + genreName4 + "\n" +

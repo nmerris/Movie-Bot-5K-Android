@@ -49,7 +49,7 @@ public class ActivityHome extends ActivitySingleFragment
             // in tablet mode, replace the movie detail fragment, which is in the second pane,
             // and instruct it to not use the favorites table
             mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-                    FragmentMovieDetails.newInstance(false, movieId)).commit();
+                    FragmentMovieDetails.newInstance(false, movieId, true)).commit();
         }
         else {
             // in phone mode, launch an intent to movie details pager activity

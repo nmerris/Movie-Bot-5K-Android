@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<!--<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fragment_details_phone_mode_container"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- I put the toolbar in this fragment layout so it's programmatically updated movie title
-    and tagline text did not get out of sync with the fragment that was on screen -->
-    <include layout="@layout/toolbar_details"/>
+    &lt;!&ndash; I put the toolbar in this fragment layout so it's programmatically updated movie title
+    and tagline text did not get out of sync with the fragment that was on screen &ndash;&gt;
+    <include layout="@layout/toolbar_details"/>-->
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -187,6 +187,6 @@
 
         </LinearLayout>
     </ScrollView>
-
-</LinearLayout>
+<!--
+</LinearLayout>-->
 

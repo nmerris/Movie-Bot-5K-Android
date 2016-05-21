@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
  * Created by Nathan Merris on 5/16/2016.
  */
 public class ActivityMovieDetailsPager extends AppCompatActivity
-        implements FragmentMovieDetails.Callbacks{
+        implements FragmentMovieDetails.Callbacks {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovDetPager";
 
     @Bind(R.id.activity_movie_detail_view_pager) ViewPager mViewPager;
@@ -46,10 +46,11 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         ButterKnife.bind(this);
 
         // in this activity, the details toolbar is also the action bar, unlike elsewhere
-//        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar_details);
-//        setSupportActionBar(actionBarToolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(actionBarToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setTitle("Movie Details");
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -74,7 +75,7 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
                 Log.i(LOGTAG, "      and about to load new detail frag with movieId: " + movieId);
 
 
-                return FragmentMovieDetails.newInstance(false, movieId);
+                return FragmentMovieDetails.newInstance(false, movieId, false);
             }
 
             @Override
