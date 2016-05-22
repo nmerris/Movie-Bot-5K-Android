@@ -33,8 +33,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovGridFragment";
 
     private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
-    private static final int MOVIES_TABLE_LOADER_ID = R.id.loader_movies_table_fragment_movie_grid;
-    private static final int FAVORITES_TABLE_LOADER_ID = R.id.loader_favorites_table_fragment_movie_grid;
+    private static final int MOVIES_LOADER_ID = R.id.loader_movies_table_fragment_movie_grid;
+//    private static final int FAVORITES_LOADER_ID = R.id.loader_favorites_table_fragment_movie_grid;
 
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
@@ -208,78 +208,98 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOGTAG, "entered onActivityCreated");
 
-        // start the appropriate Loader depending on which Activity is hosting this fragment
-        if(mUseFavorites) {
-            Log.i(LOGTAG, "  and about to initLoader FAVORITES_TABLE_LOADER");
-            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-        }
-        else {
-            Log.i(LOGTAG, "  and about to initLoader MOVIES_TABLE_LOADER, and genre and cert spinner loaders also");
-            getLoaderManager().initLoader(MOVIES_TABLE_LOADER_ID, null, this);
-        }
+        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+
+//        // start the appropriate Loader depending on which Activity is hosting this fragment
+//        if(mUseFavorites) {
+//            Log.i(LOGTAG, "  and about to initLoader FAVORITES_TABLE_LOADER");
+//            getLoaderManager().initLoader(FAVORITES_LOADER_ID, null, this);
+//        }
+//        else {
+//            Log.i(LOGTAG, "  and about to initLoader MOVIES_TABLE_LOADER, and genre and cert spinner loaders also");
+//            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//        }
 
         super.onActivityCreated(savedInstanceState);
     }
     
 
-    // define a projection for this fragment's Loaders, only want to query what we need for
-    // the movie grid views.  NOTE: this is not going to restrict what actual data is fetched from
-    // themoviedb during the API call, that will grab all the data it needs, the point here to just
-    // grab the data we need to make FragmentMovieGrid have what it needs to do it's thing
-    // NOTE: must include _id column, or Loader will not work
-    private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
-            MovieTheaterContract.MoviesEntry._ID,
-            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID,
-            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH
-    };
-    // these columns variables match the order of the projection above, if you change one you must
-    // also change the other
-    public static final int MOVIES_TABLE_COL_ID = 0;
-    public static final int MOVIES_TABLE_COL_MOVIE_ID = 1;
-    public static final int MOVIES_TABLE_COL_POSTER_PATH = 2;
+//    // define a projection for this fragment's Loaders, only want to query what we need for
+//    // the movie grid views.  NOTE: this is not going to restrict what actual data is fetched from
+//    // themoviedb during the API call, that will grab all the data it needs, the point here to just
+//    // grab the data we need to make FragmentMovieGrid have what it needs to do it's thing
+//    // NOTE: must include _id column, or Loader will not work
+//    private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
+//            MovieTheaterContract.MoviesEntry._ID,
+//            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID,
+//            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH
+//    };
+//    // these columns variables match the order of the projection above, if you change one you must
+//    // also change the other
+//    public static final int MOVIES_TABLE_COL_ID = 0;
+//    public static final int MOVIES_TABLE_COL_MOVIE_ID = 1;
+//    public static final int MOVIES_TABLE_COL_POSTER_PATH = 2;
 
 
     // the reason the favorites tables has more columns in it's projection is because when sorting
     // the favorites table, the sorting happens on the device, as opposed to the live movies table,
     // where sorting is done by themoviedb API
-    private final String[] FAVORITES_TABLE_COLUMNS_PROJECTION = {
-            MovieTheaterContract.FavoritesEntry._ID,
-            MovieTheaterContract.FavoritesEntry.COLUMN_MOVIE_ID,
-            MovieTheaterContract.FavoritesEntry.COLUMN_POSTER_FILE_PATH,
-            MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY,
-            MovieTheaterContract.FavoritesEntry.COLUMN_VOTE_AVG,
-            MovieTheaterContract.FavoritesEntry.COLUMN_REVENUE
+    private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
+            MovieTheaterContract.MoviesEntry._ID,
+            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID,
+            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
+            MovieTheaterContract.MoviesEntry.COLUMN_POPULARITY,
+            MovieTheaterContract.MoviesEntry.COLUMN_VOTE_AVG,
+            MovieTheaterContract.MoviesEntry.COLUMN_REVENUE
     };
-    public static final int FAVORITES_TABLE_COL_ID = 0;
-    public static final int FAVORITES_TABLE_COL_MOVIE_ID = 1;
-    public static final int FAVORITES_TABLE_COL_POSTER_FILE_PATH = 2;
-    public static final int FAVORITES_TABLE_COL_POPULARITY = 3;
-    public static final int FAVORITES_TABLE_COL_VOTE_AVG = 4;
-    public static final int FAVORITES_TABLE_COL_REVENUE = 5;
+//    public static final int MOVIES_TABLE_COL_ID = 0;
+    public static final int MOVIES_TABLE_COL_MOVIE_ID = 1;
+    public static final int MOVIES_TABLE_COL_POSTER_PATH = 2;
+    public static final int MOVIES_TABLE_COL_POSTER_FILE_PATH = 3;
+    public static final int MOVIES_TABLE_COL_POPULARITY = 4;
+    public static final int MOVIES_TABLE_COL_VOTE_AVG = 5;
+    public static final int MOVIES_TABLE_COL_REVENUE = 6;
 
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i(LOGTAG, "entered onCreateLoader");
 
-        if(id == MOVIES_TABLE_LOADER_ID) {
-            Log.i(LOGTAG, "  and about to return new MOVIES_TABLE_LOADER");
+        if(id == MOVIES_LOADER_ID) {
+            Log.i(LOGTAG, "  and about to return new MOVIES_LOADER");
 
             return new CursorLoader(
                     getActivity(),
                     MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
                     MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
-                    null, null, null);
+                    MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?", // select by is_favorites
+                    new String[]{ String.valueOf(mUseFavorites) }, // select the data based on mUseFavorites
+                    null);
         }
-        else if(id == FAVORITES_TABLE_LOADER_ID) {
-            Log.i(LOGTAG, "  and about to return new FAVORITES_TABLE_LOADER");
 
-            return new CursorLoader(
-                    getActivity(),
-                    MovieTheaterContract.FavoritesEntry.CONTENT_URI, // the whole favorites table
-                    FAVORITES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
-                    null, null, null);
-        }
+
+//        if(id == MOVIES_LOADER_ID) {
+//            Log.i(LOGTAG, "  and about to return new MOVIES_LOADER");
+//
+//            return new CursorLoader(
+//                    getActivity(),
+//                    MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
+//                    MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
+//                    MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?",
+//                    new String[]{ "false" }, // do NOT select the favorites from the movies table
+//                    null);
+//        }
+//        else if(id == FAVORITES_LOADER_ID) {
+//            Log.i(LOGTAG, "  and about to return new FAVORITES_LOADER");
+//
+//            return new CursorLoader(
+//                    getActivity(),
+//                    MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
+//                    MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
+//                    MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?",
+//                    new String[]{ "true" }, // do NOT select the favorites from the movies table
+//                    null);
+//        }
 
         return null;
     }
@@ -326,7 +346,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         protected void onPostExecute(Integer numMoviesFetched) {
             Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, numMovies fetched was: " + numMoviesFetched);
 
-            getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
 
 
             // TODO: I think I was going to return num movies fetched here, and then display a msg if it was 0

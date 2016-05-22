@@ -4,8 +4,10 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.provider.ContactsContract;
 
 import com.nate.moviebot5k.ActivitySingleFragment;
+import com.nate.moviebot5k.ScrollAwareFABBehavior;
 
 /**
  * Defines the table and column names for movie_theater SQLite database.
@@ -18,15 +20,15 @@ public class MovieTheaterContract {
     public static final String CONTENT_AUTHORITY = "com.nate.moviebot5k";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_MOVIES = "movies";
-    public static final String PATH_FAVORITES = "favorites";
+//    public static final String PATH_FAVORITES = "favorites";
     public static final String PATH_GENRES = "genres";
     public static final String PATH_CERTS = "certifications";
     public static final String PATH_CREDITS = "credits";
     public static final String PATH_VIDEOS = "videos";
     public static final String PATH_REVIEWS = "reviews";
-    public static final String PATH_FAVORITES_CREDITS = "favorites_credits";
-    public static final String PATH_FAVORITES_VIDEOS = "favorites_videos";
-    public static final String PATH_FAVORITES_REVIEWS = "favorites_reviews";
+//    public static final String PATH_FAVORITES_CREDITS = "favorites_credits";
+//    public static final String PATH_FAVORITES_VIDEOS = "favorites_videos";
+//    public static final String PATH_FAVORITES_REVIEWS = "favorites_reviews";
     
 //    public static final String PATH_MOVIE_DETAILS = PATH_MOVIES + "/details";
 //    public static final String PATH_FAVORITE_DETAILS = PATH_FAVORITES + "/details";
@@ -74,6 +76,8 @@ public class MovieTheaterContract {
         // stored local file path so that the favorites table can be accessed while offline
         public static final String COLUMN_POSTER_FILE_PATH = "poster_file_path";
         public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
+
+        public static final String COLUMN_IS_FAVORITE = "is_favorite";
     }
     
     
@@ -82,6 +86,7 @@ public class MovieTheaterContract {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_AUTHOR = "author";
         public static final String COLUMN_CONTENT = "content";
+        public static final String COLUMN_IS_FAVORITE = "is_favorite";
     }
     
     
@@ -95,6 +100,7 @@ public class MovieTheaterContract {
 
         // needed to store local profile image file paths so they can be accessed in offline mode
         public static final String COLUMN_PROFILE_FILE_PATH = "profile_file_path";
+        public static final String COLUMN_IS_FAVORITE = "is_favorite";
     }
     
     
@@ -107,6 +113,7 @@ public class MovieTheaterContract {
         public static final String COLUMN_SIZE = "size";
         public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_THUMBNAIL_URL = "thumbnail_url"; // using hqdefault size
+        public static final String COLUMN_IS_FAVORITE = "is_favorite";
     }
 
     
@@ -128,7 +135,7 @@ public class MovieTheaterContract {
                 .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
         public static final String TABLE_NAME = "movies";
         
-        public static final String DETAILS_PATH = "details";
+//        public static final String DETAILS_PATH = "details";
 
         
         // returns a movie Uri (a single record in this table) given a MOVIE id
@@ -150,49 +157,49 @@ public class MovieTheaterContract {
     }
 
 
-    /**
-     * Defines the table contents that FragmentMovieGrid and MovieDetailFragment will access when
-     * hosted by FavoritesActivity and FavoritesPagerActivity (in phone mode).
-     * Basically this will be the table that is used when user is viewing their favorites, which
-     * can be done with or without an internet connection.  The data in this table is identical to
-     * MoviesEntry except that it has 2 additional columns to hold the file paths for the poster
-     * and backdrop images, since they are stored locally.  The records in this table are inserted
-     * or deleted one at a time.
-     */
-    public static final class FavoritesEntry extends MoviesEntryColumns implements BaseColumns {
-
-        // "content://com.nate.moviebot5k/favorites"
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_FAVORITES).build();
-        public static final String CONTENT_TYPE = ContentResolver
-                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver
-                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
-        public static final String TABLE_NAME = "favorites";
-
-        public static final String DETAILS_PATH = "details";
-
-
-//        // 2 additional columns needed to store local poster and backdrop image file paths
-//        // so that the favorites table can be accessed while offline
-//        public static final String COLUMN_POSTER_FILE_PATH = "poster_file_path";
-//        public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
-
-
-        // returns a favorte Uri (a single record in this table) given a MOVIE id
-        // TODO: this is not going to work, needs to use .appendQueryParameter (??)
-        // .withAppendedId will only work for the primary key _id, I think
-        public static Uri buildFavoriteUriFromMovieId(long movieId) {
-            return ContentUris.withAppendedId(CONTENT_URI, movieId);
-        }
-
-//        // use to get the joined table of favorite details joined with videos, reviews, and credits tables
-//        public static Uri buildFavoriteDetailsUriFromMovieId(long movieId) {
-//            return ContentUris.withAppendedId(CONTENT_URI, movieId).buildUpon()
-//                    .appendPath(DETAILS_PATH).build();
+//    /**
+//     * Defines the table contents that FragmentMovieGrid and MovieDetailFragment will access when
+//     * hosted by FavoritesActivity and FavoritesPagerActivity (in phone mode).
+//     * Basically this will be the table that is used when user is viewing their favorites, which
+//     * can be done with or without an internet connection.  The data in this table is identical to
+//     * MoviesEntry except that it has 2 additional columns to hold the file paths for the poster
+//     * and backdrop images, since they are stored locally.  The records in this table are inserted
+//     * or deleted one at a time.
+//     */
+//    public static final class FavoritesEntry extends MoviesEntryColumns implements BaseColumns {
+//
+//        // "content://com.nate.moviebot5k/favorites"
+//        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+//                .appendPath(PATH_FAVORITES).build();
+//        public static final String CONTENT_TYPE = ContentResolver
+//                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
+//        public static final String CONTENT_ITEM_TYPE = ContentResolver
+//                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
+//        public static final String TABLE_NAME = "favorites";
+//
+//        public static final String DETAILS_PATH = "details";
+//
+//
+////        // 2 additional columns needed to store local poster and backdrop image file paths
+////        // so that the favorites table can be accessed while offline
+////        public static final String COLUMN_POSTER_FILE_PATH = "poster_file_path";
+////        public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
+//
+//
+//        // returns a favorte Uri (a single record in this table) given a MOVIE id
+//        // TODO: this is not going to work, needs to use .appendQueryParameter (??)
+//        // .withAppendedId will only work for the primary key _id, I think
+//        public static Uri buildFavoriteUriFromMovieId(long movieId) {
+//            return ContentUris.withAppendedId(CONTENT_URI, movieId);
 //        }
-
-    }
+//
+////        // use to get the joined table of favorite details joined with videos, reviews, and credits tables
+////        public static Uri buildFavoriteDetailsUriFromMovieId(long movieId) {
+////            return ContentUris.withAppendedId(CONTENT_URI, movieId).buildUpon()
+////                    .appendPath(DETAILS_PATH).build();
+////        }
+//
+//    }
 
     
 
@@ -216,26 +223,26 @@ public class MovieTheaterContract {
 
     }
 
-    public static final class FavoritesCreditsEntry extends CreditsEntryColumns implements BaseColumns {
-
-        // "content://com.nate.moviebot5k/favorites_credits"
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_FAVORITES_CREDITS).build();
-        public static final String CONTENT_TYPE = ContentResolver
-                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver
-                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
-        public static final String TABLE_NAME = "favorites_credits";
-
-//        // 1 additional column needed to store the local file location for the image associated
-//        // with the actor/actress for each credits record
-//        public static final String COLUMN_PROFILE_FILE_PATH = "profile_file_path";
-
-        public static Uri buildFavoritesCreditsUriFromMovieId(long movieId) {
-            return ContentUris.withAppendedId(CONTENT_URI, movieId);
-        }
-
-    }
+//    public static final class FavoritesCreditsEntry extends CreditsEntryColumns implements BaseColumns {
+//
+//        // "content://com.nate.moviebot5k/favorites_credits"
+//        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+//                .appendPath(PATH_FAVORITES_CREDITS).build();
+//        public static final String CONTENT_TYPE = ContentResolver
+//                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
+//        public static final String CONTENT_ITEM_TYPE = ContentResolver
+//                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_CREDITS;
+//        public static final String TABLE_NAME = "favorites_credits";
+//
+////        // 1 additional column needed to store the local file location for the image associated
+////        // with the actor/actress for each credits record
+////        public static final String COLUMN_PROFILE_FILE_PATH = "profile_file_path";
+//
+//        public static Uri buildFavoritesCreditsUriFromMovieId(long movieId) {
+//            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+//        }
+//
+//    }
 
 
 
@@ -256,22 +263,22 @@ public class MovieTheaterContract {
 
     }
 
-    public static final class FavoritesVideosEntry extends VideosEntryColumns implements BaseColumns {
-
-        // "content://com.nate.moviebot5k/favorites_videos"
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_FAVORITES_VIDEOS).build();
-        public static final String CONTENT_TYPE = ContentResolver
-                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_VIDEOS;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver
-                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_VIDEOS;
-        public static final String TABLE_NAME = "favorites_videos";
-
-        public static Uri buildFavoritesVideosUriFromMovieId(long movieId) {
-            return ContentUris.withAppendedId(CONTENT_URI, movieId);
-        }
-
-    }
+//    public static final class FavoritesVideosEntry extends VideosEntryColumns implements BaseColumns {
+//
+//        // "content://com.nate.moviebot5k/favorites_videos"
+//        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+//                .appendPath(PATH_FAVORITES_VIDEOS).build();
+//        public static final String CONTENT_TYPE = ContentResolver
+//                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_VIDEOS;
+//        public static final String CONTENT_ITEM_TYPE = ContentResolver
+//                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_VIDEOS;
+//        public static final String TABLE_NAME = "favorites_videos";
+//
+//        public static Uri buildFavoritesVideosUriFromMovieId(long movieId) {
+//            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+//        }
+//
+//    }
 
 
 
@@ -292,22 +299,22 @@ public class MovieTheaterContract {
 
     }
 
-    public static final class FavoritesReviewsEntry extends ReviewsEntryColumns implements BaseColumns {
-
-        // "content://com.nate.moviebot5k/favorites_reviews"
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-                .appendPath(PATH_FAVORITES_REVIEWS).build();
-        public static final String CONTENT_TYPE = ContentResolver
-                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_REVIEWS;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver
-                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_REVIEWS;
-        public static final String TABLE_NAME = "favorites_reviews";
-
-        public static Uri buildFavoritesReviewsUriFromMovieId(long movieId) {
-            return ContentUris.withAppendedId(CONTENT_URI, movieId);
-        }
-
-    }
+//    public static final class FavoritesReviewsEntry extends ReviewsEntryColumns implements BaseColumns {
+//
+//        // "content://com.nate.moviebot5k/favorites_reviews"
+//        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+//                .appendPath(PATH_FAVORITES_REVIEWS).build();
+//        public static final String CONTENT_TYPE = ContentResolver
+//                .CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_REVIEWS;
+//        public static final String CONTENT_ITEM_TYPE = ContentResolver
+//                .CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES_REVIEWS;
+//        public static final String TABLE_NAME = "favorites_reviews";
+//
+//        public static Uri buildFavoritesReviewsUriFromMovieId(long movieId) {
+//            return ContentUris.withAppendedId(CONTENT_URI, movieId);
+//        }
+//
+//    }
     
     
     
