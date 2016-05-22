@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--<LinearLayout
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/main_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_details_phone_mode_container"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
-    &lt;!&ndash; I put the toolbar in this fragment layout so it's programmatically updated movie title
-    and tagline text did not get out of sync with the fragment that was on screen &ndash;&gt;
-    <include layout="@layout/toolbar_details"/>-->
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v4.widget.NestedScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -19,7 +18,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
 
 
             <ImageView
@@ -38,8 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textSize="20sp"
-                android:gravity="center"/>
-
+                android:gravity="center" />
 
 
             <LinearLayout
@@ -63,8 +60,6 @@
                     android:layout_height="wrap_content"
                     android:textSize="20sp"
                     android:text="VIDEO 1 NO DATA" />
-
-
 
             </LinearLayout>
 
@@ -94,28 +89,26 @@
             </LinearLayout>
 
 
-<!--            <TextView
-                android:id="@+id/test_videos3_textview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="VIDEO 3 NO DATA"/>
+            <!--            <TextView
+                            android:id="@+id/test_videos3_textview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:text="VIDEO 3 NO DATA"/>
 
-            <TextView
-                android:id="@+id/test_videos4_textview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="VIDEO 4 NO DATA"/>-->
-
+                        <TextView
+                            android:id="@+id/test_videos4_textview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="20sp"
+                            android:text="VIDEO 4 NO DATA"/>-->
 
 
             <TextView
                 android:id="@+id/test_reviews_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"/>
-
+                android:textSize="16sp" />
 
 
             <LinearLayout
@@ -126,13 +119,13 @@
                 <ImageView
                     android:id="@+id/test_credits_profile_1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/test_credits_textview_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -188,7 +181,23 @@
 
 
         </LinearLayout>
-    </ScrollView>
-<!--
-</LinearLayout>-->
+    </android.support.v4.widget.NestedScrollView>
+
+
+    <!-- NOTE TO SELF: app:layout_anchor documentation can be found here:
+    https://developer.android.com/reference/android/support/design/R.attr.html -->
+    <!-- this FAB widget is using the android.support.design library, and layout_anchor
+    is an ATTRIBUTE.. it's just a public static int -->
+    <!-- layout_anchor and gravity only work INSIDE a coordinate layout -->
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        app:layout_anchor="@id/scrollview"
+        app:layout_anchorGravity="bottom|right|end"
+        app:layout_behavior="com.nate.moviebot5k.ScrollAwareFABBehavior" />
+
+
+</android.support.design.widget.CoordinatorLayout>
 

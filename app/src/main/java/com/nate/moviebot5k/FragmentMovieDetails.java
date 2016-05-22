@@ -273,6 +273,13 @@ public class FragmentMovieDetails extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
+        ButterKnife.bind(this, rootView);
+
+
+
+
+
+
 
 
 //        if(rootView.findViewById(R.id.fragment_details_phone_mode_container) != null) {
@@ -432,7 +439,7 @@ public class FragmentMovieDetails extends Fragment
         View rootView = getView();
 
         if(rootView != null && data.moveToFirst()) {
-            ButterKnife.bind(this, rootView);
+//            ButterKnife.bind(this, rootView);
 
             switch (loader.getId()) {
                 case MOVIES_TABLE_LOADER_ID:
