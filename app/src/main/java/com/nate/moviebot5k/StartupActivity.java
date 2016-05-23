@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -30,7 +31,6 @@ public class StartupActivity extends AppCompatActivity {
 
 
         initializeSharedPrefs();
-        //showDebugLog();
 
         clearCreditsVideosReviewsTables();
 
@@ -46,19 +46,19 @@ public class StartupActivity extends AppCompatActivity {
 
 
     // NOTE: old movies records are deleted every time new movies are fetched in MoviesFetcher
+    // but for these tables, just clean out the non favorites records each time app starts from dead
     private void clearCreditsVideosReviewsTables() {
         Log.i(LOGTAG, "about to clear out credits, videos, and reviews tables but only NON favorites records");
+        String[] selectionArgs = new String[]{ "false" };
+
         getContentResolver().delete(MovieTheaterContract.CreditsEntry.CONTENT_URI,
-                MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE + " = ?",
-                new String[]{ "false" });
+                MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE + " = ?", selectionArgs);
 
         getContentResolver().delete(MovieTheaterContract.VideosEntry.CONTENT_URI,
-                MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE + " = ?",
-                new String[]{ "false" });
+                MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE + " = ?", selectionArgs);
 
         getContentResolver().delete(MovieTheaterContract.ReviewsEntry.CONTENT_URI,
-                MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE + " = ?",
-                new String[]{ "false" });
+                MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE + " = ?", selectionArgs);
     }
 
 
@@ -199,32 +199,4 @@ public class StartupActivity extends AppCompatActivity {
 
     }
 
-    // just pumps out a bunch of stuff that I used when writing this app, mostly db initialization
-    private void showDebugLog() {
-
-        // MovieTheaterContract movies table
-        Log.i(LOGTAG, "MoviesEntry CONTENT_URI: " + MovieTheaterContract.MoviesEntry.CONTENT_URI);
-        Log.i(LOGTAG, "MoviesEntry CONTENT_TYPE: " + MovieTheaterContract.MoviesEntry.CONTENT_TYPE);
-        Log.i(LOGTAG, "MoviesEntry CONTENT_ITEM_TYPE: " + MovieTheaterContract.MoviesEntry.CONTENT_ITEM_TYPE);
-        Log.i(LOGTAG, "MoviesEntry COLUMN_POPULARITY: " + MovieTheaterContract.MoviesEntry.COLUMN_POPULARITY);
-        Log.i(LOGTAG, "MoviesEntry Uri returned from buildMovieUriFromMovieId(999): "
-            + MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(999));
-
-//        // MovieTheaterContract favorites table
-//        Log.i(LOGTAG, "FavoritesEntry CONTENT_URI: " + MovieTheaterContract.FavoritesEntry.CONTENT_URI);
-//        Log.i(LOGTAG, "FavoritesEntry CONTENT_TYPE: " + MovieTheaterContract.FavoritesEntry.CONTENT_TYPE);
-//        Log.i(LOGTAG, "FavoritesEntry CONTENT_ITEM_TYPE: " + MovieTheaterContract.FavoritesEntry.CONTENT_ITEM_TYPE);
-//        Log.i(LOGTAG, "FavoritesEntry COLUMN_POPULARITY: " + MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY);
-//        Log.i(LOGTAG, "FavoritesEntry COLUMN_BACKDROP_FILE_PATH: "
-//                + MovieTheaterContract.FavoritesEntry.COLUMN_BACKDROP_FILE_PATH);
-//        Log.i(LOGTAG, "FavoritesEntry Uri returned from buildMovieUriFromMovieId(888): "
-//                + MovieTheaterContract.FavoritesEntry.buildFavoriteUriFromMovieId(888));
-
-        // MovieTheaterDbHelper create tables
-//        MovieTheaterDbHelper testHelper = new MovieTheaterDbHelper(this);
-//        testHelper.getReadableDatabase();
-
-
-
-    }
 }

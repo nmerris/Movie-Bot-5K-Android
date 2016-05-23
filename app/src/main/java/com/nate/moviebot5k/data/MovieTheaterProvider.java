@@ -38,39 +38,25 @@ public class MovieTheaterProvider extends ContentProvider {
     // and the constants that will be used in switch statements for various ContentProvider methods
     static final int MOVIES_ALL = 1; // used in FragmentMovieGrid to display all movie posters
     static final int MOVIE_WITH_MOVIE_ID = 2; // used in MovieDetailFragment to display 1 movie
-//    static final int FAVORITES_ALL = 3; // used in FragmentMovieGrid to display all favorites posters
-//    static final int FAVORITE_WITH_MOVIE_ID = 4; // used in MovieDetailFragment to display 1 movie
+
     static final int GENRES_ALL = 5; // used to populate genre spinner
     static final int CERTS_ALL = 6; // used to populate certifications spinner
 
     static final int CREDITS_WITH_MOVIE_ID = 7;
     static final int VIDEOS_WITH_MOVIE_ID = 8;
     static final int REVIEWS_WITH_MOVIE_ID = 9;
-//    static final int FAVORITES_CREDITS_WITH_MOVIE_ID = 10;
-//    static final int FAVORITES_VIDEOS_WITH_MOVIE_ID = 11;
-//    static final int FAVORITES_REVIEWS_WITH_MOVIE_ID = 12;
+
     static final int CREDITS_ALL = 13;
     static final int VIDEOS_ALL = 14;
     static final int REVIEWS_ALL = 15;
-//    static final int FAVORITES_CREDITS_ALL = 16;
-//    static final int FAVORITES_VIDEOS_ALL = 17;
-//    static final int FAVORITES_REVIEWS_ALL = 18;
-
-//    static final int MOVIE_WITH_DETAILS = 19;
-//    static final int FAVORITE_WITH_DETAILS = 20;
 
     // SQL selection statements
     private static final String sMovieWithMovieIdSelection = MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
-//    private static final String sFavoriteWithMovieIdSelection = FavoritesEntry.COLUMN_MOVIE_ID + " = ? ";
-
-//    private static final String sMovieWithMovieIdSelection = MoviesEntry.TABLE_NAME + "." + MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
-//    private static final String sFavoriteWithMovieIdSelection = FavoritesEntry.TABLE_NAME + "." + FavoritesEntry.COLUMN_MOVIE_ID + " = ? ";
-
     private static final String sCreditsWithMovieIdSelection = CreditsEntry.COLUMN_MOVIE_ID + " = ? ";
-//    private static final String sFavoritesCreditsWithMovieIdSelection = FavoritesCreditsEntry.COLUMN_MOVIE_ID + " = ? ";
     private static final String sVideosWithMovieIdSelection = VideosEntry.COLUMN_MOVIE_ID + " = ? ";
-//    private static final String sFavoritesVideosWithMovieIdSelection = FavoritesVideosEntry.COLUMN_MOVIE_ID + " = ? ";
     private static final String sReviewsWithMovieIdSelection = ReviewsEntry.COLUMN_MOVIE_ID + " = ? ";
+
+
 //    private static final String sFavoritesReviewsWithMovieIdSelection = ReviewsEntry.COLUMN_MOVIE_ID + " = ? ";
 
 //    private static final SQLiteQueryBuilder sMovieDetails;
@@ -147,11 +133,6 @@ public class MovieTheaterProvider extends ContentProvider {
 //    }
 
 
-
-
-
-
-
     static UriMatcher buildUriMatcher() {
         Log.i(LOGTAG, "entered buildUriMatcher");
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -159,27 +140,16 @@ public class MovieTheaterProvider extends ContentProvider {
 
         matcher.addURI(authority, MovieTheaterContract.PATH_MOVIES, MOVIES_ALL);
         matcher.addURI(authority, MovieTheaterContract.PATH_MOVIES + "/#", MOVIE_WITH_MOVIE_ID);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES, FAVORITES_ALL);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES + "/#", FAVORITE_WITH_MOVIE_ID);
         matcher.addURI(authority, MovieTheaterContract.PATH_GENRES, GENRES_ALL);
         matcher.addURI(authority, MovieTheaterContract.PATH_CERTS, CERTS_ALL);
 
         matcher.addURI(authority, MovieTheaterContract.PATH_VIDEOS + "/#", VIDEOS_WITH_MOVIE_ID);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_VIDEOS + "/#", FAVORITES_VIDEOS_WITH_MOVIE_ID);
         matcher.addURI(authority, MovieTheaterContract.PATH_CREDITS + "/#", CREDITS_WITH_MOVIE_ID);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_CREDITS + "/#", FAVORITES_CREDITS_WITH_MOVIE_ID);
         matcher.addURI(authority, MovieTheaterContract.PATH_REVIEWS + "/#", REVIEWS_WITH_MOVIE_ID);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_REVIEWS + "/#", FAVORITES_REVIEWS_WITH_MOVIE_ID);
 
         matcher.addURI(authority, MovieTheaterContract.PATH_CREDITS, CREDITS_ALL);
         matcher.addURI(authority, MovieTheaterContract.PATH_VIDEOS, VIDEOS_ALL);
         matcher.addURI(authority, MovieTheaterContract.PATH_REVIEWS, REVIEWS_ALL);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_CREDITS, FAVORITES_CREDITS_ALL);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_VIDEOS, FAVORITES_VIDEOS_ALL);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES_REVIEWS, FAVORITES_REVIEWS_ALL);
-
-//        matcher.addURI(authority, MovieTheaterContract.PATH_MOVIES + "/#/" + MoviesEntry.DETAILS_PATH, MOVIE_WITH_DETAILS);
-//        matcher.addURI(authority, MovieTheaterContract.PATH_FAVORITES + "/#/" + FavoritesEntry.DETAILS_PATH, FAVORITE_WITH_DETAILS);
 
         return matcher;
     }
@@ -202,7 +172,6 @@ public class MovieTheaterProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case MOVIES_ALL:
-//            case FAVORITES_ALL:
             case GENRES_ALL:
             case CERTS_ALL:
             case VIDEOS_ALL:
@@ -221,145 +190,6 @@ public class MovieTheaterProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-
-            // this app will only ever query for one specific movie, by movieId,
-//            case MOVIE_WITH_MOVIE_ID:
-//                Log.i(LOGTAG,"  uri matched to switch statement MOVIE_WITH_MOVIE_ID");
-//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sMovieWithMovieIdSelection);
-//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-//
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        MoviesEntry.TABLE_NAME,
-//                        projection,
-//                        sMovieWithMovieIdSelection,
-//                        new String[] {uri.getLastPathSegment()},
-//                        null, null, null);
-//                break;
-
-//            case FAVORITE_WITH_MOVIE_ID:
-//                Log.i(LOGTAG,"  uri matched to switch statement FAVORITE_WITH_MOVIE_ID");
-//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoriteWithMovieIdSelection);
-//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-//
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        FavoritesEntry.TABLE_NAME,
-//                        projection,
-//                        sFavoriteWithMovieIdSelection,
-//                        new String[] {uri.getLastPathSegment()},
-//                        null, null, null);
-//                break;
-
-            
-//            case CREDITS_WITH_MOVIE_ID:
-//                Log.i(LOGTAG,"  uri matched to switch statement CREDITS_WITH_MOVIE_ID");
-//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sCreditsWithMovieIdSelection);
-//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-//
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        CreditsEntry.TABLE_NAME,
-//                        projection,
-//                        sCreditsWithMovieIdSelection,
-//                        new String[] {uri.getLastPathSegment()},
-//                        null, null, null);
-//                break;
-//
-//            case VIDEOS_WITH_MOVIE_ID:
-//                Log.i(LOGTAG,"  uri matched to switch statement VIDEOS_WITH_MOVIE_ID");
-//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sVideosWithMovieIdSelection);
-//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-//
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        VideosEntry.TABLE_NAME,
-//                        projection,
-//                        sVideosWithMovieIdSelection,
-//                        new String[] {uri.getLastPathSegment()},
-//                        null, null, null);
-//                break;
-//
-//            case REVIEWS_WITH_MOVIE_ID:
-//                Log.i(LOGTAG,"  uri matched to switch statement REVIEWS_WITH_MOVIE_ID");
-//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sReviewsWithMovieIdSelection);
-//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-//
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        ReviewsEntry.TABLE_NAME,
-//                        projection,
-//                        sReviewsWithMovieIdSelection,
-//                        new String[] {uri.getLastPathSegment()},
-//                        null, null, null);
-//                break;
-
-//            case FAVORITES_CREDITS_WITH_MOVIE_ID:
-//                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_CREDITS_WITH_MOVIE_ID");
-//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesCreditsWithMovieIdSelection);
-//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-//
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        FavoritesCreditsEntry.TABLE_NAME,
-//                        projection,
-//                        sFavoritesCreditsWithMovieIdSelection,
-//                        new String[] {uri.getLastPathSegment()},
-//                        null, null, null);
-//                break;
-//
-//            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
-//                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_VIDEOS_WITH_MOVIE_ID");
-//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesVideosWithMovieIdSelection);
-//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-//
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        FavoritesVideosEntry.TABLE_NAME,
-//                        projection,
-//                        sFavoritesVideosWithMovieIdSelection,
-//                        new String[] {uri.getLastPathSegment()},
-//                        null, null, null);
-//                break;
-//
-//            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
-//                Log.i(LOGTAG,"  uri matched to switch statement FAVORITES_REVIEWS_WITH_MOVIE_ID");
-//                Log.i(LOGTAG,"    ignoring selection passed in, instead using: " + sFavoritesReviewsWithMovieIdSelection);
-//                Log.i(LOGTAG,"    ignoring selectionArg passed in, instead using: " + uri.getLastPathSegment());
-//
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        FavoritesReviewsEntry.TABLE_NAME,
-//                        projection,
-//                        sFavoritesReviewsWithMovieIdSelection,
-//                        new String[] {uri.getLastPathSegment()},
-//                        null, null, null);
-//                break;
-
-//            case MOVIE_WITH_DETAILS:
-//                Log.i(LOGTAG, "  uri matched to switch statement MOVIE_WITH_DETAILS");
-//
-//                // testing
-//                List<String> pathSegments = uri.getPathSegments();
-//                for(int i = 0; i < pathSegments.size(); i++) {
-//                    Log.i(LOGTAG, "    and uri path segment at: " + i + " is: " + pathSegments.get(i));
-//                }
-//
-//                retCursor = sMovieDetails.query(mOpenHelper.getReadableDatabase(),
-//                        projection,
-//                        sMovieWithMovieIdSelection, // "movies.movie_id = ? "
-//                        new String[]{ pathSegments.get(1) }, // movieId
-//                        null, null,
-//                        sortOrder);
-//                break;
-//
-//            case FAVORITE_WITH_DETAILS:
-//
-//                // TODO: implement this same way as above after making sure above works
-//                retCursor = null;
-//
-//                break;
-//
-//            case CREDITS_ALL:
-//            case VIDEOS_ALL:
-//            case REVIEWS_ALL:
-//            case FAVORITES_CREDITS_ALL:
-//            case FAVORITES_VIDEOS_ALL:
-//            case FAVORITES_REVIEWS_ALL:
-//                throw new UnsupportedOperationException(
-//                        "!!!!! DO NOT QUERY THE FAV/CREDITS, FAV/VIDEOS, OR FAV/REVIEWS TABLE WITHOUT A MOVIEID !!!!!" + uri);
 
             default:
                 throw new UnsupportedOperationException("I do not understand this URI: " + uri);
@@ -380,12 +210,8 @@ public class MovieTheaterProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case MOVIES_ALL:
                 return MoviesEntry.CONTENT_TYPE;
-//            case FAVORITES_ALL:
-//                return FavoritesEntry.CONTENT_TYPE;
             case MOVIE_WITH_MOVIE_ID:
                 return MoviesEntry.CONTENT_ITEM_TYPE;
-//            case FAVORITE_WITH_MOVIE_ID:
-//                return FavoritesEntry.CONTENT_ITEM_TYPE;
             case GENRES_ALL:
                 return GenresEntry.CONTENT_TYPE;
             case CERTS_ALL:
@@ -393,16 +219,10 @@ public class MovieTheaterProvider extends ContentProvider {
 
             case CREDITS_WITH_MOVIE_ID:
                 return CreditsEntry.CONTENT_ITEM_TYPE;
-//            case FAVORITES_CREDITS_WITH_MOVIE_ID:
-//                return FavoritesCreditsEntry.CONTENT_ITEM_TYPE;
             case VIDEOS_WITH_MOVIE_ID:
                 return VideosEntry.CONTENT_ITEM_TYPE;
-//            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
-//                return FavoritesVideosEntry.CONTENT_ITEM_TYPE;
             case REVIEWS_WITH_MOVIE_ID:
                 return ReviewsEntry.CONTENT_ITEM_TYPE;
-//            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
-//                return FavoritesReviewsEntry.CONTENT_ITEM_TYPE;
 
             case CREDITS_ALL:
                 return CreditsEntry.CONTENT_TYPE;
@@ -410,12 +230,6 @@ public class MovieTheaterProvider extends ContentProvider {
                 return VideosEntry.CONTENT_TYPE;
             case REVIEWS_ALL:
                 return ReviewsEntry.CONTENT_TYPE;
-//            case FAVORITES_CREDITS_ALL:
-//                return CreditsEntry.CONTENT_TYPE;
-//            case FAVORITES_VIDEOS_ALL:
-//                return VideosEntry.CONTENT_TYPE;
-//            case FAVORITES_REVIEWS_ALL:
-//                return ReviewsEntry.CONTENT_TYPE;
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -528,9 +342,6 @@ public class MovieTheaterProvider extends ContentProvider {
             case CREDITS_ALL:
             case VIDEOS_ALL:
             case REVIEWS_ALL:
-//            case FAVORITES_CREDITS_ALL:
-//            case FAVORITES_VIDEOS_ALL:
-//            case FAVORITES_REVIEWS_ALL:
                 Log.i(LOGTAG, "  uri.getLastPathSegment, ie table name to bulkInsert into: " + uri.getLastPathSegment());
 
                 db.beginTransaction();
@@ -548,11 +359,8 @@ public class MovieTheaterProvider extends ContentProvider {
                 break;
 
             case CREDITS_WITH_MOVIE_ID:
-//            case FAVORITES_CREDITS_WITH_MOVIE_ID:
             case VIDEOS_WITH_MOVIE_ID:
-//            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
             case REVIEWS_WITH_MOVIE_ID:
-//            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
                 throw new UnsupportedOperationException("!!!! DO NOT BULKINSERT TO THE CREDITS, VIDEOS, OR" +
                         "REVIEWS TABLE WITH PATH ENDING IN MOVIE ID B/C EACH RECORD ALREADY HAS THE MOVIE_ID IN IT");
 
@@ -605,63 +413,7 @@ public class MovieTheaterProvider extends ContentProvider {
 
                 // in these cases, the uri points to the entire table
                 getContext().getContentResolver().notifyChange(uri, null);
-
-
-//                Log.i(LOGTAG, "  about to wipe out all records from table: " + uri.getLastPathSegment());
-//                // get the table name from the uri and wipe all the records
-//                // passing "1" to where clause will make db.delete return the number of rows deleted
-//                // when deleting all rows
-//                // should look like "DELETE FROM [tableName]"
-//                rowsDeleted = db.delete(uri.getLastPathSegment(), "1", null);
-//
-//                // in these cases, the uri points to the entire table
-//                getContext().getContentResolver().notifyChange(uri, null);
                 break;
-
-//            case FAVORITE_WITH_MOVIE_ID:
-//                Log.i(LOGTAG, "  about to wipe out a single record from favorites table," +
-//                        " with movieId: " + uri.getLastPathSegment());
-//
-//                // should look like "DELETE FROM favorites WHERE movie_id = [movieId]"
-//                rowsDeleted = db.delete(
-//                        FavoritesEntry.TABLE_NAME,
-//                        FavoritesEntry.COLUMN_MOVIE_ID + " = ? ", // "movie_id = ? "
-//                        new String[] {uri.getLastPathSegment()});
-//
-//                // I am not sure if I should be calling update on the ENTIRE table or just the one
-//                // record that was deleted..
-////                Log.i(LOGTAG, "    ********** about to call getContentResolver.notifyChange on the ENTIRE favorites table");
-////                Log.i(LOGTAG, "         I need to figure out it it's okay to just call the notify on the specific record" +
-////                        " that was update, which would be the URI passed in: " + uri);
-////                getContext().getContentResolver().notifyChange(FavoritesEntry.CONTENT_URI, null);
-//
-//                // seems like updating the specific record makes more sense, as opposed to above
-//                // then again... both MGF and MDF will be using different cursors to display their data,
-//                // and I want them both to update when a single record is removed from favorites table,
-//                // so mayby BOTH need to be update here?????????????????
-//                // TODO: figure this out
-//                Log.i(LOGTAG, "    ********** about to call getContentResolver.notifyChange on ONLY the uri passed in, which points to a single favorites records");
-//                Log.i(LOGTAG, "         Is this okay?  do I need to notifyChange on the entire favorites table?  URI passed in: " + uri);
-//                getContext().getContentResolver().notifyChange(uri, null);
-//                break;
-//
-//
-//
-//            case FAVORITES_CREDITS_WITH_MOVIE_ID:
-//                rowsDeleted = 0;
-//                Log.i(LOGTAG, "  in DELETE, no implementation for FAVORITES_CREDITS_WITH_MOVIE_ID yet, should prob. make sure delete for FAVORITE_WITH_MOVIE_ID works fist");
-//                break;
-//
-//            case FAVORITES_VIDEOS_WITH_MOVIE_ID:
-//                rowsDeleted = 0;
-//                Log.i(LOGTAG, "  in DELETE, no implementation for FAVORITES_VIDEOS_WITH_MOVIE_ID yet, should prob. make sure delete for FAVORITE_WITH_MOVIE_ID works fist");
-//
-//                break;
-//
-//            case FAVORITES_REVIEWS_WITH_MOVIE_ID:
-//                rowsDeleted = 0;
-//                Log.i(LOGTAG, "  in DELETE, no implementation for FAVORITES_REVIEWS_WITH_MOVIE_ID yet, should prob. make sure delete for FAVORITE_WITH_MOVIE_ID works fist");
-//                break;
 
             default:
                 throw new UnsupportedOperationException("delete only supports wiping out the entire" +
@@ -730,28 +482,6 @@ public class MovieTheaterProvider extends ContentProvider {
                         " and URI should end with movieId");
 
         }
-
-//
-//
-//        if(sUriMatcher.match(uri) == MOVIE_WITH_MOVIE_ID) {
-//            Log.i(LOGTAG, "  and about to update movies table after matching uri to MOVIE_WITH_MOVIE_ID");
-//            Log.i(LOGTAG, "    and am ignoring selection and selectionArgs, will just get movieId from URI");
-//            final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-//
-//            numUpdated = db.update(
-//                    MoviesEntry.TABLE_NAME,
-//                    values,
-//                    sMovieWithMovieIdSelection, // "movie_id = ? "
-//                    new String[]{ uri.getLastPathSegment() });
-//        }
-//
-//
-//
-//
-//        else {
-//            throw new UnsupportedOperationException("This DB only allows updates to the movies table" +
-//                    " with URI for movie record with movieId");
-//        }
 
     }
 

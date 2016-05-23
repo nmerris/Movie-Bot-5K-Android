@@ -7,16 +7,12 @@ import android.util.Log;
 
 import com.nate.moviebot5k.ActivitySingleFragment;
 import com.nate.moviebot5k.data.MovieTheaterContract.MoviesEntry;
-//import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.GenresEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.CertsEntry;
 
 import com.nate.moviebot5k.data.MovieTheaterContract.CreditsEntry;
-//import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesCreditsEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.VideosEntry;
-//import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesVideosEntry;
 import com.nate.moviebot5k.data.MovieTheaterContract.ReviewsEntry;
-//import com.nate.moviebot5k.data.MovieTheaterContract.FavoritesReviewsEntry;
 
 
 
@@ -77,20 +73,11 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_BACKDROP_FILE_PATH + " TEXT, " +
                 MoviesEntry.COLUMN_IS_FAVORITE + " TEXT NOT NULL"; // use 'true' or 'false'
 
-        
         // create a table to hold the currently 'showing' movies
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MoviesEntry.TABLE_NAME + "(" + 
                 SQL_MOVIES_COLUMNS + ");";
         Log.i(LOGTAG, "onCreate movies table SQL: " + SQL_CREATE_MOVIES_TABLE);
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
-        
-//        // create a table to hold favorites, same as movies except also has local poster
-//        // and backdrop paths for offline access, used by
-//        final String SQL_CREATE_FAVORITES_TABLE = "CREATE TABLE " + FavoritesEntry.TABLE_NAME + "(" +
-//                SQL_MOVIES_COLUMNS + ");";
-//        Log.i(LOGTAG, "onCreate favorites table SQL: " + SQL_CREATE_FAVORITES_TABLE);
-//        db.execSQL(SQL_CREATE_FAVORITES_TABLE);
-
 
 
 
@@ -105,17 +92,10 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                         VideosEntry.COLUMN_THUMBNAIL_URL + " TEXT, " +
                         VideosEntry.COLUMN_IS_FAVORITE + " TEXT NOT NULL";
 
-
         final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " + VideosEntry.TABLE_NAME + "(" +
                 SQL_VIDEOS_COLUMNS + ");";
         Log.i(LOGTAG, "onCreate videos table SQL: " + SQL_CREATE_VIDEOS_TABLE);
         db.execSQL(SQL_CREATE_VIDEOS_TABLE);
-
-//        final String SQL_CREATE_FAVORITES_VIDEOS_TABLE = "CREATE TABLE " + FavoritesVideosEntry.TABLE_NAME + "(" +
-//                SQL_VIDEOS_COLUMNS + ");";
-//        Log.i(LOGTAG, "onCreate favorites_videos table SQL: " + SQL_CREATE_FAVORITES_VIDEOS_TABLE);
-//        db.execSQL(SQL_CREATE_FAVORITES_VIDEOS_TABLE);
-
 
 
 
@@ -129,17 +109,10 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                         CreditsEntry.COLUMN_PROFILE_FILE_PATH + " TEXT, " +
                         CreditsEntry.COLUMN_IS_FAVORITE + " TEXT NOT NULL";
 
-
         final String SQL_CREATE_CREDITS_TABLE = "CREATE TABLE " + CreditsEntry.TABLE_NAME + "(" +
                 SQL_CREDITS_COLUMNS + ");";
         Log.i(LOGTAG, "onCreate credits table SQL: " + SQL_CREATE_CREDITS_TABLE);
         db.execSQL(SQL_CREATE_CREDITS_TABLE);
-
-//        final String SQL_CREATE_FAVORITES_CREDITS_TABLE = "CREATE TABLE " + FavoritesCreditsEntry.TABLE_NAME + "(" +
-//                SQL_CREDITS_COLUMNS + ");";
-//        Log.i(LOGTAG, "onCreate favorites_credits table SQL: " + SQL_CREATE_FAVORITES_CREDITS_TABLE);
-//        db.execSQL(SQL_CREATE_FAVORITES_CREDITS_TABLE);
-
 
 
 
@@ -154,11 +127,6 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 SQL_REVIEWS_COLUMNS + ");";
         Log.i(LOGTAG, "onCreate reviews table SQL: " + SQL_CREATE_REVIEWS_TABLE);
         db.execSQL(SQL_CREATE_REVIEWS_TABLE);
-
-//        final String SQL_CREATE_FAVORITES_REVIEWS_TABLE = "CREATE TABLE " + FavoritesReviewsEntry.TABLE_NAME + "(" +
-//                SQL_REVIEWS_COLUMNS + ");";
-//        Log.i(LOGTAG, "onCreate favorites_reviews table SQL: " + SQL_CREATE_FAVORITES_REVIEWS_TABLE);
-//        db.execSQL(SQL_CREATE_FAVORITES_REVIEWS_TABLE);
         
 
         
@@ -170,7 +138,9 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 GenresEntry.COLUMN_NAME + " TEXT NOT NULL);";
         Log.i(LOGTAG, "onCreate genres table SQL: " + SQL_CREATE_GENRES_TABLE);
         db.execSQL(SQL_CREATE_GENRES_TABLE);
-        
+
+
+
         // create a table for certifications, similar to genres table (like G, PG, PG-13, etc)
         final String SQL_CREATE_CERTS_TABLE = "CREATE TABLE " + CertsEntry.TABLE_NAME + "(" +
                 CertsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
@@ -191,16 +161,12 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         // so do not change the DATABASE_VERSION or everything will get wiped out!
         // you would need a strategy to preserve the users favorites here
         db.execSQL("DROP TABLE IF EXISTS " + MoviesEntry.TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + FavoritesEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + GenresEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + CertsEntry.TABLE_NAME);
 
         db.execSQL("DROP TABLE IF EXISTS " + CreditsEntry.TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + FavoritesCreditsEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + VideosEntry.TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + FavoritesVideosEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ReviewsEntry.TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + FavoritesReviewsEntry.TABLE_NAME);
 
         // and recreate them from scratch
         onCreate(db);
