@@ -2,4 +2,5 @@
 <resources>
     <!-- tablet mode uses horizontal spinner fragment layout -->
     <item name="fragment_filter_spinners_ref" type="layout">@layout/fragment_filter_spinners_horizontal</item>
+    <item name="fragment_filter_details_ref" type="layout">@layout/fragment_movie_details</item>
 </resources>

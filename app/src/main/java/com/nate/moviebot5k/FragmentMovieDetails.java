@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -260,7 +261,10 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
+
+        // the ref points to the same details frag layout on tablet and phone portrait,
+        // but points to a wider layout in phone landscape
+        View rootView = inflater.inflate(R.layout.fragment_movie_details_ref, container, false);
         ButterKnife.bind(this, rootView);
 
         // TODO: I'm really not sure where to put initLoader..
@@ -271,46 +275,6 @@ public class FragmentMovieDetails extends Fragment
 
         return rootView;
     }
-
-
-//    @Override
-//    public void onResume() {
-//        Log.e(LOGTAG, "entered onResume and mMovieId is: " + mMovieId);
-////        Log.e(LOGTAG, "  and mMovieId is: " + mMovieId);
-//
-//
-//        // TODO: I think this can be moved to onCreate, since this fragment is only ever created from scratch
-//        // when it's host does a frag txn
-////        fireFetchDetailsTaskIfNecessary();
-//
-//
-//        super.onResume();
-//    }
-
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        Log.i(LOGTAG, "entered onActivityCreated");
-//
-//        // start the appropriate Loader depending on which Activity is hosting this fragment
-////        if(mUseFavorites) {
-////            Log.i(LOGTAG, "  and about to init all FAVORITES loaders");
-//////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-//////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-//////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-//////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-////        }
-////        else {
-////            Log.i(LOGTAG, "  and about to init all NON-favorites loaders");
-////            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
-////        }
-//
-//        super.onActivityCreated(savedInstanceState);
-//    }
-
-
 
 
     @Override
@@ -365,6 +329,10 @@ public class FragmentMovieDetails extends Fragment
             switch (loader.getId()) {
                 case MOVIES_LOADER_ID:
 
+
+//                    FloatingActionButton fab = rootView.findViewById(R.id.)
+
+
                     // backdrop image
                     Picasso.with(getActivity())
                             .load(data.getString(COLUMN_BACKDROP_PATH))
@@ -401,7 +369,11 @@ public class FragmentMovieDetails extends Fragment
                             "Runtime: " + runtime + "\n");
 
                     break;
-                
+
+
+
+
+
                 case VIDEOS_LOADER_ID:
                     Log.e(LOGTAG, "  from videos table loader, key: " + data.getString(COLUMN_VIDEO_KEY));
 
@@ -438,6 +410,10 @@ public class FragmentMovieDetails extends Fragment
                     }
                     break;
 
+
+
+
+
                 case REVIEWS_LOADER_ID:
 
                     // testing
@@ -455,6 +431,10 @@ public class FragmentMovieDetails extends Fragment
                     
                     mReviewsTextView.setText(testRevText);
                     break;
+
+
+
+
 
                 case CREDITS_LOADER_ID:
                     // better check for null here.. some cast may not have a profile img path

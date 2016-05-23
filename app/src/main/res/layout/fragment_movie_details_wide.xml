@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- TODO: everything in this layout is prob. going to be identical to phone portrait, so need to clean that up in one file -->
+<!-- TODO: this is just a copy of fragment_movie_details right now, will need to modify it for phone land -->
+<!-- NOTE: taglet is always land, and so it's aspect ratio is similar to phone port, so no need for separate tablet layout -->
 
 <android.support.design.widget.CoordinatorLayout
     android:id="@+id/main_content"
