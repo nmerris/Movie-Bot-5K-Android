@@ -208,7 +208,7 @@ public class MovieTheaterProvider extends ContentProvider {
             case VIDEOS_ALL:
             case REVIEWS_ALL:
             case CREDITS_ALL:
-                Log.i(LOGTAG, "  uri matched to switch statement case for ALL records from one of the tables");
+                Log.i(LOGTAG, "  uri matched to switch statement case for ALL records from one of the tables, but selection and selectionArgs will be honored");
                 Log.i(LOGTAG, "    and table name being used for mOpenHelper.query, after extracting from uri," +
                                 " is: " + uri.getLastPathSegment());
 
@@ -569,22 +569,22 @@ public class MovieTheaterProvider extends ContentProvider {
     }
 
 
-    /**
-     * Only allowed to delete entire movies, certifications, or genres tables, for example:
-     * "content://com.nate.moviebot5k/movies" will wipe out the entire movies table.
-     *
-     * Only other allowed uri is to delete a single favorites table record with a movieId as the last segment
-     * in the uri, for example:
-     * "content://com.nate.moviebot5k/favorites/[movieId]"
-     *
-     * All other uri's will throw an unsupported operation exception.
-     *
-     * @param uri the uri of the data to delete
-     * @param selection not used, ok to always be null
-     * @param selectionArgs not used, ok to always be null
-     * @return the number of records deleted
-     * @throws UnsupportedOperationException
-     */
+//    /**
+//     * Only allowed to delete entire movies, certifications, or genres tables, for example:
+//     * "content://com.nate.moviebot5k/movies" will wipe out the entire movies table.
+//     *
+//     * Only other allowed uri is to delete a single favorites table record with a movieId as the last segment
+//     * in the uri, for example:
+//     * "content://com.nate.moviebot5k/favorites/[movieId]"
+//     *
+//     * All other uri's will throw an unsupported operation exception.
+//     *
+//     * @param uri the uri of the data to delete
+//     * @param selection not used, ok to always be null
+//     * @param selectionArgs not used, ok to always be null
+//     * @return the number of records deleted
+//     * @throws UnsupportedOperationException
+//     */
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         Log.i(LOGTAG, "entered delete");
@@ -599,16 +599,23 @@ public class MovieTheaterProvider extends ContentProvider {
             case CREDITS_ALL:
             case VIDEOS_ALL:
             case REVIEWS_ALL:
+                Log.i(LOGTAG, "  about to wipe out records from table: " + uri.getLastPathSegment());
 
-                Log.i(LOGTAG, "  about to wipe out all records from table: " + uri.getLastPathSegment());
-                // get the table name from the uri and wipe all the records
-                // passing "1" to where clause will make db.delete return the number of rows deleted
-                // when deleting all rows
-                // should look like "DELETE FROM [tableName]"
-                rowsDeleted = db.delete(uri.getLastPathSegment(), "1", null);
+                rowsDeleted = db.delete(uri.getLastPathSegment(), selection, selectionArgs);
 
                 // in these cases, the uri points to the entire table
                 getContext().getContentResolver().notifyChange(uri, null);
+
+
+//                Log.i(LOGTAG, "  about to wipe out all records from table: " + uri.getLastPathSegment());
+//                // get the table name from the uri and wipe all the records
+//                // passing "1" to where clause will make db.delete return the number of rows deleted
+//                // when deleting all rows
+//                // should look like "DELETE FROM [tableName]"
+//                rowsDeleted = db.delete(uri.getLastPathSegment(), "1", null);
+//
+//                // in these cases, the uri points to the entire table
+//                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
 //            case FAVORITE_WITH_MOVIE_ID:
@@ -673,6 +680,9 @@ public class MovieTheaterProvider extends ContentProvider {
     }
 
 
+    // the movies table is update with a few more columns of data in MovieDetailsFetcher,
+    // additionally ANY table can be updated when user selects or deselects a favorte movie, which
+    // also triggers updates to all credits, reviews, and videos records with the same movie_id
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Log.i(LOGTAG, "entered update");

@@ -103,7 +103,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                         VideosEntry.COLUMN_SIZE + " INTEGER, " +
                         VideosEntry.COLUMN_TYPE + " TEXT, " +
                         VideosEntry.COLUMN_THUMBNAIL_URL + " TEXT, " +
-                        VideosEntry.COLUMN_IS_FAVORITE + " INTEGER";
+                        VideosEntry.COLUMN_IS_FAVORITE + " TEXT NOT NULL";
 
 
         final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " + VideosEntry.TABLE_NAME + "(" +
@@ -127,7 +127,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                         CreditsEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
                         CreditsEntry.COLUMN_PROFILE_PATH + " TEXT, " +
                         CreditsEntry.COLUMN_PROFILE_FILE_PATH + " TEXT, " +
-                        CreditsEntry.COLUMN_IS_FAVORITE + " INTEGER";
+                        CreditsEntry.COLUMN_IS_FAVORITE + " TEXT NOT NULL";
 
 
         final String SQL_CREATE_CREDITS_TABLE = "CREATE TABLE " + CreditsEntry.TABLE_NAME + "(" +
@@ -148,7 +148,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                         ReviewsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                         ReviewsEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
                         ReviewsEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
-                        ReviewsEntry.COLUMN_IS_FAVORITE + " INTEGER";
+                        ReviewsEntry.COLUMN_IS_FAVORITE + " TEXT NOT NULL";
 
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + ReviewsEntry.TABLE_NAME + "(" +
                 SQL_REVIEWS_COLUMNS + ");";

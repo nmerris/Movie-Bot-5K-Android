@@ -95,7 +95,6 @@ public class MovieDetailsFetcher {
         values.put(MovieTheaterContract.MoviesEntry.COLUMN_RUNTIME, jsonBody.getInt("runtime")); // in min
         values.put(MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE, jsonBody.getString("tagline"));
 
-
         // populate up to 4 genre columns, I'm just ignoring more than that
         JSONArray genresJsonArray = jsonBody.getJSONArray("genres");
         try {
@@ -107,10 +106,6 @@ public class MovieDetailsFetcher {
         } catch (JSONException e) {
                 Log.i(LOGTAG, "  there were less than 4 genre names associated with this movie, this is not an error");
         }
-        
-        
-        
-        
 
         int numUpdated = mContext.getContentResolver()
                 .update(MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
@@ -121,6 +116,9 @@ public class MovieDetailsFetcher {
         Log.i(LOGTAG, "  runtime: " + jsonBody.getLong("runtime"));
         Log.i(LOGTAG, "  budget: " + jsonBody.getLong("budget"));
         Log.i(LOGTAG, "  numRecords updated in movies table: " + numUpdated);
+
+
+
 
 
 
@@ -152,12 +150,15 @@ public class MovieDetailsFetcher {
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_THUMBNAIL_URL, youtubeVideoThumbnailUrl);
 
             // testing
-            Log.i(LOGTAG, "  added video table record with movie_id: " + mMovieId);
+            Log.i(LOGTAG, "  added video table ContenValues obj with movie_id: " + mMovieId);
             Log.i(LOGTAG, "    and with key: " + jsonObject.getString("key"));
             Log.i(LOGTAG, "    and with size: " + jsonObject.getInt("size"));
             Log.i(LOGTAG, "    and with type: " + jsonObject.getString("type"));
             Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
             Log.e(LOGTAG, "    and with thumbnail URL: " + youtubeVideoThumbnailUrl);
+
+            // set the is_favorite column to FALSE
+            valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE, "false");
 
             valuesVidsVector.add(valuesVideos);
         }
@@ -176,6 +177,9 @@ public class MovieDetailsFetcher {
                     .bulkInsert(MovieTheaterContract.VideosEntry.CONTENT_URI, valuesVidsArray);
         }
         Log.d(LOGTAG, "        num videos inserted to videos table was: " + numVideosInserted);
+
+
+
 
 
 
@@ -204,6 +208,9 @@ public class MovieDetailsFetcher {
             Log.i(LOGTAG, "    and with author: " + jsonObject.getString("author"));
             Log.i(LOGTAG, "    and with content: " + jsonObject.getString("content"));
 
+            // set the is_favorite column to FALSE
+            valuesReviews.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, "false");
+
             // add the single object to the ContentValues Vector
             valuesReviewsVector.add(valuesReviews);
         }
@@ -222,6 +229,9 @@ public class MovieDetailsFetcher {
                     .bulkInsert(MovieTheaterContract.ReviewsEntry.CONTENT_URI, valuesReviewsArray);
         }
         Log.d(LOGTAG, "        num reviews inserted to reviews table was: " + numReviewsInserted);
+
+
+
 
 
 
@@ -264,6 +274,9 @@ public class MovieDetailsFetcher {
 //            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
 //            Log.i(LOGTAG, "    and with profile path: " + profileImageUrl);
 //            Log.i(LOGTAG, "    and with profile order: " + jsonObject.getInt("order"));
+
+            // set the is_favorite column to FALSE
+            valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE, "false");
 
             // add the single object to the ContentValues Vector
             valuesCreditsVector.add(valuesCredits);

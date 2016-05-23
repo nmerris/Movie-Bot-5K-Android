@@ -247,6 +247,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
             MovieTheaterContract.MoviesEntry._ID,
             MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID,
+            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH,
             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
             MovieTheaterContract.MoviesEntry.COLUMN_POPULARITY,
             MovieTheaterContract.MoviesEntry.COLUMN_VOTE_AVG,
@@ -268,11 +269,10 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         if(id == MOVIES_LOADER_ID) {
             Log.i(LOGTAG, "  and about to return new MOVIES_LOADER");
 
-            return new CursorLoader(
-                    getActivity(),
+            return new CursorLoader(getActivity(),
                     MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
                     MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
-                    MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?", // select by is_favorites
+                    MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ? ", // select by is_favorites
                     new String[]{ String.valueOf(mUseFavorites) }, // select the data based on mUseFavorites
                     null);
         }
@@ -311,6 +311,12 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         // update the ArrayList that contains the movieIds this fragment is showing
         mMovieIds = Utility.getMovieIdList(getActivity());
+
+        if(data == null) Log.e(LOGTAG, "  and data is NULL");
+        else Log.e(LOGTAG, "  and data is NOT NULL");
+
+        if(data.moveToFirst()) Log.i(LOGTAG, "    and data.moveToFist was successful");
+        else Log.i(LOGTAG, "    and data.moveToFist was NOT successful");
 
         // swap the cursor so the adapter can load the new images
         mMoviePosterAdapter.swapCursor(data);

@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
@@ -42,14 +40,14 @@ public class FragmentMovieDetails extends Fragment
     private Callbacks mCallbacks;
 
 
-    private static final int FAVORITES_TABLE_LOADER_ID = R.id.loader_favorites_movies_fragment_movie_details;
-    private static final int MOVIES_TABLE_LOADER_ID = R.id.loader_movies_fragment_movie_details;
-    private static final int CREDITS_TABLE_LOADER_ID = R.id.loader_credits_fragment_movie_details;
-    private static final int FAVORITES_CREDITS_TABLE_LOADER_ID = R.id.loader_favorites_credits_fragment_movie_details;
-    private static final int VIDEOS_TABLE_LOADER_ID = R.id.loader_videos_fragment_movie_details;
-    private static final int FAVORITES_VIDEOS_TABLE_LOADER_ID = R.id.loader_favorites_videos_fragment_movie_details;
-    private static final int REVIEWS_TABLE_LOADER_ID = R.id.loader_reviews_fragment_movie_details;
-    private static final int FAVORITES_REVIEWS_TABLE_LOADER_ID = R.id.loader_favorites_reviews_fragment_movie_details;
+//    private static final int FAVORITES_TABLE_LOADER_ID = R.id.loader_favorites_movies_fragment_movie_details;
+    private static final int MOVIES_LOADER_ID = R.id.loader_movies_fragment_movie_details;
+    private static final int CREDITS_LOADER_ID = R.id.loader_credits_fragment_movie_details;
+//    private static final int FAVORITES_CREDITS_TABLE_LOADER_ID = R.id.loader_favorites_credits_fragment_movie_details;
+    private static final int VIDEOS_LOADER_ID = R.id.loader_videos_fragment_movie_details;
+//    private static final int FAVORITES_VIDEOS_TABLE_LOADER_ID = R.id.loader_favorites_videos_fragment_movie_details;
+    private static final int REVIEWS_LOADER_ID = R.id.loader_reviews_fragment_movie_details;
+//    private static final int FAVORITES_REVIEWS_TABLE_LOADER_ID = R.id.loader_favorites_reviews_fragment_movie_details;
 
 
     private SharedPreferences mSharedPrefs;
@@ -98,7 +96,8 @@ public class FragmentMovieDetails extends Fragment
             MovieTheaterContract.MoviesEntry.COLUMN_RUNTIME,
             MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE,
             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
-            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH
+            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH,
+            MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE
     };
     private static final int COLUMN_MOVIE_ID = 1; // need only for testing
     private static final int COLUMN_OVERVIEW = 2;
@@ -116,17 +115,20 @@ public class FragmentMovieDetails extends Fragment
     private static final int COLUMN_TAGLINE = 14;
     private static final int COLUMN_POSTER_FILE_PATH = 15;
     private static final int COLUMN_BACKDROP_FILE_PATH = 16;
+    private static final int COLUMN_IS_FAVORITE = 17;
     
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] REVIEWS_PROJECTION = {
             MovieTheaterContract.ReviewsEntry._ID,
             MovieTheaterContract.ReviewsEntry.COLUMN_MOVIE_ID,
             MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR,
-            MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT
+            MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT,
+//            MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE
     };
     private static final int COLUMN_REVIEW_AUTHOR = 2;
     private static final int COLUMN_REVIEW_CONTENT = 3;
-    
+//    private static final int COLUMN_IS_FAVORITE = 3;
+
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] CREDITS_PROJECTION = {
             MovieTheaterContract.CreditsEntry._ID,
@@ -135,13 +137,15 @@ public class FragmentMovieDetails extends Fragment
             MovieTheaterContract.CreditsEntry.COLUMN_NAME,
             MovieTheaterContract.CreditsEntry.COLUMN_ORDER,
             MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH,
-            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH
+            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
+            MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE
     };
     private static final int COLUMN_CHARACTER = 2;
     private static final int COLUMN_CAST_NAME = 3;
 //    private static final int COLUMN_ORDER = 4;
     private static final int COLUMN_PROFILE_PATH = 5;
     private static final int COLUMN_PROFILE__FILE_PATH = 6;
+//    private static final int COLUMN_IS_FAVORITE = 6;
 
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] VIDEOS_PROJECTION = {
@@ -151,13 +155,15 @@ public class FragmentMovieDetails extends Fragment
             MovieTheaterContract.VideosEntry.COLUMN_SITE,
             MovieTheaterContract.VideosEntry.COLUMN_TYPE,
             MovieTheaterContract.VideosEntry.COLUMN_THUMBNAIL_URL,
-            MovieTheaterContract.VideosEntry.COLUMN_NAME
+            MovieTheaterContract.VideosEntry.COLUMN_NAME,
+//            MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE
     };
     private static final int COLUMN_VIDEO_KEY = 2;
     private static final int COLUMN_VIDEO_SITE = 3;
     private static final int COLUMN_VIDEO_TYPE = 4;
     private static final int COLUMN_VIDEO_THUMBNAIL_URL = 5;
     private static final int COLUMN_VIDEO_NAME = 6;
+//    private static final int COLUMN_IS_FAVORITE = 6;
 
 
 
@@ -304,24 +310,27 @@ public class FragmentMovieDetails extends Fragment
 
 
 
+        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+        getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+        getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+        getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
 
 
 
-
-        if(mUseFavorites) {
-            Log.i(LOGTAG, "  and about to init all FAVORITES loaders");
-//            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-//            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-//            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-//            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
-        }
-        else {
-            Log.i(LOGTAG, "  and about to init all NON-favorites loaders");
-            getLoaderManager().initLoader(MOVIES_TABLE_LOADER_ID, null, this);
-            getLoaderManager().initLoader(CREDITS_TABLE_LOADER_ID, null, this);
-            getLoaderManager().initLoader(VIDEOS_TABLE_LOADER_ID, null, this);
-            getLoaderManager().initLoader(REVIEWS_TABLE_LOADER_ID, null, this);
-        }
+//        if(mUseFavorites) {
+//            Log.i(LOGTAG, "  and about to init all FAVORITES loaders");
+////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(FAVORITES_TABLE_LOADER_ID, null, this);
+//        }
+//        else {
+//            Log.i(LOGTAG, "  and about to init all NON-favorites loaders");
+//            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+//            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+//            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+//        }
 
 
 
@@ -357,10 +366,10 @@ public class FragmentMovieDetails extends Fragment
 ////        }
 ////        else {
 ////            Log.i(LOGTAG, "  and about to init all NON-favorites loaders");
-////            getLoaderManager().initLoader(MOVIES_TABLE_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(CREDITS_TABLE_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(VIDEOS_TABLE_LOADER_ID, null, this);
-////            getLoaderManager().initLoader(REVIEWS_TABLE_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+////            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
 ////        }
 //
 //        super.onActivityCreated(savedInstanceState);
@@ -374,57 +383,75 @@ public class FragmentMovieDetails extends Fragment
         Log.i(LOGTAG, "entered onCreateLoader");
 
 
+        // TODO: clean this up
+        String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
+        String[] selectionArgs =
+                new String[]{ String.valueOf(mMovieId), String.valueOf(mUseFavorites) };
+
 
         switch (id) {
-            case MOVIES_TABLE_LOADER_ID:
+            case MOVIES_LOADER_ID:
                 Log.i(LOGTAG, "  and about to return new MOVIES_TABLE_LOADER");
                 return new CursorLoader(getActivity(),
-                        MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-                        MOVIES_PROJECTION, null, null, null);
+                        MovieTheaterContract.MoviesEntry.CONTENT_URI,
+                        MOVIES_PROJECTION,
+                        selectMovieIdAndIsFav,
+                        selectionArgs,
+                        null);
 
-            case FAVORITES_TABLE_LOADER_ID:
-                Log.i(LOGTAG, "  and about to return new FAVORITES_TABLE_LOADER");
+//            case FAVORITES_TABLE_LOADER_ID:
+//                Log.i(LOGTAG, "  and about to return new FAVORITES_TABLE_LOADER");
+//                return new CursorLoader(getActivity(),
+//                        MovieTheaterContract.FavoritesEntry.buildFavoriteUriFromMovieId(mMovieId),
+//                        MOVIES_PROJECTION, null, null, null);
+
+            case VIDEOS_LOADER_ID:
+                Log.i(LOGTAG, "  and about to return new VIDEOS_LOADER_ID");
                 return new CursorLoader(getActivity(),
-                        MovieTheaterContract.FavoritesEntry.buildFavoriteUriFromMovieId(mMovieId),
-                        MOVIES_PROJECTION, null, null, null);
+                        MovieTheaterContract.VideosEntry.CONTENT_URI,
+                        VIDEOS_PROJECTION,
+                        selectMovieIdAndIsFav,
+                        selectionArgs,
+                        null);
 
-            case VIDEOS_TABLE_LOADER_ID:
-                Log.i(LOGTAG, "  and about to return new VIDEOS_TABLE_LOADER_ID");
+//            case FAVORITES_VIDEOS_TABLE_LOADER_ID:
+//                Log.i(LOGTAG, "  and about to return new FAVORITES_VIDEOS_TABLE_LOADER_ID");
+//                return new CursorLoader(getActivity(),
+//                        MovieTheaterContract.FavoritesVideosEntry.buildFavoritesVideosUriFromMovieId(mMovieId),
+//                        VIDEOS_PROJECTION, null, null, null);
+
+            case REVIEWS_LOADER_ID:
+                Log.i(LOGTAG, "  and about to return new REVIEWS_LOADER_ID");
                 return new CursorLoader(getActivity(),
-                        MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
-                        VIDEOS_PROJECTION, null, null, null);
+                        MovieTheaterContract.ReviewsEntry.CONTENT_URI,
+                        REVIEWS_PROJECTION,
+                        selectMovieIdAndIsFav,
+                        selectionArgs,
+                        null);
+//
+//            case FAVORITES_REVIEWS_TABLE_LOADER_ID:
+//                Log.i(LOGTAG, "  and about to return new FAVORITES_REVIEWS_TABLE_LOADER_ID");
+//                return new CursorLoader(getActivity(),
+//                        MovieTheaterContract.FavoritesReviewsEntry.buildFavoritesReviewsUriFromMovieId(mMovieId),
+//                        REVIEWS_PROJECTION, null, null, null);
 
-            case FAVORITES_VIDEOS_TABLE_LOADER_ID:
-                Log.i(LOGTAG, "  and about to return new FAVORITES_VIDEOS_TABLE_LOADER_ID");
-                return new CursorLoader(getActivity(),
-                        MovieTheaterContract.FavoritesVideosEntry.buildFavoritesVideosUriFromMovieId(mMovieId),
-                        VIDEOS_PROJECTION, null, null, null);
-
-            case REVIEWS_TABLE_LOADER_ID:
-                Log.i(LOGTAG, "  and about to return new REVIEWS_TABLE_LOADER_ID");
-                return new CursorLoader(getActivity(),
-                        MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
-                        REVIEWS_PROJECTION, null, null, null);
-
-            case FAVORITES_REVIEWS_TABLE_LOADER_ID:
-                Log.i(LOGTAG, "  and about to return new FAVORITES_REVIEWS_TABLE_LOADER_ID");
-                return new CursorLoader(getActivity(),
-                        MovieTheaterContract.FavoritesReviewsEntry.buildFavoritesReviewsUriFromMovieId(mMovieId),
-                        REVIEWS_PROJECTION, null, null, null);
-
-        case CREDITS_TABLE_LOADER_ID:
-            Log.i(LOGTAG, "  and about to return new CREDITS_TABLE_LOADER_ID");
+        case CREDITS_LOADER_ID:
+            Log.i(LOGTAG, "  and about to return new CREDITS_LOADER_ID");
             return new CursorLoader(getActivity(),
-                    MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
-                    CREDITS_PROJECTION, null, null,
-                    MovieTheaterContract.CreditsEntry.COLUMN_ORDER + " ASC");
+                    MovieTheaterContract.CreditsEntry.CONTENT_URI,
+                    null,
+//                    CREDITS_PROJECTION,
+                    selectMovieIdAndIsFav,
+                    selectionArgs,
+                    null);
+//                    MovieTheaterContract.CreditsEntry.COLUMN_ORDER + " ASC");
 
-        case FAVORITES_CREDITS_TABLE_LOADER_ID:
-            Log.i(LOGTAG, "  and about to return new FAVORITES_CREDITS_TABLE_LOADER_ID");
-            return new CursorLoader(getActivity(),
-                    MovieTheaterContract.FavoritesCreditsEntry.buildFavoritesCreditsUriFromMovieId(mMovieId),
-                    CREDITS_PROJECTION, null, null,
-                    MovieTheaterContract.CreditsEntry.COLUMN_ORDER + " ASC");
+//        case FAVORITES_CREDITS_TABLE_LOADER_ID:
+//            Log.i(LOGTAG, "  and about to return new FAVORITES_CREDITS_TABLE_LOADER_ID");
+//            return new CursorLoader(getActivity(),
+//                    MovieTheaterContract.FavoritesCreditsEntry.buildFavoritesCreditsUriFromMovieId(mMovieId),
+//                    CREDITS_PROJECTION, null, null,
+//                    MovieTheaterContract.CreditsEntry.COLUMN_ORDER + " ASC");
 
         }
 
@@ -438,11 +465,13 @@ public class FragmentMovieDetails extends Fragment
         Log.i(LOGTAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entered onLoadFinished");
         View rootView = getView();
 
+        if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
+
         if(rootView != null && data.moveToFirst()) {
 //            ButterKnife.bind(this, rootView);
 
             switch (loader.getId()) {
-                case MOVIES_TABLE_LOADER_ID:
+                case MOVIES_LOADER_ID:
 
                     // backdrop image
                     Picasso.with(getActivity())
@@ -481,12 +510,12 @@ public class FragmentMovieDetails extends Fragment
 
                     break;
                 
-                case FAVORITES_TABLE_LOADER_ID:
-                    break;
+//                case FAVORITES_TABLE_LOADER_ID:
+//                    break;
                 
                 
                 
-                case VIDEOS_TABLE_LOADER_ID:
+                case VIDEOS_LOADER_ID:
                     Log.e(LOGTAG, "  from videos table loader, key: " + data.getString(COLUMN_VIDEO_KEY));
 
                     // testing, prob. need some kind of adapter in due to varying numbers of videos
@@ -524,10 +553,10 @@ public class FragmentMovieDetails extends Fragment
                 
                 
                 
-                case FAVORITES_VIDEOS_TABLE_LOADER_ID:
-                    break;
+//                case FAVORITES_VIDEOS_TABLE_LOADER_ID:
+//                    break;
                 
-                case REVIEWS_TABLE_LOADER_ID:
+                case REVIEWS_LOADER_ID:
 
                     // testing
                     String testRevText = "REVIEW AUTHOR 1: " + data.getString(COLUMN_REVIEW_AUTHOR) +
@@ -545,12 +574,12 @@ public class FragmentMovieDetails extends Fragment
                     mReviewsTextView.setText(testRevText);
                     break;
 
-                case FAVORITES_REVIEWS_TABLE_LOADER_ID:
-                    break;
+//                case FAVORITES_REVIEWS_TABLE_LOADER_ID:
+//                    break;
 
                 
                 
-                case CREDITS_TABLE_LOADER_ID:
+                case CREDITS_LOADER_ID:
                     // better check for null here.. some cast may not have a profile img path
                     // the credits order should already be correct due to the order param passed
                     // in when this particular loader was created
@@ -594,8 +623,11 @@ public class FragmentMovieDetails extends Fragment
                     }
                     break;
 
-                case FAVORITES_CREDITS_TABLE_LOADER_ID:
-                    break;
+                default:
+                    Log.e(LOGTAG, "    DEFAULT CASE REACHED IN ON-LOAD-FINISHED IN MOV DETAIL FRAGMENT!!");
+
+//                case FAVORITES_CREDITS_TABLE_LOADER_ID:
+//                    break;
                 
             } // end switch
         } // end if(rootView != null...)
@@ -659,7 +691,7 @@ public class FragmentMovieDetails extends Fragment
 
         @Override
         protected Void doInBackground(Void... params) {
-            Log.i(LOGTAG, "just entered FetchMoviesTask.doInBackground");
+            Log.i(LOGTAG, "just entered FetchMovieDetailsTask.doInBackground");
             return new MovieDetailsFetcher(context, mMovieId).fetchMovieDetails();
         }
 
@@ -667,20 +699,27 @@ public class FragmentMovieDetails extends Fragment
         protected void onPostExecute(Void v) {
             Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader");
 
-            // now that the db has been updated with new movie detail data,
-            // restart the loader that lives in the class that contains this inner class
-            if(mUseFavorites) {
-                getLoaderManager().restartLoader(FAVORITES_TABLE_LOADER_ID, null, loaderCallbacks);
-                getLoaderManager().restartLoader(FAVORITES_VIDEOS_TABLE_LOADER_ID, null, loaderCallbacks);
-                getLoaderManager().restartLoader(FAVORITES_CREDITS_TABLE_LOADER_ID, null, loaderCallbacks);
-                getLoaderManager().restartLoader(FAVORITES_REVIEWS_TABLE_LOADER_ID, null, loaderCallbacks);
 
-            } else {
-                getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, loaderCallbacks);
-//                getLoaderManager().restartLoader(CREDITS_TABLE_LOADER_ID, null, loaderCallbacks);
-//                getLoaderManager().restartLoader(REVIEWS_TABLE_LOADER_ID, null, loaderCallbacks);
-                getLoaderManager().restartLoader(VIDEOS_TABLE_LOADER_ID, null, loaderCallbacks);
-            }
+            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+
+
+//            // now that the db has been updated with new movie detail data,
+//            // restart the loader that lives in the class that contains this inner class
+//            if(mUseFavorites) {
+//                getLoaderManager().restartLoader(FAVORITES_TABLE_LOADER_ID, null, loaderCallbacks);
+//                getLoaderManager().restartLoader(FAVORITES_VIDEOS_TABLE_LOADER_ID, null, loaderCallbacks);
+//                getLoaderManager().restartLoader(FAVORITES_CREDITS_TABLE_LOADER_ID, null, loaderCallbacks);
+//                getLoaderManager().restartLoader(FAVORITES_REVIEWS_TABLE_LOADER_ID, null, loaderCallbacks);
+//
+//            } else {
+//                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+////                getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
+////                getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
+//                getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+//            }
         }
     }
 
@@ -690,10 +729,16 @@ public class FragmentMovieDetails extends Fragment
 
         if(!mUseFavorites) {
 
+            String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
+            String[] selectionArgs =
+                    new String[]{ String.valueOf(mMovieId), "false" };
+
             Cursor cursorCredits = getActivity().getContentResolver().query(
-                    MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
-                    new String[] {MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID},
-                    null, null, null);
+                    MovieTheaterContract.CreditsEntry.CONTENT_URI,
+                    new String[] {MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID}, // only need to check for existence of movie_id here
+                    selectMovieIdAndIsFav,
+                    selectionArgs,
+                    null);
             Log.i(LOGTAG, "  cursorCredits.getCount: " + cursorCredits.getCount());
 
 
@@ -702,16 +747,20 @@ public class FragmentMovieDetails extends Fragment
             // videos, credits, or reviews data ever being written to the db
             if(cursorCredits != null && cursorCredits.getCount() == 0) {
                 Cursor cursorVideos = getActivity().getContentResolver().query(
-                        MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
+                        MovieTheaterContract.VideosEntry.CONTENT_URI,
                         new String[] {MovieTheaterContract.VideosEntry.COLUMN_MOVIE_ID},
-                        null, null, null);
+                        selectMovieIdAndIsFav,
+                        selectionArgs,
+                        null);
                 Log.i(LOGTAG, "    cursorVideos.getCount: " + cursorVideos.getCount());
 
                 if(cursorVideos != null && cursorVideos.getCount() == 0) {
                     Cursor cursorReviews = getActivity().getContentResolver().query(
-                            MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
+                            MovieTheaterContract.ReviewsEntry.CONTENT_URI,
                             new String[] {MovieTheaterContract.ReviewsEntry.COLUMN_MOVIE_ID},
-                            null, null, null);
+                            selectMovieIdAndIsFav,
+                            selectionArgs,
+                            null);
                     Log.i(LOGTAG, "      cursorReviews.getCount: " + cursorReviews.getCount());
 
                     if(cursorReviews != null && cursorReviews.getCount() == 0) {

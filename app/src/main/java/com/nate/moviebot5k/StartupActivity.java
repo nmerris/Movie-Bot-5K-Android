@@ -45,18 +45,20 @@ public class StartupActivity extends AppCompatActivity {
     }
 
 
-    // NOTE: the movies table is wiped out every time a new api call is successfully made in FragmentMovieGrid
-    // the reason these tables are wiped out here are because we want to their data around while the user
-    // is currently in an 'app session'.. it would not be efficient to wipe each of these tables out
-    // every time a new movie is clicked to view details.. it's possible the user might navigate back
-    // to the same movie details page they were recently on.. that being said, considering the almost
-    // limitless amount of movies that this app may see, it does not make sense to keep this data around
-    // forever, furthermore the reviews and videos might change from time to time
+    // NOTE: old movies records are deleted every time new movies are fetched in MoviesFetcher
     private void clearCreditsVideosReviewsTables() {
-        Log.i(LOGTAG, "about to clear out credits, videos, and reviews tables");
-        getContentResolver().delete(MovieTheaterContract.CreditsEntry.CONTENT_URI, null, null);
-        getContentResolver().delete(MovieTheaterContract.VideosEntry.CONTENT_URI, null, null);
-        getContentResolver().delete(MovieTheaterContract.ReviewsEntry.CONTENT_URI, null, null);
+        Log.i(LOGTAG, "about to clear out credits, videos, and reviews tables but only NON favorites records");
+        getContentResolver().delete(MovieTheaterContract.CreditsEntry.CONTENT_URI,
+                MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE + " = ?",
+                new String[]{ "false" });
+
+        getContentResolver().delete(MovieTheaterContract.VideosEntry.CONTENT_URI,
+                MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE + " = ?",
+                new String[]{ "false" });
+
+        getContentResolver().delete(MovieTheaterContract.ReviewsEntry.CONTENT_URI,
+                MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE + " = ?",
+                new String[]{ "false" });
     }
 
 
@@ -102,9 +104,11 @@ public class StartupActivity extends AppCompatActivity {
             // so just arbitrarily use movie_id
             else {
                 Cursor cursor = getContentResolver().query(
-                        MovieTheaterContract.FavoritesEntry.CONTENT_URI,
-                        new String[]{MovieTheaterContract.FavoritesEntry.COLUMN_MOVIE_ID},
-                        null, null, null);
+                        MovieTheaterContract.MoviesEntry.CONTENT_URI,
+                        new String[]{MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID},
+                        MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?",
+                        new String[]{ "true" },
+                        null);
 
                 if(cursor == null) {
                     Log.e(LOGTAG, "    Woah there buddy, somehow a Cursor was null, this should never happen!");
@@ -206,15 +210,15 @@ public class StartupActivity extends AppCompatActivity {
         Log.i(LOGTAG, "MoviesEntry Uri returned from buildMovieUriFromMovieId(999): "
             + MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(999));
 
-        // MovieTheaterContract favorites table
-        Log.i(LOGTAG, "FavoritesEntry CONTENT_URI: " + MovieTheaterContract.FavoritesEntry.CONTENT_URI);
-        Log.i(LOGTAG, "FavoritesEntry CONTENT_TYPE: " + MovieTheaterContract.FavoritesEntry.CONTENT_TYPE);
-        Log.i(LOGTAG, "FavoritesEntry CONTENT_ITEM_TYPE: " + MovieTheaterContract.FavoritesEntry.CONTENT_ITEM_TYPE);
-        Log.i(LOGTAG, "FavoritesEntry COLUMN_POPULARITY: " + MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY);
-        Log.i(LOGTAG, "FavoritesEntry COLUMN_BACKDROP_FILE_PATH: "
-                + MovieTheaterContract.FavoritesEntry.COLUMN_BACKDROP_FILE_PATH);
-        Log.i(LOGTAG, "FavoritesEntry Uri returned from buildMovieUriFromMovieId(888): "
-                + MovieTheaterContract.FavoritesEntry.buildFavoriteUriFromMovieId(888));
+//        // MovieTheaterContract favorites table
+//        Log.i(LOGTAG, "FavoritesEntry CONTENT_URI: " + MovieTheaterContract.FavoritesEntry.CONTENT_URI);
+//        Log.i(LOGTAG, "FavoritesEntry CONTENT_TYPE: " + MovieTheaterContract.FavoritesEntry.CONTENT_TYPE);
+//        Log.i(LOGTAG, "FavoritesEntry CONTENT_ITEM_TYPE: " + MovieTheaterContract.FavoritesEntry.CONTENT_ITEM_TYPE);
+//        Log.i(LOGTAG, "FavoritesEntry COLUMN_POPULARITY: " + MovieTheaterContract.FavoritesEntry.COLUMN_POPULARITY);
+//        Log.i(LOGTAG, "FavoritesEntry COLUMN_BACKDROP_FILE_PATH: "
+//                + MovieTheaterContract.FavoritesEntry.COLUMN_BACKDROP_FILE_PATH);
+//        Log.i(LOGTAG, "FavoritesEntry Uri returned from buildMovieUriFromMovieId(888): "
+//                + MovieTheaterContract.FavoritesEntry.buildFavoriteUriFromMovieId(888));
 
         // MovieTheaterDbHelper create tables
 //        MovieTheaterDbHelper testHelper = new MovieTheaterDbHelper(this);

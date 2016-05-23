@@ -214,6 +214,9 @@ public class MoviesFetcher {
 ////            Log.d(LOGTAG, "  and genre_id_4: " + genresJsonArray.getInt(3));
 
 
+            // set the is_favorite column to FALSE
+            values.put(MoviesEntry.COLUMN_IS_FAVORITE, "false");
+
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
         }
@@ -221,12 +224,15 @@ public class MoviesFetcher {
         if(valuesVector.size() > 0) { // no point in doing anything if no data could be obtained
             // TODO: can get rid of numDeleted after testing
 
-            Log.i(LOGTAG, "  about to wipe out old movies table data, calling delete with uri: " + MoviesEntry.CONTENT_URI);
+            Log.i(LOGTAG, "  about to wipe out old movies table data but only NON favorites, calling delete with uri: " + MoviesEntry.CONTENT_URI);
             // wipe out the old data
             int numDeleted = mContext.getContentResolver()
-                    .delete(MoviesEntry.CONTENT_URI, null, null);
+                    .delete(MoviesEntry.CONTENT_URI,
+                            MoviesEntry.COLUMN_IS_FAVORITE + " = ?",
+                            new String[]{ "false" });
 
-            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
+            Log.i(LOGTAG, "    number of NON favorites records deleted: " + numDeleted);
+
 
 
             Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
