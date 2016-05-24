@@ -116,9 +116,15 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
 
+            // this fragment is being hosted by ActivityHome
             if(!mUseFavorites /*&& mSharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)*/) {
                 Log.i(LOGTAG, "  and since !mUseFavorites, about to fire a FetchMoviesTask");
                 new FetchMoviesTask(getActivity(), this).execute();
+            }
+            else { // this fragment is being hosted by ActivityFavorites
+                Log.i(LOGTAG, "  and since mUseFavorites is TRUE, about to restart LOADER, which will only select favorites records");
+                mMovieIds = new ArrayList<>();
+                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
             }
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
@@ -241,6 +247,17 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             if(mUseFavorites) {
                 // only load the movies that are marked as favorite in the movies table in db
 
+                return new CursorLoader(getActivity(),
+                        MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
+                        MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
+                        MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?", // not my most proud java coding moment here, but it works
+                        new String[]{ "true" }, // select only the rows that match the movieIds returned by movies fetcher
+                        null); // TODO: the sortOrder will be whatever the sorby spinner is set to..
+                // remember this code block can only be reached if FavoritesAct is hosting this fragment
+                // really I think I was going to store a value to sharedPrefs, like currSelectedFavSortBy
+                // and call that up here, elsewhere it would need to be set any time the user changes the
+                // sortby selection in the spinner, it's important to keep track of both a fav sortby
+                // and a 'normal' home act sortby
 
 
 
@@ -281,19 +298,31 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i(LOGTAG, "entered onLoadFinished, about to swap data on cursor for poster adapter");
+        Log.i(LOGTAG, "entered onLoadFinished");
 
-        // update the ArrayList that contains the movieIds this fragment is showing
-//        mMovieIds = Utility.getMovieIdList(getActivity());
+        // if this app is using the favorites table, that means it's being hosted by ActivityFavorites,
+        // in which case a fetch movies task will never fire.. so mMovieIds List will not be initialized
+        // in this case since that is normall done when the task completes, instead just need to create
+        // the list from the cursor that was created when the cursor loader was started in onCreate
+        if(mUseFavorites) {
+            Log.i(LOGTAG, "  and mUseFavorites is TRUE, so about to populate mMovieIds list from cursor that returned all the favorites");
+            if(data != null && data.moveToFirst()) {
+                while(!data.isAfterLast()) {
+                    mMovieIds.add(data.getInt(MOVIES_TABLE_COL_MOVIE_ID));
+                    Log.e(LOGTAG, "    just added to mMovieIds list: " + data.getInt(MOVIES_TABLE_COL_MOVIE_ID));
+                    data.moveToNext();
+                }
+                Log.i(LOGTAG, "      num movieIds now in list: " + mMovieIds.size());
 
-//        if(data == null) Log.e(LOGTAG, "  and data is NULL");
-//        else Log.e(LOGTAG, "  and data is NOT NULL");
-//
-//        if(data.moveToFirst()) Log.i(LOGTAG, "    and data.moveToFist was successful");
-//        else Log.i(LOGTAG, "    and data.moveToFist was NOT successful");
+            }
+        }
+
 
         // swap the cursor so the adapter can load the new images
-        mMoviePosterAdapter.swapCursor(data);
+//        mMoviePosterAdapter.swapCursor(data);
+        mMoviePosterAdapter.changeCursor(data);
+
+
 
     }
 
@@ -323,7 +352,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         @Override
         protected void onPostExecute(ArrayList<Integer> movieIdList) {
-            Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, numMovies fetched was: " + movieIdList.size());
+            Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, about to restart loader, size of ArrayList movieIdList is: " + movieIdList.size());
             mMovieIds = movieIdList;
             getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
         }

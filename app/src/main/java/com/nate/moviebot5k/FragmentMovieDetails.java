@@ -766,6 +766,7 @@ public class FragmentMovieDetails extends Fragment
             boolean initialFavState = Boolean.valueOf(cursor.getString(0));
             Log.i(LOGTAG, "  FAB listener.onClick, movieId is: " + mMovieId);
             Log.i(LOGTAG, "    and before anything else, column is_favorite for that id is: " + initialFavState);
+            cursor.close();
 
 
 
@@ -783,40 +784,6 @@ public class FragmentMovieDetails extends Fragment
                     contentValues,
                     MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
                     new String[]{ String.valueOf(mMovieId) });
-
-            cursor.close();
-//
-//            // if db already has value of false for column is_favorite, set isNowFavorite to true
-//            boolean isNowFavorite = cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE)).equals("false");
-//            Log.e(LOGTAG, "in FabListener.. isNowFavorite (should be toggle of whatever button was before it was clicked) is now: " + isNowFavorite);
-//
-//            // set fab drawable to the appropriate image
-//            int fabDrawable = isNowFavorite ?
-//                    R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
-//            mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
-//
-//            // create a one column ContentValues to use top update the db
-//            ContentValues cv = new ContentValues();
-//            Log.i(LOGTAG, "  String.valueOf(isNowFavorites): " + String.valueOf(isNowFavorite));
-//            cv.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, String.valueOf(isNowFavorite));
-//
-//            // update db, in this case the provider takes care of selection and selection args
-//            // it grabs them from the URI
-//            int numUpdated = getActivity().getContentResolver().update(
-//                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-//                    cv, null, null);
-//
-//
-//
-//            String newIsFavorite = cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE));
-//
-//            cursor1.close();
-
-//
-//            Log.i(LOGTAG, "    after updating db, column is_favorite is now: " + newIsFavorite);
-//
-//
-//            Log.i(LOGTAG, "  and num records updated (should be 1) was: " + numUpdated);
 
         }
     }
