@@ -234,13 +234,31 @@ public class FragmentMovieDetails extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
+        Log.i(LOGTAG, "******** JUST ENTERED ONACTIVITYCREATED ******");
 
         // TODO: I'm really not sure where to put initLoader..
-        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-        getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-        getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-        getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+//                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+//                getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, this);
+//                getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, this);
+//                getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, this);
+                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
 
+            // if this fragment is null, might need to fetch movie details, will only happen if the db
+            // does not have details data for current mMovieId
+            // only need to do it if user is not viewing favorites
+//            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
+//                fireFetchDetailsTaskIfNecessary(); // this will restart the loader if it fires the task
+//            }
+//            // should I be using initLoader?  does it matter if savedInstanceState is null?
+//            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
+//                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+//                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+//                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+//            }
 
 
 
@@ -268,7 +286,17 @@ public class FragmentMovieDetails extends Fragment
 
             // if this fragment is null, might need to fetch movie details, will only happen if the db
             // does not have details data for current mMovieId
-            fireFetchDetailsTaskIfNecessary();
+            // only need to do it if user is not viewing favorites
+            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
+//                fireFetchDetailsTaskIfNecessary(); // this will restart the loader if it fires the task
+                new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
+            }
+//            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
+//                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+//                getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, this);
+//                getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, this);
+//                getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, this);
+//            }
 
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
@@ -293,12 +321,6 @@ public class FragmentMovieDetails extends Fragment
         // but points to a wider layout in phone landscape
         View rootView = inflater.inflate(R.layout.fragment_movie_details_ref, container, false);
         ButterKnife.bind(this, rootView);
-
-//        // TODO: I'm really not sure where to put initLoader..
-//        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-//        getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-//        getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-//        getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
 
         return rootView;
     }
@@ -352,7 +374,7 @@ public class FragmentMovieDetails extends Fragment
 //        Log.i(LOGTAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entered onLoadFinished");
         View rootView = getView();
 
-//        if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
+        if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
 
 
 
@@ -776,14 +798,44 @@ public class FragmentMovieDetails extends Fragment
 //            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
             mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
 
-            // update the db
+            // update the db tables
             ContentValues contentValues = new ContentValues();
-            contentValues.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
-            getActivity().getContentResolver().update(
+
+            contentValues.put("is_favorite", String.valueOf(!initialFavState));
+            int numMovieRecordsUpated = getActivity().getContentResolver().update(
                     MovieTheaterContract.MoviesEntry.CONTENT_URI,
                     contentValues,
                     MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
                     new String[]{ String.valueOf(mMovieId) });
+            Log.i(LOGTAG, "      num movies table records updated: " + numMovieRecordsUpated);
+
+//            contentValues.put(MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
+            int numVideosRecordsUpdated = getActivity().getContentResolver().update(
+                    MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
+                    contentValues,
+                    null,
+                    null);
+            Log.i(LOGTAG, "      num videos table records updated: " + numVideosRecordsUpdated);
+
+
+//            contentValues.put(MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
+            int numCreditsRecordsUpdated = getActivity().getContentResolver().update(
+                    MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
+                    contentValues,
+                    null,
+                    null);
+            Log.i(LOGTAG, "      num credits table records updated: " + numCreditsRecordsUpdated);
+
+
+//            contentValues.put(MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
+            int numReviewsRecordsUpdated = getActivity().getContentResolver().update(
+                    MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
+                    contentValues,
+                    null,
+                    null);
+            Log.i(LOGTAG, "      num reviews table records updated: " + numReviewsRecordsUpdated);
+
+
 
         }
     }
@@ -838,7 +890,7 @@ public class FragmentMovieDetails extends Fragment
 
         @Override
         protected Void doInBackground(Void... params) {
-//            Log.i(LOGTAG, "just entered FetchMovieDetailsTask.doInBackground");
+            Log.i(LOGTAG, "just entered FetchMovieDetailsTask.doInBackground");
             return new MovieDetailsFetcher(context, mMovieId).fetchMovieDetails();
         }
 
@@ -906,6 +958,7 @@ public class FragmentMovieDetails extends Fragment
                 cursorVideos.close();
             }
             cursorCredits.close();
+//            Log.i(LOGTAG, "ABOUT TO EXIT FFDTIN");
         }
         
     }

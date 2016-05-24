@@ -124,7 +124,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             else { // this fragment is being hosted by ActivityFavorites
                 Log.i(LOGTAG, "  and since mUseFavorites is TRUE, about to restart LOADER, which will only select favorites records");
                 mMovieIds = new ArrayList<>();
-                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+//                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
             }
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
@@ -135,10 +135,20 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             mMovieIds = savedInstanceState.getIntegerArrayList(BUNDLE_MOVIE_ID_LIST);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
 
-            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+//            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
 
         }
 
+    }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+//        Log.i(LOGTAG, "entered onActivityCreated");
+
+        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+
+        super.onActivityCreated(savedInstanceState);
     }
 
 
@@ -183,36 +193,29 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     }
 
 
-    @Override
-    public void onResume() {
-        Log.i(LOGTAG, "entered onResume");
-//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//
-//        // check if a new fetch movies task should be launched
-//        // technically mUseFavorites should never be true if sharedPrefs key_fetch_new_movies is true,
-//        // but it doesn't hurt to check it as well here before starting a fetch movies async task
-//        if(!mUseFavorites && sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
-//            Log.i(LOGTAG, "  and sharedPrefs fetch_new_movies was true, so about to get more movies");
-//
-//            new FetchMoviesTask(getActivity()).execute();
-//
-//            // restart the Loader for the movies table, it doesn't matter if the async task
-//            // does not return any movies, it won't update the movies table in that case and the
-//            // loader manager can just do nothing until it's restarted again
-//            getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, this);
-//        }
-        super.onResume();
-    }
+//    @Override
+//    public void onResume() {
+//        Log.i(LOGTAG, "entered onResume");
+////        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+////
+////        // check if a new fetch movies task should be launched
+////        // technically mUseFavorites should never be true if sharedPrefs key_fetch_new_movies is true,
+////        // but it doesn't hurt to check it as well here before starting a fetch movies async task
+////        if(!mUseFavorites && sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
+////            Log.i(LOGTAG, "  and sharedPrefs fetch_new_movies was true, so about to get more movies");
+////
+////            new FetchMoviesTask(getActivity()).execute();
+////
+////            // restart the Loader for the movies table, it doesn't matter if the async task
+////            // does not return any movies, it won't update the movies table in that case and the
+////            // loader manager can just do nothing until it's restarted again
+////            getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, this);
+////        }
+//        super.onResume();
+//    }
 
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-//        Log.i(LOGTAG, "entered onActivityCreated");
 
-//        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-
-        super.onActivityCreated(savedInstanceState);
-    }
 
 
     // the reason the favorites tables has more columns in it's projection is because when sorting
