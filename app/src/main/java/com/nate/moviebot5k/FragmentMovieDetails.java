@@ -1,6 +1,7 @@
 package com.nate.moviebot5k;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,8 @@ import android.widget.TextView;
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -49,7 +52,9 @@ public class FragmentMovieDetails extends Fragment
 //    private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private int mMovieId; // the id for the movie or favorite movie
     private boolean mTwoPane;
-    
+
+    @Bind(R.id.fab_favorites) FloatingActionButton mFabFavorites;
+
     @Bind(R.id.backdrop_imageview) ImageView mBackdropImageView;
     @Bind(R.id.test_details_textview) TextView mDetailsTextView;
 
@@ -217,6 +222,9 @@ public class FragmentMovieDetails extends Fragment
         outState.putInt(BUNDLE_MOVIE_ID_KEY, mMovieId);
         outState.putBoolean(BUNDLE_USE_FAVORITES_KEY, mUseFavorites);
         outState.putBoolean(BUNDLE_MTWO_PANE, mTwoPane);
+
+//        outState.p
+
         super.onSaveInstanceState(outState);
     }
 
@@ -324,13 +332,19 @@ public class FragmentMovieDetails extends Fragment
 
         if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
 
+
+
         if(rootView != null && data.moveToFirst()) {
 
             switch (loader.getId()) {
                 case MOVIES_LOADER_ID:
 
+                    // get the FAB and set it's drawable depending on if movie is a favorite or not
+//                    FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_favorites);
+                    mFabFavorites.setOnClickListener(new FabClickListenerAndDrawableUpdater(data));
 
-//                    FloatingActionButton fab = rootView.findViewById(R.id.)
+
+
 
 
                     // backdrop image
@@ -380,7 +394,7 @@ public class FragmentMovieDetails extends Fragment
                     // testing, prob. need some kind of adapter in due to varying numbers of videos
                     // but will always only show so many on main details page, and will need to have
                     // a link to another activity that shows them all in scrolling list
-                    
+
                     // is it really worth it to use an adapter?  not sure
                     // I don't really need to check for full here, that was checked before this
                     // switch statement started when if(data.moveToFirst... executed
@@ -406,7 +420,7 @@ public class FragmentMovieDetails extends Fragment
                                 .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
                                 .into(mVideoThumbnailImageView2);
 
-                    mVideosTextView2.setText(data.getString(COLUMN_VIDEO_NAME));
+                        mVideosTextView2.setText(data.getString(COLUMN_VIDEO_NAME));
                     }
                     break;
 
@@ -418,8 +432,8 @@ public class FragmentMovieDetails extends Fragment
 
                     // testing
                     String testRevText = "REVIEW AUTHOR 1: " + data.getString(COLUMN_REVIEW_AUTHOR) +
-                    "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
-                    
+                            "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
+
                     if(data.moveToNext()) {
                         testRevText += "REVIEW AUTHOR 2: " + data.getString(COLUMN_REVIEW_AUTHOR) +
                                 "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
@@ -428,7 +442,7 @@ public class FragmentMovieDetails extends Fragment
                         testRevText += "REVIEW AUTHOR 3: " + data.getString(COLUMN_REVIEW_AUTHOR) +
                                 "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
                     }
-                    
+
                     mReviewsTextView.setText(testRevText);
                     break;
 
@@ -449,7 +463,7 @@ public class FragmentMovieDetails extends Fragment
                                 .into(mCreditsProfile1);
 
                         mCreditsTextView1.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-                            ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
+                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
                     }
                     if(data.moveToNext()) {
                         if(data.getString(COLUMN_PROFILE_PATH) != null) {
@@ -486,11 +500,254 @@ public class FragmentMovieDetails extends Fragment
             } // end switch
         } // end if(rootView != null...)
 
+
+
+
+
+
+//        if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
+//
+//        if(rootView != null && data.moveToFirst()) {
+//
+//            switch (loader.getId()) {
+//                case MOVIES_LOADER_ID:
+//
+//                    // get the FAB and set it's drawable depending on if movie is a favorite or not
+////                    FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_favorites);
+//                    mFabFavorites.setOnClickListener(new FabClickListenerAndDrawableUpdater(data));
+//
+//
+//
+//
+//
+//                    // backdrop image
+//                    Picasso.with(getActivity())
+//                            .load(data.getString(COLUMN_BACKDROP_PATH))
+//                            .into(mBackdropImageView);
+//
+//                    // other misc movie detail data
+//                    String genreName1 = data.getString(COLUMN_GENRE_NAME1);
+//                    String genreName2 = data.getString(COLUMN_GENRE_NAME2);
+//                    String genreName3 = data.getString(COLUMN_GENRE_NAME3);
+//                    String genreName4 = data.getString(COLUMN_GENRE_NAME4);
+//                    String overview = data.getString(COLUMN_OVERVIEW);
+//                    String releaseDate = data.getString(COLUMN_RELEASE_DATE);
+//                    String title = data.getString(COLUMN_MOVIE_TITLE);
+//                    float voteAvg = data.getFloat(COLUMN_VOTE_AVG);
+//                    long budget = data.getLong(COLUMN_BUDGET);
+//                    long revenue = data.getLong(COLUMN_REVENUE);
+//                    int runtime = data.getInt(COLUMN_RUNTIME);
+//                    String tagline = data.getString(COLUMN_TAGLINE);
+//
+//                    // update the toolbar title and subtitle
+//                    if(mTwoPane) {
+//                        // app is running in tablet mode, let hosting activity deal with toolbar update
+//                        mCallbacks.onUpdateToolbar(title, tagline);
+//                    }
+//
+//
+//                    mDetailsTextView.setText("DETAILS FROM MOVIE TABLE: \n" +
+//                            genreName1 + " " + genreName2 + " " + genreName3 + " " + genreName4 + "\n" +
+//                            "MOVIE_ID: " + mMovieId + "\n" +
+//                            overview + "\n" +
+//                            "Release Date: " + releaseDate + "\n" +
+//                            "Vote Avg: " + voteAvg + "\n" +
+//                            "Budget: " + budget + "\n" +
+//                            "Runtime: " + runtime + "\n");
+//
+//                    break;
+//
+//
+//
+//
+//
+//                case VIDEOS_LOADER_ID:
+//                    Log.e(LOGTAG, "  from videos table loader, key: " + data.getString(COLUMN_VIDEO_KEY));
+//
+//                    // testing, prob. need some kind of adapter in due to varying numbers of videos
+//                    // but will always only show so many on main details page, and will need to have
+//                    // a link to another activity that shows them all in scrolling list
+//
+//                    // is it really worth it to use an adapter?  not sure
+//                    // I don't really need to check for full here, that was checked before this
+//                    // switch statement started when if(data.moveToFirst... executed
+//                    if(data.getString(COLUMN_VIDEO_KEY) != null) {
+//                        // video thumbnail image 1
+//                        Picasso.with(getActivity())
+//                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
+//                                .into(mVideoThumbnailImageView1);
+//                        // set a click listener on the ImageView video trailer thumbnail
+//                        mVideoThumbnailImageView1.setOnClickListener(new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
+//
+//                        // set a click listener on the ... well this will be an share ICON in future
+//                        mVideosTextView1.setText(data.getString(COLUMN_VIDEO_NAME));
+//                        mVideosTextView1.setOnClickListener(new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
+//
+//                    }
+//
+//
+//                    // again testing, just doing 2 videos now, if there are even 2
+//                    if(data.moveToNext()) {
+//                        // video thumbnail image 2
+//                        Picasso.with(getActivity())
+//                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
+//                                .into(mVideoThumbnailImageView2);
+//
+//                    mVideosTextView2.setText(data.getString(COLUMN_VIDEO_NAME));
+//                    }
+//                    break;
+//
+//
+//
+//
+//
+//                case REVIEWS_LOADER_ID:
+//
+//                    // testing
+//                    String testRevText = "REVIEW AUTHOR 1: " + data.getString(COLUMN_REVIEW_AUTHOR) +
+//                    "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
+//
+//                    if(data.moveToNext()) {
+//                        testRevText += "REVIEW AUTHOR 2: " + data.getString(COLUMN_REVIEW_AUTHOR) +
+//                                "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
+//                    }
+//                    if(data.moveToNext()) {
+//                        testRevText += "REVIEW AUTHOR 3: " + data.getString(COLUMN_REVIEW_AUTHOR) +
+//                                "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
+//                    }
+//
+//                    mReviewsTextView.setText(testRevText);
+//                    break;
+//
+//
+//
+//
+//
+//                case CREDITS_LOADER_ID:
+//                    // better check for null here.. some cast may not have a profile img path
+//                    // the credits order should already be correct due to the order param passed
+//                    // in when this particular loader was created
+//
+//                    // testing
+//                    if(data.getString(COLUMN_PROFILE_PATH) != null) {
+//                        // cast member profile image path
+//                        Picasso.with(getActivity())
+//                                .load(data.getString(COLUMN_PROFILE_PATH))
+//                                .into(mCreditsProfile1);
+//
+//                        mCreditsTextView1.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
+//                            ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
+//                    }
+//                    if(data.moveToNext()) {
+//                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
+//                            Picasso.with(getActivity())
+//                                    .load(data.getString(COLUMN_PROFILE_PATH))
+//                                    .into(mCreditsProfile2);
+//                        }
+//                        mCreditsTextView2.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
+//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
+//                    }
+//                    if(data.moveToNext()) {
+//                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
+//                            Picasso.with(getActivity())
+//                                    .load(data.getString(COLUMN_PROFILE_PATH))
+//                                    .into(mCreditsProfile3);
+//                        }
+//                        mCreditsTextView3.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
+//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
+//                    }
+//                    if(data.moveToNext()) {
+//                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
+//                            Picasso.with(getActivity())
+//                                    .load(data.getString(COLUMN_PROFILE_PATH))
+//                                    .into(mCreditsProfile4);
+//                        }
+//                        mCreditsTextView4.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
+//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
+//                    }
+//                    break;
+//
+//                default:
+//                    Log.e(LOGTAG, "    DEFAULT CASE REACHED IN ON-LOAD-FINISHED IN MOV DETAIL FRAGMENT!!");
+//
+//            } // end switch
+//        } // end if(rootView != null...)
+
     } // end onLoadFinished
 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {}
+
+
+    private class FabClickListenerAndDrawableUpdater implements View.OnClickListener {
+        private Cursor cursor;
+
+        private FabClickListenerAndDrawableUpdater(Cursor cursor) {
+            Log.e(LOGTAG, "just entered FabListener... constructor");
+
+            Log.i(LOGTAG, "  and before anything else, column is_favorite is: " + cursor.getString(COLUMN_IS_FAVORITE));
+
+            this.cursor = cursor;
+            int fabDrawable = cursor.getString(COLUMN_IS_FAVORITE).equals("true") ?
+                    R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
+
+            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
+
+            mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
+        }
+
+        @Override
+        public void onClick(View v) {
+
+            Cursor cursor1 = getActivity().getContentResolver().query(
+                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            cursor1.moveToFirst();
+
+            Log.i(LOGTAG, "  in FAB.onClick, before anything else AND USING A CURSOR I JUST CREATED THIS MOMENT, " +
+                    "column is_favorite is: " + cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE)));
+
+
+            // if db already has value of false for column is_favorite, set isNowFavorite to true
+            boolean isNowFavorite = cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE)).equals("false");
+            Log.e(LOGTAG, "in FabListener.. isNowFavorite (should be toggle of whatever button was before it was clicked) is now: " + isNowFavorite);
+
+            // set fab drawable to the appropriate image
+            int fabDrawable = isNowFavorite ?
+                    R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
+            mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
+
+            // create a one column ContentValues to use top update the db
+            ContentValues cv = new ContentValues();
+            Log.i(LOGTAG, "  String.valueOf(isNowFavorites): " + String.valueOf(isNowFavorite));
+            cv.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, String.valueOf(isNowFavorite));
+
+            // update db, in this case the provider takes care of selection and selection args
+            // it grabs them from the URI
+            int numUpdated = getActivity().getContentResolver().update(
+                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
+                    cv, null, null);
+
+
+
+            String newIsFavorite = cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE));
+
+            cursor1.close();
+
+
+            Log.i(LOGTAG, "    after updating db, column is_favorite is now: " + newIsFavorite);
+
+
+            Log.i(LOGTAG, "  and num records updated (should be 1) was: " + numUpdated);
+
+        }
+    }
 
 
     private class VideoViewListener implements View.OnClickListener {

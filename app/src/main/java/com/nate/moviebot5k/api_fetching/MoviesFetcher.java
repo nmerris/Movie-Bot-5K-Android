@@ -18,6 +18,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -32,10 +34,12 @@ public class MoviesFetcher {
 
 
 
-    public int fetchMovies() {
+    public ArrayList<Integer> fetchMovies() {
         Log.i(LOGTAG, "entered fetchMovies, only possible to get here if key_fetch_new_movies in sharedPrefs is TRUE");
 
-        int numMoviesFetched = 0;
+//        int numMoviesFetched = 0;
+        ArrayList<Integer> movieIdList = new ArrayList<>();
+
 
         // compile a list to use as query params for the discover movie endpoint
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -98,7 +102,8 @@ public class MoviesFetcher {
             Log.i(LOGTAG, "    Received JSON: " + jsonString);
 
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
-            numMoviesFetched = parseMoviesAndInsertToDb(jsonBody);
+//            numMoviesFetched = parseMoviesAndInsertToDb(jsonBody);
+            parseMoviesAndInsertToDb(jsonBody, movieIdList);
 
             // if this code is reached, there must not have been any exceptions thrown,
             // so set key_fetch_new_movies to false.. we don't really care if zero movies was return,
@@ -124,18 +129,21 @@ public class MoviesFetcher {
                     + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
         }
 
-        return numMoviesFetched;
+//        return numMoviesFetched;
+        return movieIdList;
 
     }
 
 
-    private int parseMoviesAndInsertToDb(JSONObject jsonBody) throws JSONException {
+    private void parseMoviesAndInsertToDb(JSONObject jsonBody, ArrayList<Integer> movieIdList) throws JSONException {
         Log.i(LOGTAG, "entered parseMoviesAndInsertToDb");
         
         JSONArray moviesJsonArray = jsonBody.getJSONArray("results");
         int numMovies = moviesJsonArray.length();
         int numInserted = 0;
         Vector<ContentValues> valuesVector = new Vector<>(numMovies);
+
+//        List<Long> movieIdList = new ArrayList<>();
 
         for (int i = 0; i < numMovies; i++) {
             // get a single JSON object from jsonBody
@@ -215,7 +223,36 @@ public class MoviesFetcher {
 
 
             // set the is_favorite column to FALSE
-            values.put(MoviesEntry.COLUMN_IS_FAVORITE, "false");
+            //
+            values.put(MoviesEntry.COLUMN_IS_FAVORITE, "false"); // assume all are not favorites here,
+            // but below the bulkinsert will reject any movies that are already in the db due to UNIQUE
+            // constraint on movie_id column, so no danger of overriding a users favorites list
+
+            values.put(MoviesEntry.COLUMN_FETCH_ORDER, i); // keep track of the order of the movies
+
+
+
+
+            // need a list of movieIds so that MovieGridFragment will know which ones to select
+            // from the db when it creates the loader that populates the movie grid
+            movieIdList.add(jsonObject.getInt("id"));
+
+
+            // check if the movie just parsed from the json is already in the db and is a favorite,
+            // if it is, update it's fetch_order so that the movie grid will display it in the right
+            // order along with all the other non favorites movies that may have been parsed out
+            ContentValues fetchOrderCV = new ContentValues();
+            fetchOrderCV.put(MoviesEntry.COLUMN_FETCH_ORDER, i);
+
+            int favoriteFetchOrderUpdated = mContext.getContentResolver().update(
+                    MoviesEntry.CONTENT_URI,
+                    fetchOrderCV,
+                    MoviesEntry.COLUMN_MOVIE_ID + " = ? AND " + MoviesEntry.COLUMN_IS_FAVORITE + " = ?",
+                    new String[]{ jsonObject.getString("id"), "true" });
+            Log.e(LOGTAG, "    IN MOVIES FETCHER, favoriteFetchOrderUpdated for movieId: " + jsonObject.getString("id") +
+                " is (0 means no update performed because " +
+                    "that movieId was not in db already and was not a favorite): " + favoriteFetchOrderUpdated);
+
 
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
@@ -235,6 +272,10 @@ public class MoviesFetcher {
 
 
 
+
+
+
+
             Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
             // insert the new data
             ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
@@ -242,10 +283,15 @@ public class MoviesFetcher {
 
             numInserted = mContext.getContentResolver()
                     .bulkInsert(MoviesEntry.CONTENT_URI, valuesArray);
+
+
+
+
+
         }
 
         Log.d(LOGTAG, "        before return from parseMoviesAndInsertToDb, numInserted is: " + numInserted);
-        return numInserted;
+//        return numInserted;
     }
 
 }

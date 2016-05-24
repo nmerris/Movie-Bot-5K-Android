@@ -25,7 +25,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
     private static final String LOGTAG = ActivitySingleFragment.N8LOG + "MovTheatrDbHelper";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
     static final String DATABASE_NAME = "movie_theater.db";
 
 
@@ -71,7 +71,8 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_TAGLINE + " TEXT, " +
                 MoviesEntry.COLUMN_POSTER_FILE_PATH + " TEXT, " +
                 MoviesEntry.COLUMN_BACKDROP_FILE_PATH + " TEXT, " +
-                MoviesEntry.COLUMN_IS_FAVORITE + " TEXT NOT NULL"; // use 'true' or 'false'
+                MoviesEntry.COLUMN_IS_FAVORITE + " TEXT NOT NULL, " + // use 'true' or 'false'
+                MoviesEntry.COLUMN_FETCH_ORDER + " INTEGER NOT NULL"; // the order in which themoviedb returns the movies
 
         // create a table to hold the currently 'showing' movies
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MoviesEntry.TABLE_NAME + "(" + 

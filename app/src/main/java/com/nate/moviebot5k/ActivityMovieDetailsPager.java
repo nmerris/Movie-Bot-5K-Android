@@ -59,8 +59,25 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         int currSelectedMovieId = mSharedPrefs.getInt(getString(R.string.key_currently_selected_movie_id), 0);
         Log.i(LOGTAG," &&&&&&&&&&&&&&&&&&&&&& currSelectedMovieId in sharedPrefs before moving pager is: " + currSelectedMovieId);
 
+
+
+
+
+
+
+
+        // TODO: now have to get this from
         // get the current list of movieIds, these are the ids of the movies in the gridview
-        mMovieIds = Utility.getMovieIdList(this);
+//        mMovieIds = Utility.getMovieIdList(this);
+        Bundle bundle = getIntent().getBundleExtra("bundle_movie_list");
+        mMovieIds = bundle.getIntegerArrayList("movie_id_list");
+
+
+
+
+
+
+
         mNumMovies = mMovieIds.size();
 
 

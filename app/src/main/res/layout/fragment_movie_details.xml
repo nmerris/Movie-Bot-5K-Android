@@ -190,6 +190,7 @@
     is an ATTRIBUTE.. it's just a public static int -->
     <!-- layout_anchor and gravity only work INSIDE a coordinate layout -->
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_favorites"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"

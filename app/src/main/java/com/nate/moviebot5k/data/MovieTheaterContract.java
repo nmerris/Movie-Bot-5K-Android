@@ -68,6 +68,7 @@ public class MovieTheaterContract {
         public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
 
         public static final String COLUMN_IS_FAVORITE = "is_favorite";
+        public static final String COLUMN_FETCH_ORDER = "fetch_order";
     }
     
     

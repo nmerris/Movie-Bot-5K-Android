@@ -22,6 +22,7 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.adapters.MoviePosterAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -33,6 +34,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovGridFragment";
 
     private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
+    private static final String BUNDLE_MOVIE_ID_LIST = "movie_id_list";
     private static final int MOVIES_LOADER_ID = R.id.loader_movies_table_fragment_movie_grid;
 
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
@@ -73,7 +75,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
          *                which is how all movies and favorites are referenced in the database
          *
          */
-        void onMovieSelected(int movieId);
+        void onMovieSelected(int movieId, ArrayList<Integer> moviesList);
     }
 
     @Override
@@ -96,6 +98,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         Log.i(LOGTAG, "entered onSaveInstanceState");
         Log.i(LOGTAG, "  about to stash in Bundle mUseFavorites: " + mUseFavorites);
         outState.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, mUseFavorites);
+        outState.putIntegerArrayList(BUNDLE_MOVIE_ID_LIST, mMovieIds);
+
         super.onSaveInstanceState(outState);
     }
 
@@ -112,7 +116,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
 
-            if(!mUseFavorites && mSharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
+            if(!mUseFavorites /*&& mSharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)*/) {
                 Log.i(LOGTAG, "  and since !mUseFavorites AND S.P. fetch new movies is TRUE, about to fire a FetchMoviesTask");
                 new FetchMoviesTask(getActivity(), this).execute();
             }
@@ -120,9 +124,13 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         // must be some other reason the fragment is being recreated, likely an orientation change,
         // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
         else {
-            Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool from SIS Bundle");
+            Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool AND mMovieIds List from SIS Bundle");
             mUseFavorites = savedInstanceState.getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
+            mMovieIds = savedInstanceState.getIntegerArrayList(BUNDLE_MOVIE_ID_LIST);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
+
+            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+
         }
 
     }
@@ -161,7 +169,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                 Log.i(LOGTAG, "just clicked on movie with ID: " + movieId);
 
                 // call back to the hosting Activity so it can do what it needs to do
-                mCallbacks.onMovieSelected(movieId);
+                mCallbacks.onMovieSelected(movieId, mMovieIds);
             }
         });
 
@@ -195,7 +203,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOGTAG, "entered onActivityCreated");
 
-        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -229,12 +237,43 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         if(id == MOVIES_LOADER_ID) {
             Log.i(LOGTAG, "  and about to return new MOVIES_LOADER");
 
-            return new CursorLoader(getActivity(),
-                    MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
-                    MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
-                    MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ? ", // select by is_favorites
-                    new String[]{ String.valueOf(mUseFavorites) }, // select the data based on mUseFavorites
-                    null);
+
+            if(mUseFavorites) {
+                // only load the movies that are marked as favorite in the movies table in db
+
+
+
+
+            }
+            else {
+                // load the movies with id's in mMovieIds, which are exactly the movies that
+                // MoviesFetcher returned after it's api call, this may end up being a mix
+                // of favorites and new movies, which is ok
+                // note that the db does not allow duplicate entries with the same movie_id
+
+                String movieIdSelection = "";
+                String[] movieIdSelectionArgs = new String[mMovieIds.size()];
+                int numMovieIds = mMovieIds.size();
+
+                for(int i = 0; i < mMovieIds.size(); i++) {
+                    movieIdSelectionArgs[i] = String.valueOf(mMovieIds.get(i));
+
+                    // "movie_id = ? OR "
+                    movieIdSelection += MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?";
+                    if(i == numMovieIds - 1) break;
+                    movieIdSelection += " OR "; // do not want an OR at the end of this obnoxiously long selection statement
+                }
+                Log.e(LOGTAG, "    movieIdSelection: " + movieIdSelection);
+
+
+                return new CursorLoader(getActivity(),
+                        MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
+                        MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
+                        movieIdSelection, // not my most proud java coding moment here, but it works
+                        movieIdSelectionArgs, // select only the rows that match the movieIds returned by movies fetcher
+                        MovieTheaterContract.MoviesEntry.COLUMN_FETCH_ORDER + " ASC");
+            }
+
         }
         return null;
     }
@@ -245,7 +284,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         Log.i(LOGTAG, "entered onLoadFinished");
 
         // update the ArrayList that contains the movieIds this fragment is showing
-        mMovieIds = Utility.getMovieIdList(getActivity());
+//        mMovieIds = Utility.getMovieIdList(getActivity());
 
         if(data == null) Log.e(LOGTAG, "  and data is NULL");
         else Log.e(LOGTAG, "  and data is NOT NULL");
@@ -266,7 +305,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     }
 
 
-    private class FetchMoviesTask extends AsyncTask<Void, Void, Integer> {
+    private class FetchMoviesTask extends AsyncTask<Void, Void, ArrayList<Integer>> {
 
         Context context;
         LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks;
@@ -277,20 +316,16 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         }
 
         @Override
-        protected Integer doInBackground(Void... params) {
+        protected ArrayList<Integer> doInBackground(Void... params) {
             Log.i(LOGTAG, "just entered FetchMoviesTask.doInBackground");
-
             return new MoviesFetcher(context).fetchMovies();
         }
 
         @Override
-        protected void onPostExecute(Integer numMoviesFetched) {
-            Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, numMovies fetched was: " + numMoviesFetched);
-
+        protected void onPostExecute(ArrayList<Integer> movieIdList) {
+            Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, numMovies fetched was: " + movieIdList.size());
+            mMovieIds = movieIdList;
             getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
-
-
-            // TODO: I think I was going to return num movies fetched here, and then display a msg if it was 0
         }
     }
 

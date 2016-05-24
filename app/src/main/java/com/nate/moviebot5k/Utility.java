@@ -73,32 +73,32 @@ public class Utility {
     }
     
     
-    public static ArrayList<Integer> getMovieIdList(Context context) {
-
-        ArrayList<Integer> movieIds = new ArrayList<>();
-        Cursor cursor = context.getContentResolver().query(
-                MovieTheaterContract.MoviesEntry.CONTENT_URI,
-                new String[]{MovieTheaterContract.MoviesEntry._ID, MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID},
-                null, null,
-                "_id ASC");
-
-        if(cursor != null && cursor.moveToFirst()) {
-
-            do {
-//                Log.i("UTILITY", "******** cursor _id is: " + cursor.getInt(0));
-//                Log.i("UTILITY", "********    and added movieId to list: " + cursor.getInt(1));
-
-                movieIds.add(cursor.getInt(1));
-                cursor.moveToNext();
-
-            } while(!cursor.isAfterLast());
-
-//            Log.i("UTILITY", "    and numMovies is: " + movieIds.size());
-
-            cursor.close();
-        }
-        return movieIds;
-    }
+//    public static ArrayList<Integer> getMovieIdList(Context context) {
+//
+//        ArrayList<Integer> movieIds = new ArrayList<>();
+//        Cursor cursor = context.getContentResolver().query(
+//                MovieTheaterContract.MoviesEntry.CONTENT_URI,
+//                new String[]{MovieTheaterContract.MoviesEntry._ID, MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID},
+//                null, null,
+//                "_id ASC");
+//
+//        if(cursor != null && cursor.moveToFirst()) {
+//
+//            do {
+////                Log.i("UTILITY", "******** cursor _id is: " + cursor.getInt(0));
+////                Log.i("UTILITY", "********    and added movieId to list: " + cursor.getInt(1));
+//
+//                movieIds.add(cursor.getInt(1));
+//                cursor.moveToNext();
+//
+//            } while(!cursor.isAfterLast());
+//
+////            Log.i("UTILITY", "    and numMovies is: " + movieIds.size());
+//
+//            cursor.close();
+//        }
+//        return movieIds;
+//    }
 
 
     public static Uri buildYouTubeUri(String youTubeKey) {

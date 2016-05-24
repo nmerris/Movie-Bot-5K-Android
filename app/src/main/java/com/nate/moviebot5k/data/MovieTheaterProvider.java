@@ -356,7 +356,8 @@ public class MovieTheaterProvider extends ContentProvider {
                 }
 
                 Log.i(LOGTAG, "    number records inserted: " + returnCount);
-                break;
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
 
             case CREDITS_WITH_MOVIE_ID:
             case VIDEOS_WITH_MOVIE_ID:
@@ -366,14 +367,8 @@ public class MovieTheaterProvider extends ContentProvider {
 
             default:
                 Log.i(LOGTAG, "  UhOh.. somehow super.bulkInsert is about to be called, should never happen");
-                super.bulkInsert(uri, values);
+                return super.bulkInsert(uri, values);
         }
-
-        // notify any content observers that the table data has changed, will be either
-        // movies, genres, or certifications in this case
-        getContext().getContentResolver().notifyChange(uri, null);
-        return returnCount;
-
     }
 
 
@@ -412,7 +407,7 @@ public class MovieTheaterProvider extends ContentProvider {
                 rowsDeleted = db.delete(uri.getLastPathSegment(), selection, selectionArgs);
 
                 // in these cases, the uri points to the entire table
-                getContext().getContentResolver().notifyChange(uri, null);
+//                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
             default:
@@ -426,8 +421,11 @@ public class MovieTheaterProvider extends ContentProvider {
         // this method is the way to go, just move the notifyChange code out of the switch to here,
         // and do a quick check if(rowsDeleted != 0) before calling it
 
-
         Log.i(LOGTAG, "  number of rowsDeleted: " + rowsDeleted);
+        if(rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
         return rowsDeleted;
     }
 
@@ -439,43 +437,54 @@ public class MovieTheaterProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         Log.i(LOGTAG, "entered update");
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int rowsUpdated;
 
         switch (sUriMatcher.match(uri)) {
+            case MOVIES_ALL:
+                Log.i(LOGTAG, "  and about to update MOVIES_ALL, all parameter being passed in will be honored");
+                rowsUpdated = db.update(MoviesEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+
             case MOVIE_WITH_MOVIE_ID:
                 Log.i(LOGTAG, "  and about to update movies table after matching uri to MOVIE_WITH_MOVIE_ID");
-                Log.i(LOGTAG, "    and am ignoring selection and selectionArgs, will just get movieId from URI");
+                Log.i(LOGTAG, "    and am ignoring selectionArgs, got if from URI, it is: " + uri.getLastPathSegment());
+                Log.i(LOGTAG, "      and static selection string is: " + sMovieWithMovieIdSelection);
 
-                return db.update(
+                rowsUpdated =  db.update(
                         MoviesEntry.TABLE_NAME, values,
                         sMovieWithMovieIdSelection, // "movie_id = ? "
                         new String[]{ uri.getLastPathSegment() });
+                break;
 
             case VIDEOS_WITH_MOVIE_ID:
                 Log.i(LOGTAG, "  and about to update videos table after matching uri to VIDEO_WITH_MOVIE_ID");
                 Log.i(LOGTAG, "    and am ignoring selection and selectionArgs, will just get movieId from URI");
 
-                return db.update(
+                rowsUpdated =  db.update(
                         VideosEntry.TABLE_NAME, values,
                         sVideosWithMovieIdSelection, // "movie_id = ? "
                         new String[]{ uri.getLastPathSegment() });
+                break;
 
             case CREDITS_WITH_MOVIE_ID:
                 Log.i(LOGTAG, "  and about to update movies table after matching uri to CREDIT_WITH_MOVIE_ID");
                 Log.i(LOGTAG, "    and am ignoring selection and selectionArgs, will just get movieId from URI");
 
-                return db.update(
+                rowsUpdated = db.update(
                         CreditsEntry.TABLE_NAME, values,
                         sCreditsWithMovieIdSelection, // "movie_id = ? "
                         new String[]{ uri.getLastPathSegment() });
+                break;
 
             case REVIEWS_WITH_MOVIE_ID:
                 Log.i(LOGTAG, "  and about to update movies table after matching uri to REVIEW_WITH_MOVIE_ID");
                 Log.i(LOGTAG, "    and am ignoring selection and selectionArgs, will just get movieId from URI");
 
-                return db.update(
+                rowsUpdated = db.update(
                         ReviewsEntry.TABLE_NAME, values,
                         sReviewsWithMovieIdSelection, // "movie_id = ? "
                         new String[]{ uri.getLastPathSegment() });
+                break;
 
             default:
                 throw new UnsupportedOperationException("This DB only allows updates to the movies, credits, videos, or reviews tables" +
@@ -483,6 +492,10 @@ public class MovieTheaterProvider extends ContentProvider {
 
         }
 
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
     }
 
 

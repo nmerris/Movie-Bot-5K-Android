@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 
 public class ActivityHome extends ActivitySingleFragment
     implements FragmentMovieGrid.Callbacks, FragmentMovieFiltersSpinner.Callbacks,
@@ -42,7 +44,7 @@ public class ActivityHome extends ActivitySingleFragment
 
 
     @Override
-    public void onMovieSelected(int movieId) {
+    public void onMovieSelected(int movieId, ArrayList<Integer> moviesList) {
         Log.i(LOGTAG, "entered onMovieSelected");
 
         if(mTwoPane) {
@@ -56,6 +58,11 @@ public class ActivityHome extends ActivitySingleFragment
             // the movie to show has already been stored in sharedPrefs key currently_selected_movie_id
             // so there is no need for an intent extra
             Intent intent = new Intent(this, ActivityMovieDetailsPager.class);
+
+            Bundle bundle = new Bundle();
+            bundle.putIntegerArrayList("movie_id_list", moviesList);
+            intent.putExtra("bundle_movie_list", bundle);
+
             startActivity(intent);
         }
     }
