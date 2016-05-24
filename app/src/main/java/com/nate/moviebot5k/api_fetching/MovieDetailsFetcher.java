@@ -33,19 +33,19 @@ public class MovieDetailsFetcher {
         mContext = context;
         mMovieId = movieId;
 
-        Log.e(LOGTAG, "in MovieDetailsFetcher contructor, mMovieId is: " + movieId);
+//        Log.e(LOGTAG, "in MovieDetailsFetcher contructor, mMovieId is: " + movieId);
     }
 
 
     // I can't believe that Void and void are different.......
     // needs to be Void because the async task that launches it needs it to return Void
     public Void fetchMovieDetails() {
-        Log.i(LOGTAG, "entered fetchMovieDetails");
+//        Log.i(LOGTAG, "entered fetchMovieDetails");
 
         // get the currently selected movieId to use for API queries
 //        int movieId = PreferenceManager.getDefaultSharedPreferences(mContext)
 //                .getInt(mContext.getString(R.string.key_currently_selected_movie_id), 0);
-        Log.i(LOGTAG, "  and the movieId to be used to fetch movie details is: " + mMovieId);
+        Log.i(LOGTAG, "  just inside fetchMovieDetails and the movieId to be used to fetch movie details is: " + mMovieId);
 
         try { // build the URL for themoviedb GET
             Uri.Builder builder = new Uri.Builder();
@@ -85,7 +85,7 @@ public class MovieDetailsFetcher {
 
 
     private void parseJsonAndInsertToDb(JSONObject jsonBody) throws JSONException {
-        Log.i(LOGTAG, "entered parseJsonAndInsertToDb (in movie details fetcher)");
+//        Log.i(LOGTAG, "entered parseJsonAndInsertToDb (in movie details fetcher)");
 
 
         // get the relevant pieces of extra data and update the MOVIES table
@@ -112,10 +112,10 @@ public class MovieDetailsFetcher {
                        values, null, null);
 
         Log.i(LOGTAG, "  tagline: " + jsonBody.getString("tagline"));
-        Log.i(LOGTAG, "  revenue: " + jsonBody.getLong("revenue"));
-        Log.i(LOGTAG, "  runtime: " + jsonBody.getLong("runtime"));
-        Log.i(LOGTAG, "  budget: " + jsonBody.getLong("budget"));
-        Log.i(LOGTAG, "  numRecords updated in movies table: " + numUpdated);
+//        Log.i(LOGTAG, "  revenue: " + jsonBody.getLong("revenue"));
+//        Log.i(LOGTAG, "  runtime: " + jsonBody.getLong("runtime"));
+//        Log.i(LOGTAG, "  budget: " + jsonBody.getLong("budget"));
+//        Log.i(LOGTAG, "  numRecords updated in movies table: " + numUpdated);
 
 
 
@@ -150,12 +150,12 @@ public class MovieDetailsFetcher {
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_THUMBNAIL_URL, youtubeVideoThumbnailUrl);
 
             // testing
-            Log.i(LOGTAG, "  added video table ContenValues obj with movie_id: " + mMovieId);
-            Log.i(LOGTAG, "    and with key: " + jsonObject.getString("key"));
-            Log.i(LOGTAG, "    and with size: " + jsonObject.getInt("size"));
-            Log.i(LOGTAG, "    and with type: " + jsonObject.getString("type"));
-            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
-            Log.e(LOGTAG, "    and with thumbnail URL: " + youtubeVideoThumbnailUrl);
+//            Log.i(LOGTAG, "  added video table ContenValues obj with movie_id: " + mMovieId);
+//            Log.i(LOGTAG, "    and with key: " + jsonObject.getString("key"));
+//            Log.i(LOGTAG, "    and with size: " + jsonObject.getInt("size"));
+//            Log.i(LOGTAG, "    and with type: " + jsonObject.getString("type"));
+//            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
+//            Log.e(LOGTAG, "    and with thumbnail URL: " + youtubeVideoThumbnailUrl);
 
             // set the is_favorite column to FALSE
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE, "false");
@@ -163,12 +163,12 @@ public class MovieDetailsFetcher {
             valuesVidsVector.add(valuesVideos);
         }
 
-        Log.i(LOGTAG, "      num video records extracted from json array was: " + numVideos);
+//        Log.i(LOGTAG, "      num video records extracted from json array was: " + numVideos);
 
         if(valuesVidsVector.size() > 0) { // no point in doing anything if no data could be obtained
             // TODO: can get rid of numDeleted after testing
 
-            Log.i(LOGTAG, "      about to call bulkInsert");
+//            Log.i(LOGTAG, "      about to call bulkInsert");
             // insert the new data
             ContentValues[] valuesVidsArray = new ContentValues[valuesVidsVector.size()];
             valuesVidsVector.toArray(valuesVidsArray);
@@ -204,9 +204,9 @@ public class MovieDetailsFetcher {
             valuesReviews.put(MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT, jsonObject.getString("content"));
 
             // testing
-            Log.i(LOGTAG, "  added review table record with movie_id: " + mMovieId);
-            Log.i(LOGTAG, "    and with author: " + jsonObject.getString("author"));
-            Log.i(LOGTAG, "    and with content: " + jsonObject.getString("content"));
+//            Log.i(LOGTAG, "  added review table record with movie_id: " + mMovieId);
+//            Log.i(LOGTAG, "    and with author: " + jsonObject.getString("author"));
+//            Log.i(LOGTAG, "    and with content: " + jsonObject.getString("content"));
 
             // set the is_favorite column to FALSE
             valuesReviews.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, "false");
@@ -215,12 +215,12 @@ public class MovieDetailsFetcher {
             valuesReviewsVector.add(valuesReviews);
         }
 
-        Log.i(LOGTAG, "      num review records extracted from json array was: " + numReviews);
+//        Log.i(LOGTAG, "      num review records extracted from json array was: " + numReviews);
 
         if(valuesReviewsVector.size() > 0) { // no point in doing anything if no data could be obtained
             // TODO: can get rid of numDeleted after testing
 
-            Log.i(LOGTAG, "      about to call bulkInsert");
+//            Log.i(LOGTAG, "      about to call bulkInsert");
             // insert the new data
             ContentValues[] valuesReviewsArray = new ContentValues[valuesReviewsVector.size()];
             valuesReviewsVector.toArray(valuesReviewsArray);
@@ -282,7 +282,7 @@ public class MovieDetailsFetcher {
             valuesCreditsVector.add(valuesCredits);
         }
 
-        Log.i(LOGTAG, "      num credit records extracted from json array was: " + numCredits);
+//        Log.i(LOGTAG, "      num credit records extracted from json array was: " + numCredits);
 
         if(valuesCreditsVector.size() > 0) { // no point in doing anything if no data could be obtained
             // TODO: can get rid of numDeleted after testing

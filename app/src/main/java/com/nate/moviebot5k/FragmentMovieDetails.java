@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -52,6 +53,7 @@ public class FragmentMovieDetails extends Fragment
 //    private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private int mMovieId; // the id for the movie or favorite movie
     private boolean mTwoPane;
+    private List<Long> mMovieIdList; // the list of movies to display
 
     @Bind(R.id.fab_favorites) FloatingActionButton mFabFavorites;
 
@@ -228,6 +230,23 @@ public class FragmentMovieDetails extends Fragment
         super.onSaveInstanceState(outState);
     }
 
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+
+
+        // TODO: I'm really not sure where to put initLoader..
+        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+        getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+        getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+        getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+
+
+
+
+        super.onActivityCreated(savedInstanceState);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -275,11 +294,11 @@ public class FragmentMovieDetails extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_movie_details_ref, container, false);
         ButterKnife.bind(this, rootView);
 
-        // TODO: I'm really not sure where to put initLoader..
-        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-        getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-        getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-        getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+//        // TODO: I'm really not sure where to put initLoader..
+//        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//        getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+//        getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+//        getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
 
         return rootView;
     }
@@ -287,35 +306,38 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i(LOGTAG, "entered onCreateLoader");
+//        Log.i(LOGTAG, "entered onCreateLoader");
 
-        String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
+//        String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
+//        String[] selectionArgs =
+//                new String[]{ String.valueOf(mMovieId), String.valueOf(mUseFavorites) };
+        String selection = "movie_id = ?";
         String[] selectionArgs =
-                new String[]{ String.valueOf(mMovieId), String.valueOf(mUseFavorites) };
+                new String[]{ String.valueOf(mMovieId) };
 
         switch (id) {
             case MOVIES_LOADER_ID:
-                Log.i(LOGTAG, "  and about to return new MOVIES_TABLE_LOADER");
+//                Log.i(LOGTAG, "  and about to return new MOVIES_TABLE_LOADER");
                 return new CursorLoader(getActivity(), MovieTheaterContract.MoviesEntry.CONTENT_URI,
-                        MOVIES_PROJECTION, selectMovieIdAndIsFav, selectionArgs, null);
+                        MOVIES_PROJECTION, selection, selectionArgs, null);
 
             case VIDEOS_LOADER_ID:
-                Log.i(LOGTAG, "  and about to return new VIDEOS_LOADER_ID");
+//                Log.i(LOGTAG, "  and about to return new VIDEOS_LOADER_ID");
                 return new CursorLoader(getActivity(),
                         MovieTheaterContract.VideosEntry.CONTENT_URI, VIDEOS_PROJECTION,
-                        selectMovieIdAndIsFav, selectionArgs, null);
+                        selection, selectionArgs, null);
 
             case REVIEWS_LOADER_ID:
-                Log.i(LOGTAG, "  and about to return new REVIEWS_LOADER_ID");
+//                Log.i(LOGTAG, "  and about to return new REVIEWS_LOADER_ID");
                 return new CursorLoader(getActivity(),
                         MovieTheaterContract.ReviewsEntry.CONTENT_URI, REVIEWS_PROJECTION,
-                        selectMovieIdAndIsFav, selectionArgs, null);
+                        selection, selectionArgs, null);
 
         case CREDITS_LOADER_ID:
-            Log.i(LOGTAG, "  and about to return new CREDITS_LOADER_ID");
+//            Log.i(LOGTAG, "  and about to return new CREDITS_LOADER_ID");
             return new CursorLoader(getActivity(),
                     MovieTheaterContract.CreditsEntry.CONTENT_URI, CREDITS_PROJECTION,
-                    selectMovieIdAndIsFav, selectionArgs,
+                    selection, selectionArgs,
                     MovieTheaterContract.CreditsEntry.COLUMN_ORDER + " ASC");
 
         }
@@ -327,10 +349,10 @@ public class FragmentMovieDetails extends Fragment
     @SuppressLint("SetTextI18n")
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
-        Log.i(LOGTAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entered onLoadFinished");
+//        Log.i(LOGTAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entered onLoadFinished");
         View rootView = getView();
 
-        if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
+//        if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
 
 
 
@@ -341,8 +363,28 @@ public class FragmentMovieDetails extends Fragment
 
                     // get the FAB and set it's drawable depending on if movie is a favorite or not
 //                    FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_favorites);
-                    mFabFavorites.setOnClickListener(new FabClickListenerAndDrawableUpdater(data));
+                    mFabFavorites.setOnClickListener(new FabClickListenerAndDrawableUpdater());
+//                    Cursor cursor = getActivity().getContentResolver().query(
+//                            MovieTheaterContract.MoviesEntry.CONTENT_URI,
+//                            new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE },
+//                            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+//                            new String[]{ String.valueOf(mMovieId) }, null);
+//
+//                    cursor.moveToFirst();
 
+                    Log.i(LOGTAG, "  movieId in onLoadFinished for MOVIES_LOADER was: " + mMovieId);
+
+                    boolean favoriteState = Boolean.valueOf(data.getString(COLUMN_IS_FAVORITE));
+
+                    Log.i(LOGTAG, "  and before anything else, column is_favorite for that id is: " + favoriteState);
+
+                    // set the fab drawable depending on if the movie being displayed is already a favorite or not
+                    int fabDrawable = favoriteState ?
+                            R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
+
+//                    Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
+
+                    mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
 
 
 
@@ -389,7 +431,7 @@ public class FragmentMovieDetails extends Fragment
 
 
                 case VIDEOS_LOADER_ID:
-                    Log.e(LOGTAG, "  from videos table loader, key: " + data.getString(COLUMN_VIDEO_KEY));
+//                    Log.e(LOGTAG, "  from videos table loader, key: " + data.getString(COLUMN_VIDEO_KEY));
 
                     // testing, prob. need some kind of adapter in due to varying numbers of videos
                     // but will always only show so many on main details page, and will need to have
@@ -681,70 +723,100 @@ public class FragmentMovieDetails extends Fragment
 
 
     private class FabClickListenerAndDrawableUpdater implements View.OnClickListener {
-        private Cursor cursor;
+//        private Cursor cursor;
 
-        private FabClickListenerAndDrawableUpdater(Cursor cursor) {
-            Log.e(LOGTAG, "just entered FabListener... constructor");
+        private FabClickListenerAndDrawableUpdater() {
+//            Log.e(LOGTAG, "just entered FabListener... constructor");
 
-            Log.i(LOGTAG, "  and before anything else, column is_favorite is: " + cursor.getString(COLUMN_IS_FAVORITE));
-
-            this.cursor = cursor;
-            int fabDrawable = cursor.getString(COLUMN_IS_FAVORITE).equals("true") ?
-                    R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
-
-            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
-
-            mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
+//            // TODO: really all this constructor db code should just be up in onLoadFinished
+//            Cursor cursor = getActivity().getContentResolver().query(
+//                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
+//                    new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE },
+//                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+//                    new String[]{ String.valueOf(mMovieId) }, null);
+//
+//            cursor.moveToFirst();
+//
+//            Log.i(LOGTAG, "  movieId in constructor was: " + mMovieId);
+//            Log.i(LOGTAG, "  and before anything else, column is_favorite for that id is: " + cursor.getString(0));
+//
+//
+//            // set the fab drawable depending on if the movie being displayed is already a favorite or not
+//            int fabDrawable = cursor.getString(0).equals("true") ?
+//                    R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
+//
+//            cursor.close();
+//
+//            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
+//
+//            mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
         }
 
         @Override
         public void onClick(View v) {
 
-            Cursor cursor1 = getActivity().getContentResolver().query(
+            Cursor cursor = getActivity().getContentResolver().query(
                     MovieTheaterContract.MoviesEntry.CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null
-            );
+                    new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE },
+                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+                    new String[]{ String.valueOf(mMovieId) }, null);
 
-            cursor1.moveToFirst();
+            cursor.moveToFirst();
 
-            Log.i(LOGTAG, "  in FAB.onClick, before anything else AND USING A CURSOR I JUST CREATED THIS MOMENT, " +
-                    "column is_favorite is: " + cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE)));
+            boolean initialFavState = Boolean.valueOf(cursor.getString(0));
+            Log.i(LOGTAG, "  FAB listener.onClick, movieId is: " + mMovieId);
+            Log.i(LOGTAG, "    and before anything else, column is_favorite for that id is: " + initialFavState);
 
 
-            // if db already has value of false for column is_favorite, set isNowFavorite to true
-            boolean isNowFavorite = cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE)).equals("false");
-            Log.e(LOGTAG, "in FabListener.. isNowFavorite (should be toggle of whatever button was before it was clicked) is now: " + isNowFavorite);
 
-            // set fab drawable to the appropriate image
-            int fabDrawable = isNowFavorite ?
-                    R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
+            // toggle the fab drawable
+            int fabDrawable = initialFavState ?
+                    R.drawable.btn_star_off_normal_holo_light : R.drawable.btn_star_on_normal_holo_light;
+//            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
             mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
 
-            // create a one column ContentValues to use top update the db
-            ContentValues cv = new ContentValues();
-            Log.i(LOGTAG, "  String.valueOf(isNowFavorites): " + String.valueOf(isNowFavorite));
-            cv.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, String.valueOf(isNowFavorite));
+            // update the db
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
+            getActivity().getContentResolver().update(
+                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
+                    contentValues,
+                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+                    new String[]{ String.valueOf(mMovieId) });
 
-            // update db, in this case the provider takes care of selection and selection args
-            // it grabs them from the URI
-            int numUpdated = getActivity().getContentResolver().update(
-                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-                    cv, null, null);
+            cursor.close();
+//
+//            // if db already has value of false for column is_favorite, set isNowFavorite to true
+//            boolean isNowFavorite = cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE)).equals("false");
+//            Log.e(LOGTAG, "in FabListener.. isNowFavorite (should be toggle of whatever button was before it was clicked) is now: " + isNowFavorite);
+//
+//            // set fab drawable to the appropriate image
+//            int fabDrawable = isNowFavorite ?
+//                    R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
+//            mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
+//
+//            // create a one column ContentValues to use top update the db
+//            ContentValues cv = new ContentValues();
+//            Log.i(LOGTAG, "  String.valueOf(isNowFavorites): " + String.valueOf(isNowFavorite));
+//            cv.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, String.valueOf(isNowFavorite));
+//
+//            // update db, in this case the provider takes care of selection and selection args
+//            // it grabs them from the URI
+//            int numUpdated = getActivity().getContentResolver().update(
+//                    MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
+//                    cv, null, null);
+//
+//
+//
+//            String newIsFavorite = cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE));
+//
+//            cursor1.close();
 
-
-
-            String newIsFavorite = cursor1.getString(cursor1.getColumnIndex(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE));
-
-            cursor1.close();
-
-
-            Log.i(LOGTAG, "    after updating db, column is_favorite is now: " + newIsFavorite);
-
-
-            Log.i(LOGTAG, "  and num records updated (should be 1) was: " + numUpdated);
+//
+//            Log.i(LOGTAG, "    after updating db, column is_favorite is now: " + newIsFavorite);
+//
+//
+//            Log.i(LOGTAG, "  and num records updated (should be 1) was: " + numUpdated);
 
         }
     }
@@ -799,7 +871,7 @@ public class FragmentMovieDetails extends Fragment
 
         @Override
         protected Void doInBackground(Void... params) {
-            Log.i(LOGTAG, "just entered FetchMovieDetailsTask.doInBackground");
+//            Log.i(LOGTAG, "just entered FetchMovieDetailsTask.doInBackground");
             return new MovieDetailsFetcher(context, mMovieId).fetchMovieDetails();
         }
 

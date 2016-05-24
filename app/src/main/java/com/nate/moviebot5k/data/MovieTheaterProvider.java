@@ -134,7 +134,7 @@ public class MovieTheaterProvider extends ContentProvider {
 
 
     static UriMatcher buildUriMatcher() {
-        Log.i(LOGTAG, "entered buildUriMatcher");
+//        Log.i(LOGTAG, "entered buildUriMatcher");
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieTheaterContract.CONTENT_AUTHORITY;
 
@@ -157,7 +157,7 @@ public class MovieTheaterProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        Log.i(LOGTAG, "entered onCreate");
+//        Log.i(LOGTAG, "entered onCreate");
 
         // used to get writable and readable database objects throughout this ContentProvider
         mOpenHelper = new MovieTheaterDbHelper(getContext());
@@ -197,7 +197,7 @@ public class MovieTheaterProvider extends ContentProvider {
         }
 
         // notify whatever is using this cursor when the data it points to changes
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+//        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
 
     }
@@ -205,7 +205,7 @@ public class MovieTheaterProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        Log.i(LOGTAG, "entered getType");
+//        Log.i(LOGTAG, "entered getType");
 
         switch (sUriMatcher.match(uri)) {
             case MOVIES_ALL:
@@ -260,7 +260,7 @@ public class MovieTheaterProvider extends ContentProvider {
      */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        Log.i(LOGTAG, "NO IMPLEMENTATION FOR INSERT... SHOULD ALWAYS USE BULK INSERT IN THIS APP!!!");
+        Log.e(LOGTAG, "NO IMPLEMENTATION FOR INSERT... SHOULD ALWAYS USE BULK INSERT IN THIS APP!!!");
 
 //        if(sUriMatcher.match(uri) == FAVORITE_WITH_MOVIE_ID) {
 //            Log.i(LOGTAG, "  about to insert to favorites table: " + uri);
@@ -355,8 +355,8 @@ public class MovieTheaterProvider extends ContentProvider {
                     db.endTransaction();
                 }
 
-                Log.i(LOGTAG, "    number records inserted: " + returnCount);
-                getContext().getContentResolver().notifyChange(uri, null);
+//                Log.i(LOGTAG, "    number records inserted: " + returnCount);
+//                getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
 
             case CREDITS_WITH_MOVIE_ID:
@@ -421,9 +421,9 @@ public class MovieTheaterProvider extends ContentProvider {
         // this method is the way to go, just move the notifyChange code out of the switch to here,
         // and do a quick check if(rowsDeleted != 0) before calling it
 
-        Log.i(LOGTAG, "  number of rowsDeleted: " + rowsDeleted);
+//        Log.i(LOGTAG, "  number of rowsDeleted: " + rowsDeleted);
         if(rowsDeleted != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+//            getContext().getContentResolver().notifyChange(uri, null);
         }
 
         return rowsDeleted;
@@ -493,7 +493,7 @@ public class MovieTheaterProvider extends ContentProvider {
         }
 
         if (rowsUpdated != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+//            getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsUpdated;
     }

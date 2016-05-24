@@ -130,7 +130,7 @@ public abstract class ActivitySingleFragment extends AppCompatActivity
         float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         //Log.i(LOGTAG, "just entered onCreate");
-        Log.i(LOGTAG, "==== screen dpWidth is: " + dpWidth + ", and dpHeight is: " + dpHeight + " ====");
+//        Log.i(LOGTAG, "==== screen dpWidth is: " + dpWidth + ", and dpHeight is: " + dpHeight + " ====");
     }
 
 

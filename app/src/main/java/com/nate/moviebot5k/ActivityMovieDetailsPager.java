@@ -85,11 +85,11 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
 
             @Override
             public Fragment getItem(int position) {
-                Log.i(LOGTAG, "    FragmentPager position in getItem is: " + position);
+//                Log.i(LOGTAG, "    FragmentPager position in getItem is: " + position);
                 mMovieIds.get(position);
 
                 int movieId = mMovieIds.get(position);
-                Log.i(LOGTAG, "      and about to load new detail frag with movieId: " + movieId);
+//                Log.i(LOGTAG, "      and about to load new detail frag with movieId: " + movieId);
 
 
                 return FragmentMovieDetails.newInstance(false, movieId, false);

@@ -113,7 +113,7 @@ public class FragmentMovieFiltersSpinner extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.i(LOGTAG, "entered onCreateView");
+//        Log.i(LOGTAG, "entered onCreateView");
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -155,7 +155,7 @@ public class FragmentMovieFiltersSpinner extends Fragment
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.i(LOGTAG, "entered onItemSelected");
+//        Log.i(LOGTAG, "entered onItemSelected");
         SharedPreferences.Editor editor = mSharedPrefs.edit();
 
         switch (parent.getId()) {
@@ -276,10 +276,10 @@ public class FragmentMovieFiltersSpinner extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i(LOGTAG, "entered onCreateLoader");
+//        Log.i(LOGTAG, "entered onCreateLoader");
 
         if(id == GENRES_TABLE_LOADER_ID) {
-            Log.i(LOGTAG, "  and about to return new GENRES_TABLE_LOADER");
+//            Log.i(LOGTAG, "  and about to return new GENRES_TABLE_LOADER");
 
             return new CursorLoader(getActivity(),
                     MovieTheaterContract.GenresEntry.CONTENT_URI,
@@ -289,7 +289,7 @@ public class FragmentMovieFiltersSpinner extends Fragment
                     null, null, null);
         }
         else if(id == CERTS_TABLE_LOADER_ID) {
-            Log.i(LOGTAG, "  and about to return new CERTS_TABLE_LOADER");
+//            Log.i(LOGTAG, "  and about to return new CERTS_TABLE_LOADER");
 
             return new CursorLoader(getActivity(),
                     MovieTheaterContract.CertsEntry.CONTENT_URI,
@@ -304,7 +304,7 @@ public class FragmentMovieFiltersSpinner extends Fragment
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i(LOGTAG, "entered onLoadFinished");
+//        Log.i(LOGTAG, "entered onLoadFinished");
 
         if(loader.getId() == GENRES_TABLE_LOADER_ID) {
             mGenreSpinnerAdapter.swapCursor(data);

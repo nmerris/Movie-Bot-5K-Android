@@ -95,8 +95,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.i(LOGTAG, "entered onSaveInstanceState");
-        Log.i(LOGTAG, "  about to stash in Bundle mUseFavorites: " + mUseFavorites);
+//        Log.i(LOGTAG, "entered onSaveInstanceState");
+//        Log.i(LOGTAG, "  about to stash in Bundle mUseFavorites: " + mUseFavorites);
         outState.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, mUseFavorites);
         outState.putIntegerArrayList(BUNDLE_MOVIE_ID_LIST, mMovieIds);
 
@@ -107,7 +107,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOGTAG, "entered onCreate");
+//        Log.i(LOGTAG, "entered onCreate");
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -117,7 +117,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
 
             if(!mUseFavorites /*&& mSharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)*/) {
-                Log.i(LOGTAG, "  and since !mUseFavorites AND S.P. fetch new movies is TRUE, about to fire a FetchMoviesTask");
+                Log.i(LOGTAG, "  and since !mUseFavorites, about to fire a FetchMoviesTask");
                 new FetchMoviesTask(getActivity(), this).execute();
             }
         }
@@ -138,12 +138,12 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.i(LOGTAG, "entered onCreateView");
+//        Log.i(LOGTAG, "entered onCreateView");
         mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         ButterKnife.bind(this, rootView);
 
-        Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
+//        Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
         mMoviePosterGridView.setAdapter(mMoviePosterAdapter);
 
         // set a click listener on the adapter
@@ -201,7 +201,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(LOGTAG, "entered onActivityCreated");
+//        Log.i(LOGTAG, "entered onActivityCreated");
 
 //        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
 
@@ -235,7 +235,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         Log.i(LOGTAG, "entered onCreateLoader");
 
         if(id == MOVIES_LOADER_ID) {
-            Log.i(LOGTAG, "  and about to return new MOVIES_LOADER");
+//            Log.i(LOGTAG, "  and about to return new MOVIES_LOADER");
 
 
             if(mUseFavorites) {
@@ -263,7 +263,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                     if(i == numMovieIds - 1) break;
                     movieIdSelection += " OR "; // do not want an OR at the end of this obnoxiously long selection statement
                 }
-                Log.e(LOGTAG, "    movieIdSelection: " + movieIdSelection);
+//                Log.e(LOGTAG, "    movieIdSelection: " + movieIdSelection);
 
 
                 return new CursorLoader(getActivity(),
@@ -281,16 +281,16 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i(LOGTAG, "entered onLoadFinished");
+        Log.i(LOGTAG, "entered onLoadFinished, about to swap data on cursor for poster adapter");
 
         // update the ArrayList that contains the movieIds this fragment is showing
 //        mMovieIds = Utility.getMovieIdList(getActivity());
 
-        if(data == null) Log.e(LOGTAG, "  and data is NULL");
-        else Log.e(LOGTAG, "  and data is NOT NULL");
-
-        if(data.moveToFirst()) Log.i(LOGTAG, "    and data.moveToFist was successful");
-        else Log.i(LOGTAG, "    and data.moveToFist was NOT successful");
+//        if(data == null) Log.e(LOGTAG, "  and data is NULL");
+//        else Log.e(LOGTAG, "  and data is NOT NULL");
+//
+//        if(data.moveToFirst()) Log.i(LOGTAG, "    and data.moveToFist was successful");
+//        else Log.i(LOGTAG, "    and data.moveToFist was NOT successful");
 
         // swap the cursor so the adapter can load the new images
         mMoviePosterAdapter.swapCursor(data);
@@ -317,7 +317,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         @Override
         protected ArrayList<Integer> doInBackground(Void... params) {
-            Log.i(LOGTAG, "just entered FetchMoviesTask.doInBackground");
+//            Log.i(LOGTAG, "just entered FetchMoviesTask.doInBackground");
             return new MoviesFetcher(context).fetchMovies();
         }
 

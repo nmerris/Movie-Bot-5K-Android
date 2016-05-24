@@ -39,7 +39,7 @@ public class GenresAndCertsFetcher {
      *
      */
     public int fetchAvailableGenres() {
-        Log.i(LOGTAG, "entered fetchAvailableGenres");
+//        Log.i(LOGTAG, "entered fetchAvailableGenres");
 
         int numGenresFetched = 0;
 
@@ -57,7 +57,7 @@ public class GenresAndCertsFetcher {
 
             String url = builder.build().toString();
             String jsonString = Utility.getUrlString(url); // call getUrlString, which will query themoviedb API
-            Log.i(LOGTAG, "  Received JSON: " + jsonString);
+//            Log.i(LOGTAG, "  Received JSON: " + jsonString);
 
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
             numGenresFetched = parseGenresAndInsertToDb(jsonBody);
@@ -74,7 +74,7 @@ public class GenresAndCertsFetcher {
 
 
     public void fetchAvailableCertifications() {
-        Log.i(LOGTAG, "entered fetchAvailableCertifications");
+//        Log.i(LOGTAG, "entered fetchAvailableCertifications");
 
         try { // build the URL for themoviedb GET for certs
             Uri.Builder builder = new Uri.Builder();
@@ -89,7 +89,7 @@ public class GenresAndCertsFetcher {
 
             String url = builder.build().toString();
             String jsonString = Utility.getUrlString(url); // call getUrlString, which will query themoviedb API
-            Log.i(LOGTAG, "  Received JSON: " + jsonString);
+//            Log.i(LOGTAG, "  Received JSON: " + jsonString);
 
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
             parseCertsAndInsertToDb(jsonBody);
@@ -105,7 +105,7 @@ public class GenresAndCertsFetcher {
 
     private void parseCertsAndInsertToDb(JSONObject jsonBody)
             throws IOException, JSONException {
-        Log.i(LOGTAG, "entered parseCertsAndInsertToDb");
+//        Log.i(LOGTAG, "entered parseCertsAndInsertToDb");
 
         // get the US certs array out of the certifications json object
         JSONArray certsJsonArray = jsonBody.getJSONObject("certifications").getJSONArray("US");
@@ -139,7 +139,7 @@ public class GenresAndCertsFetcher {
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
 
-            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
+//            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
 //            Log.d(LOGTAG, "  and certification order: " + certJsonObject.getInt("order"));
         }
 
@@ -147,14 +147,14 @@ public class GenresAndCertsFetcher {
         if(valuesVector.size() > 1) { // no point in doing anything if no genres could be obtained
             // TODO: can get rid of numDeleted and numInserted after testing
 
-            Log.i(LOGTAG, "  about to wipe out old certification table data, calling delete with uri: " + CertsEntry.CONTENT_URI);
+//            Log.i(LOGTAG, "  about to wipe out old certification table data, calling delete with uri: " + CertsEntry.CONTENT_URI);
             // wipe out the old data
             int numDeleted = mContext.getContentResolver()
                     .delete(CertsEntry.CONTENT_URI, null, null);
 
-            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
+//            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
 
-            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
+//            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
             // insert the new data
             ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
             valuesVector.toArray(valuesArray);
@@ -162,7 +162,7 @@ public class GenresAndCertsFetcher {
             int numInserted = mContext.getContentResolver()
                     .bulkInsert(CertsEntry.CONTENT_URI, valuesArray);
 
-            Log.i(LOGTAG, "        and number of records inserted: " + numInserted);
+//            Log.i(LOGTAG, "        and number of records inserted: " + numInserted);
 
         }
 
@@ -179,7 +179,7 @@ public class GenresAndCertsFetcher {
      */
     private int parseGenresAndInsertToDb(JSONObject jsonBody)
             throws IOException, JSONException {
-        Log.i(LOGTAG, "entered parseGenresAndInsertToDb");
+//        Log.i(LOGTAG, "entered parseGenresAndInsertToDb");
 
 
         JSONArray genresJsonArray = jsonBody.getJSONArray("genres");
@@ -214,7 +214,7 @@ public class GenresAndCertsFetcher {
             // add the single object to the ContentValues Vector
             valuesVector.add(cv);
 
-            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id") + "  name: " + genreJsonObject.getString("name"));
+//            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id") + "  name: " + genreJsonObject.getString("name"));
 //            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
         }
 
@@ -223,15 +223,15 @@ public class GenresAndCertsFetcher {
         if(valuesVector.size() > 1) { // no point in doing anything if no genres could be obtained
             // TODO: can get rid of numDeleted after testing
 
-            Log.i(LOGTAG, "  about to wipe out old genre table data, calling delete with uri: " + GenresEntry.CONTENT_URI);
+//            Log.i(LOGTAG, "  about to wipe out old genre table data, calling delete with uri: " + GenresEntry.CONTENT_URI);
             // wipe out the old data
             int numDeleted = mContext.getContentResolver()
                     .delete(GenresEntry.CONTENT_URI, null, null);
 
-            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
+//            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
 
 
-            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
+//            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
             // insert the new data
             ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
             valuesVector.toArray(valuesArray);
@@ -240,7 +240,7 @@ public class GenresAndCertsFetcher {
                     .bulkInsert(GenresEntry.CONTENT_URI, valuesArray);
         }
 
-        Log.d(LOGTAG, "        before return from parseGenresAndInsertToDb, numInserted is: " + numInserted);
+//        Log.d(LOGTAG, "        before return from parseGenresAndInsertToDb, numInserted is: " + numInserted);
         return numInserted;
     }
 

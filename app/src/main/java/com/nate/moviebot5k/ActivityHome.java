@@ -22,7 +22,7 @@ public class ActivityHome extends ActivitySingleFragment
     // see ActivitySingleFragment
     @Override
     protected Fragment createFragment() {
-        Log.i(LOGTAG, "entered createFragment, about to return a NEW FragmentMovieGrid to ActivitySingleFragment");
+//        Log.i(LOGTAG, "entered createFragment, about to return a NEW FragmentMovieGrid to ActivitySingleFragment");
 
         // ActivityHome never shows movies from the favorites table, see FavoritesActivity
         // phone and tablet mode both always have a FragmentMovieGrid, so no need to check here
@@ -96,7 +96,7 @@ public class ActivityHome extends ActivitySingleFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOGTAG, "entered onCreate");
+//        Log.i(LOGTAG, "entered onCreate");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
@@ -112,7 +112,7 @@ public class ActivityHome extends ActivitySingleFragment
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.i(LOGTAG, "entered onCreateOptionsMenu");
+//        Log.i(LOGTAG, "entered onCreateOptionsMenu");
 
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;

@@ -44,8 +44,8 @@ public class MoviesFetcher {
         // compile a list to use as query params for the discover movie endpoint
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-        Log.i(LOGTAG, "  but just to check, here is it's current value: "
-                + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
+//        Log.i(LOGTAG, "  but just to check, here is it's current value: "
+//                + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
 
         String selectedCert = sharedPrefs
                 .getString(mContext.getString(R.string.key_movie_filter_cert), "");
@@ -136,7 +136,7 @@ public class MoviesFetcher {
 
 
     private void parseMoviesAndInsertToDb(JSONObject jsonBody, ArrayList<Integer> movieIdList) throws JSONException {
-        Log.i(LOGTAG, "entered parseMoviesAndInsertToDb");
+//        Log.i(LOGTAG, "entered parseMoviesAndInsertToDb");
         
         JSONArray moviesJsonArray = jsonBody.getJSONArray("results");
         int numMovies = moviesJsonArray.length();
@@ -206,7 +206,7 @@ public class MoviesFetcher {
             
 
             // print the data for all the NON NULL columns
-            Log.d(LOGTAG, "  added movie id: " + jsonObject.getLong("id") + "  title: " + jsonObject.getString("title"));
+//            Log.d(LOGTAG, "  added movie id: " + jsonObject.getLong("id") + "  title: " + jsonObject.getString("title"));
 //            Log.d(LOGTAG, "  and overview: " + jsonObject.getString("overview"));
 //            Log.d(LOGTAG, "  and release_date: " + jsonObject.getString("release_date"));
 //            Log.d(LOGTAG, "  and movie title: " + jsonObject.getString("title"));
@@ -271,11 +271,6 @@ public class MoviesFetcher {
             Log.i(LOGTAG, "    number of NON favorites records deleted: " + numDeleted);
 
 
-
-
-
-
-
             Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
             // insert the new data
             ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
@@ -283,9 +278,6 @@ public class MoviesFetcher {
 
             numInserted = mContext.getContentResolver()
                     .bulkInsert(MoviesEntry.CONTENT_URI, valuesArray);
-
-
-
 
 
         }
