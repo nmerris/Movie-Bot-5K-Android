@@ -111,7 +111,7 @@ public class MovieDetailsFetcher {
                 .update(MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
                        values, null, null);
 
-        Log.i(LOGTAG, "  tagline: " + jsonBody.getString("tagline"));
+//        Log.i(LOGTAG, "  tagline: " + jsonBody.getString("tagline"));
 //        Log.i(LOGTAG, "  revenue: " + jsonBody.getLong("revenue"));
 //        Log.i(LOGTAG, "  runtime: " + jsonBody.getLong("runtime"));
 //        Log.i(LOGTAG, "  budget: " + jsonBody.getLong("budget"));

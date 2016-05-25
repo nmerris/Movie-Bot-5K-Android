@@ -27,6 +27,7 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.concurrent.ThreadFactory;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -198,8 +199,7 @@ public class FragmentMovieDetails extends Fragment
         /**
          * Hosting Activity should determine what happens when a movie is removed from users favorites.
          */
-        // NOTE TO SELF: I DON'T THINK I NEED THIS PARTICULAR CALLBACK, BUT I PROB. WILL NEED OTHERS
-        // FOR LAUNCHING
+
 //        void onFavoriteRemoved(int movieId);
         void onUpdateToolbar(String movieTitle, String movieTagline);
     }
@@ -224,44 +224,70 @@ public class FragmentMovieDetails extends Fragment
         outState.putInt(BUNDLE_MOVIE_ID_KEY, mMovieId);
         outState.putBoolean(BUNDLE_USE_FAVORITES_KEY, mUseFavorites);
         outState.putBoolean(BUNDLE_MTWO_PANE, mTwoPane);
-
-//        outState.p
-
         super.onSaveInstanceState(outState);
     }
 
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-
         Log.i(LOGTAG, "******** JUST ENTERED ONACTIVITYCREATED ******");
 
-        // TODO: I'm really not sure where to put initLoader..
-//                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
-//                getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, this);
-//                getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, this);
-//                getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, this);
+        if(savedInstanceState == null && mUseFavorites) {
+            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+        }
+        else if(savedInstanceState == null) {
+            Log.e(LOGTAG, "  and since SIS was null, about to fire an async task");
+
+            boolean fetchTaskFired = fireFetchDetailsTaskIfNecessary();
+
+            if(!fetchTaskFired) {
                 getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
                 getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
                 getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+            }
 
-            // if this fragment is null, might need to fetch movie details, will only happen if the db
-            // does not have details data for current mMovieId
-            // only need to do it if user is not viewing favorites
-//            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
-//                fireFetchDetailsTaskIfNecessary(); // this will restart the loader if it fires the task
+//            new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
 //            }
-//            // should I be using initLoader?  does it matter if savedInstanceState is null?
-//            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
+        }
+        else {
+            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+        }
+        
+//        // TODO: I'm really not sure where to put initLoader..
+////                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+////                getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, this);
+////                getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, this);
+////                getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, this);
 //                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
 //                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
 //                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
 //                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-//            }
-
-
-
+//
+//            // if this fragment is null, might need to fetch movie details, will only happen if the db
+//            // does not have details data for current mMovieId
+//            // only need to do it if user is not viewing favorites
+////            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
+////                fireFetchDetailsTaskIfNecessary(); // this will restart the loader if it fires the task
+////            }
+////            // should I be using initLoader?  does it matter if savedInstanceState is null?
+////            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
+////                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+////                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+////                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+////                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+////            }
+        
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -287,10 +313,10 @@ public class FragmentMovieDetails extends Fragment
             // if this fragment is null, might need to fetch movie details, will only happen if the db
             // does not have details data for current mMovieId
             // only need to do it if user is not viewing favorites
-            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
-//                fireFetchDetailsTaskIfNecessary(); // this will restart the loader if it fires the task
-                new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
-            }
+//            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
+////                fireFetchDetailsTaskIfNecessary(); // this will restart the loader if it fires the task
+//                new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
+//            }
 //            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
 //                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
 //                getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, this);
@@ -328,7 +354,7 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        Log.i(LOGTAG, "entered onCreateLoader");
+        Log.i(LOGTAG, "entered onCreateLoader");
 
 //        String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
 //        String[] selectionArgs =
@@ -371,7 +397,7 @@ public class FragmentMovieDetails extends Fragment
     @SuppressLint("SetTextI18n")
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
-//        Log.i(LOGTAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entered onLoadFinished");
+        Log.i(LOGTAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entered onLoadFinished");
         View rootView = getView();
 
         if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
@@ -741,7 +767,10 @@ public class FragmentMovieDetails extends Fragment
 
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {}
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+        Log.e(LOGTAG, "ENTERED ONLOADER RESET");
+    }
 
 
     private class FabClickListenerAndDrawableUpdater implements View.OnClickListener {
@@ -898,70 +927,79 @@ public class FragmentMovieDetails extends Fragment
         protected void onPostExecute(Void v) {
             Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader");
 
-            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
-            getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
-            getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
-            getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+//            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+//            getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
+//            getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
+//            getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
         }
     }
 
 
     // TODO: clean this mess up
-    private void fireFetchDetailsTaskIfNecessary() {
+    // need to check if the db already has details data in the 4 tables before firing the task, or
+    // you will end up with duplicate records in videos, credits, and reviews tables, which do not
+    // have a UNIQUE constraint on the movie_id column
+    // returns TRUE if the task was fired
+    private boolean fireFetchDetailsTaskIfNecessary() {
 
-        if(!mUseFavorites) {
+//            String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
+//            String[] selectionArgs =
+//                    new String[]{ String.valueOf(mMovieId), "false" };
+        String selection = "movie_id = ?";
+        String[] selectionArgs =
+                new String[]{ String.valueOf(mMovieId) };
 
-            String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
-            String[] selectionArgs =
-                    new String[]{ String.valueOf(mMovieId), "false" };
+        Cursor cursorCredits = getActivity().getContentResolver().query(
+                MovieTheaterContract.CreditsEntry.CONTENT_URI,
+                new String[] {MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID}, // only need to check for existence of movie_id here
+                selection,
+                selectionArgs,
+                null);
+        Log.i(LOGTAG, "  cursorCredits.getCount: " + cursorCredits.getCount());
 
-            Cursor cursorCredits = getActivity().getContentResolver().query(
-                    MovieTheaterContract.CreditsEntry.CONTENT_URI,
-                    new String[] {MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID}, // only need to check for existence of movie_id here
-                    selectMovieIdAndIsFav,
+
+        // the downside is that the following code will perform 3 db queries to check if a details
+        // task should be fired, the upside is that it eliminates the possibility of duplicate
+        // videos, credits, or reviews data ever being written to the db
+        if(cursorCredits != null && cursorCredits.getCount() == 0) {
+            Cursor cursorVideos = getActivity().getContentResolver().query(
+                    MovieTheaterContract.VideosEntry.CONTENT_URI,
+                    new String[] {MovieTheaterContract.VideosEntry.COLUMN_MOVIE_ID},
+                    selection,
                     selectionArgs,
                     null);
-            Log.i(LOGTAG, "  cursorCredits.getCount: " + cursorCredits.getCount());
+            Log.i(LOGTAG, "    cursorVideos.getCount: " + cursorVideos.getCount());
 
-
-            // the downside is that the following code will perform 3 db queries to check if a details
-            // task should be fired, the upside is that it eliminates the possibility of duplicate
-            // videos, credits, or reviews data ever being written to the db
-            if(cursorCredits != null && cursorCredits.getCount() == 0) {
-                Cursor cursorVideos = getActivity().getContentResolver().query(
-                        MovieTheaterContract.VideosEntry.CONTENT_URI,
-                        new String[] {MovieTheaterContract.VideosEntry.COLUMN_MOVIE_ID},
-                        selectMovieIdAndIsFav,
+            if(cursorVideos != null && cursorVideos.getCount() == 0) {
+                Cursor cursorReviews = getActivity().getContentResolver().query(
+                        MovieTheaterContract.ReviewsEntry.CONTENT_URI,
+                        new String[] {MovieTheaterContract.ReviewsEntry.COLUMN_MOVIE_ID},
+                        selection,
                         selectionArgs,
                         null);
-                Log.i(LOGTAG, "    cursorVideos.getCount: " + cursorVideos.getCount());
+                Log.i(LOGTAG, "      cursorReviews.getCount: " + cursorReviews.getCount());
 
-                if(cursorVideos != null && cursorVideos.getCount() == 0) {
-                    Cursor cursorReviews = getActivity().getContentResolver().query(
-                            MovieTheaterContract.ReviewsEntry.CONTENT_URI,
-                            new String[] {MovieTheaterContract.ReviewsEntry.COLUMN_MOVIE_ID},
-                            selectMovieIdAndIsFav,
-                            selectionArgs,
-                            null);
-                    Log.i(LOGTAG, "      cursorReviews.getCount: " + cursorReviews.getCount());
+                if(cursorReviews != null && cursorReviews.getCount() == 0) {
+                    // since the count for the rows for this movieId was 0 for credits, videos, and reviews
+                    // tables was zero, that must mean the detail data for this movieId has not
+                    // yet been fetched, so go fetch it
 
-                    if(cursorReviews != null && cursorReviews.getCount() == 0) {
-                        // since the count for the rows for this movieId was 0 for credits, videos, and reviews
-                        // tables was zero, that must mean the detail data for this movieId has not
-                        // yet been fetched, so go fetch it
-
-                        Log.i(LOGTAG, "        about to fire a fetch details task because it appears that the details data for this movieId does not exist in the db");
-                        new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
-                    }
-                    cursorReviews.close();
+                    Log.i(LOGTAG, "        about to fire a fetch details task because it appears that the details data for this movieId does not exist in the db");
+                    new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
                 }
-                cursorVideos.close();
+                cursorReviews.close();
+                return true;
             }
-            cursorCredits.close();
-//            Log.i(LOGTAG, "ABOUT TO EXIT FFDTIN");
+            cursorVideos.close();
         }
-        
+        cursorCredits.close();
+        return false;
     }
+
 
 
 }

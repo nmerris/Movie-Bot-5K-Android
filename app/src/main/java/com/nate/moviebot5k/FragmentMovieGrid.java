@@ -148,9 +148,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOGTAG, "entered onActivityCreated");
 
-//        Bundle args = new Bundle();
-//        args.putBoolean("bundle_init_loader", true);
-
         if(savedInstanceState == null && mUseFavorites) {
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
         }
@@ -161,9 +158,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
         }
 
-
-
-//        getLoaderManager().initLoader(MOVIES_LOADER_ID, args, this);
 
         super.onActivityCreated(savedInstanceState);
     }

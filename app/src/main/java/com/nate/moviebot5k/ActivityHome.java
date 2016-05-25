@@ -54,11 +54,10 @@ public class ActivityHome extends ActivitySingleFragment
                     FragmentMovieDetails.newInstance(false, movieId, true)).commit();
         }
         else {
-            // in phone mode, launch an intent to movie details pager activity
-            // the movie to show has already been stored in sharedPrefs key currently_selected_movie_id
-            // so there is no need for an intent extra
+
             Intent intent = new Intent(this, ActivityMovieDetailsPager.class);
 
+            // need the current list of movies, in the same order as in the db, for view pager to work
             Bundle bundle = new Bundle();
             bundle.putIntegerArrayList("movie_id_list", moviesList);
             intent.putExtra("bundle_movie_list", bundle);
