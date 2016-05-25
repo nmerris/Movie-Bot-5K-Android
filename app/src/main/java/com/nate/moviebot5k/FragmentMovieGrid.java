@@ -110,6 +110,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 //        Log.i(LOGTAG, "entered onCreate");
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mMovieIds = new ArrayList<>();
+
 
         if(savedInstanceState == null) {
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
@@ -117,15 +119,15 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
 
             // this fragment is being hosted by ActivityHome
-            if(!mUseFavorites /*&& mSharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)*/) {
-                Log.i(LOGTAG, "  and since !mUseFavorites, about to fire a FetchMoviesTask");
-                new FetchMoviesTask(getActivity(), this).execute();
-            }
-            else { // this fragment is being hosted by ActivityFavorites
-                Log.i(LOGTAG, "  and since mUseFavorites is TRUE, about to restart LOADER, which will only select favorites records");
-                mMovieIds = new ArrayList<>();
-//                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
-            }
+//            if(!mUseFavorites /*&& mSharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)*/) {
+//                Log.i(LOGTAG, "  and since !mUseFavorites, about to fire a FetchMoviesTask");
+//                new FetchMoviesTask(getActivity(), this).execute();
+//            }
+//            else { // this fragment is being hosted by ActivityFavorites
+//                Log.i(LOGTAG, "  and since mUseFavorites is TRUE, about to restart LOADER, which will only select favorites records");
+////                mMovieIds = new ArrayList<>();
+////                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+//            }
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
         // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
@@ -144,9 +146,24 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-//        Log.i(LOGTAG, "entered onActivityCreated");
+        Log.i(LOGTAG, "entered onActivityCreated");
 
-        getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//        Bundle args = new Bundle();
+//        args.putBoolean("bundle_init_loader", true);
+
+        if(savedInstanceState == null && mUseFavorites) {
+            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+        }
+        else if(savedInstanceState == null) {
+            new FetchMoviesTask(getActivity(), this).execute();
+        }
+        else {
+            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+        }
+
+
+
+//        getLoaderManager().initLoader(MOVIES_LOADER_ID, args, this);
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -242,6 +259,10 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i(LOGTAG, "entered onCreateLoader");
+
+//        boolean isInitLoader = args.getBoolean("bundle_init_loader");
+
+//        Log.e(LOGTAG, "  and BUNDLE isInitLoader bool is: " + isInitLoader);
 
         if(id == MOVIES_LOADER_ID) {
 //            Log.i(LOGTAG, "  and about to return new MOVIES_LOADER");
@@ -357,7 +378,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         protected void onPostExecute(ArrayList<Integer> movieIdList) {
             Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, about to restart loader, size of ArrayList movieIdList is: " + movieIdList.size());
             mMovieIds = movieIdList;
-            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+//            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
         }
     }
 
