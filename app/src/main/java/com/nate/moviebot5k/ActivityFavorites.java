@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class ActivityFavorites extends ActivitySingleFragment
         implements FragmentMovieGrid.Callbacks, FragmentMovieFiltersSpinner.Callbacks,
         FragmentMovieDetails.Callbacks {
-    private final String LOGTAG = N8LOG + "ActivityHome";
+    private final String LOGTAG = N8LOG + "ActivityFavs";
 
 
     // see ActivitySingleFragment
@@ -53,6 +53,9 @@ public class ActivityFavorites extends ActivitySingleFragment
                     FragmentMovieDetails.newInstance(true, movieId, true)).commit();
         }
         else {
+
+            Log.e(LOGTAG, "  and movieId passed in was: " + movieId);
+
             // in phone mode, launch an intent to movie details pager activity
             // and add in to the bundle: the movieId to display, the current list of movies in the grid,
             // and tell it that ActivityFavorites is hosting it.. it needs to know that favorties
@@ -63,6 +66,7 @@ public class ActivityFavorites extends ActivitySingleFragment
             Bundle bundle = new Bundle();
             bundle.putIntegerArrayList("movie_id_list", moviesList);
             bundle.putBoolean("use_favorites", true);
+            bundle.putInt("movie_id_just_clicked", movieId);
             intent.putExtra("bundle_movie_list", bundle);
 
             startActivity(intent);

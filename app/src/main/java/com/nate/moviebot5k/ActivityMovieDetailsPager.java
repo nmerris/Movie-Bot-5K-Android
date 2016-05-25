@@ -33,6 +33,7 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
     private SharedPreferences mSharedPrefs;
     private int mNumMovies;
     private boolean mUseFavorites;
+    private int mMovieJustClicked;
     ArrayList<Integer> mMovieIds = new ArrayList<>();
 
 
@@ -57,8 +58,8 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         // store the id of the last clicked movie back in FragmentMovieGrid
-        int currSelectedMovieId = mSharedPrefs.getInt(getString(R.string.key_currently_selected_movie_id), 0);
-        Log.i(LOGTAG," &&&&&&&&&&&&&&&&&&&&&& currSelectedMovieId in sharedPrefs before moving pager is: " + currSelectedMovieId);
+//        int currSelectedMovieId = mSharedPrefs.getInt(getString(R.string.key_currently_selected_movie_id), 0);
+//        Log.i(LOGTAG," &&&&&&&&&&&&&&&&&&&&&& currSelectedMovieId in sharedPrefs before moving pager is: " + currSelectedMovieId);
 
 
 
@@ -73,6 +74,7 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         Bundle bundle = getIntent().getBundleExtra("bundle_movie_list");
         mMovieIds = bundle.getIntegerArrayList("movie_id_list");
         mUseFavorites = bundle.getBoolean("use_favorites");
+        mMovieJustClicked = bundle.getInt("movie_id_just_clicked");
 
 
 
@@ -106,7 +108,7 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
 
         // set the viewpager to start on the movie that was clicked back in FragmentMovieGrid
         for(int i = 0; i < mNumMovies; i++) {
-            if(mMovieIds.get(i) == currSelectedMovieId) {
+            if(mMovieIds.get(i) == mMovieJustClicked) {
                 mViewPager.setCurrentItem(i);
                 break;
             }

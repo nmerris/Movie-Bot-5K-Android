@@ -61,6 +61,7 @@ public class ActivityHome extends ActivitySingleFragment
             Bundle bundle = new Bundle();
             bundle.putIntegerArrayList("movie_id_list", moviesList);
             bundle.putBoolean("use_favorites", false);
+            bundle.putInt("movie_id_just_clicked", movieId);
             intent.putExtra("bundle_movie_list", bundle);
 
             startActivity(intent);
@@ -125,8 +126,11 @@ public class ActivityHome extends ActivitySingleFragment
 
         switch(id) {
             case R.id.action_favorites:
-                intent = new Intent(this, ActivityFavorites.class);
-                startActivity(intent);
+                    // no bundle needed here because ActivityFavorites always just loads a new
+                    // movie grid fragment with useFavorites arg = true
+                    intent = new Intent(this, ActivityFavorites.class);
+                    startActivity(intent);
+
                 break;
 
             case R.id.action_about_app:
