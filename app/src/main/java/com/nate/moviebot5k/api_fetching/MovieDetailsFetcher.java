@@ -2,9 +2,7 @@ package com.nate.moviebot5k.api_fetching;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.nate.moviebot5k.ActivitySingleFragment;
@@ -28,10 +26,12 @@ public class MovieDetailsFetcher {
 
     private Context mContext; // used to retrieve String resources for API queries
     private int mMovieId; // the movieId this fetcher be fetchin'
+    private boolean updateVidsReviewsCredits;
 
-    public MovieDetailsFetcher(Context context, int movieId) {
+    public MovieDetailsFetcher(Context context, int movieId, boolean updateVidsReviewsCredits) {
         mContext = context;
         mMovieId = movieId;
+        this.updateVidsReviewsCredits = updateVidsReviewsCredits;
 
 //        Log.e(LOGTAG, "in MovieDetailsFetcher contructor, mMovieId is: " + movieId);
     }
@@ -111,18 +111,31 @@ public class MovieDetailsFetcher {
                 .update(MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
                        values, null, null);
 
-//        Log.i(LOGTAG, "  tagline: " + jsonBody.getString("tagline"));
-//        Log.i(LOGTAG, "  revenue: " + jsonBody.getLong("revenue"));
-//        Log.i(LOGTAG, "  runtime: " + jsonBody.getLong("runtime"));
-//        Log.i(LOGTAG, "  budget: " + jsonBody.getLong("budget"));
-//        Log.i(LOGTAG, "  numRecords updated in movies table: " + numUpdated);
+
+        if(updateVidsReviewsCredits) {
+            try {
+                processVideosJson(jsonBody);
+            } catch (JSONException je) {
+                Log.e(LOGTAG, "Failed to parse JSON in processVideosJson", je);
+            }
+
+            try {
+                processReviewsJson(jsonBody);
+            } catch (JSONException je) {
+                Log.e(LOGTAG, "Failed to parse JSON in processReviewsJson", je);
+            }
+
+            try {
+                processCreditsJson(jsonBody);
+            } catch (JSONException je) {
+                Log.e(LOGTAG, "Failed to parse JSON in processCreditsJson", je);
+            }
+        }
+
+    }
 
 
-
-
-
-
-        // insert new records to the VIDEOS table
+    private void processVideosJson (JSONObject jsonBody) throws JSONException {
         JSONObject videosJsonObject = jsonBody.getJSONObject("videos");
         JSONArray videosJsonArray = videosJsonObject.getJSONArray("results");
 
@@ -178,12 +191,11 @@ public class MovieDetailsFetcher {
         }
         Log.d(LOGTAG, "        num videos inserted to videos table was: " + numVideosInserted);
 
+    }
 
 
+    private void processReviewsJson (JSONObject jsonBody) throws JSONException {
 
-
-
-        // insert new records to the REVIEWS table
         JSONObject reviewsJsonObject = jsonBody.getJSONObject("reviews");
         JSONArray reviewsJsonArray = reviewsJsonObject.getJSONArray("results");
 
@@ -230,12 +242,10 @@ public class MovieDetailsFetcher {
         }
         Log.d(LOGTAG, "        num reviews inserted to reviews table was: " + numReviewsInserted);
 
+    }
 
 
-
-
-
-        // insert new records to the CREDITS table
+    private void processCreditsJson(JSONObject jsonBody) throws JSONException {
         JSONObject creditsJsonObject = jsonBody.getJSONObject("credits");
         JSONArray creditsJsonArray = creditsJsonObject.getJSONArray("cast");
 
@@ -298,5 +308,6 @@ public class MovieDetailsFetcher {
         Log.d(LOGTAG, "        num credits inserted to credits table was: " + numCreditsInserted);
 
     }
+
     
 }

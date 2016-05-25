@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -27,7 +26,6 @@ import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-import java.util.concurrent.ThreadFactory;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -239,15 +237,30 @@ public class FragmentMovieDetails extends Fragment
             getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
         }
         else if(savedInstanceState == null) {
-            Log.e(LOGTAG, "  and since SIS was null, about to fire an async task");
+            Log.e(LOGTAG, "  and since SIS was null, about to MAYBE fire an async task, depends on if this movieId already has detail data in the db");
 
-            boolean fetchTaskFired = fireFetchDetailsTaskIfNecessary();
+            // returns true only if vids, credits, and reviews tables have no entries with mMovieId
+            // if it does find all those tables empty for mMovieId, it will fire a fetch details task
+            // that will insert data for those tables, in addition to the extra bits of movie detail
+            // data get put in the movies table
+            boolean updatedVidsReviewsCredits = updateVidsReviewsCreditsIfNecessary();
 
-            if(!fetchTaskFired) {
-                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+
+            // since the fetch task returned false, that means the db already has data in it for mMovieId
+            // for the videos, credits, and reviews tables, but we still need to update the extra few columns
+            // of data in the movies table, since that may have been erased the last time the movie grid fragment
+            // wiped out the non favorites movies table data, so in this case in order to avoid having duplicate
+            // entries (since the movie_id column in not UNIQUE in the videos, credits, or reviews tables), need
+            // to still fire a fetch details task, but pass in false to tell it to ignore vids, credits,
+            // and reviews data/tables
+            if(!updatedVidsReviewsCredits) {
+
+                new FetchMovieDetailsTask(getActivity(), mMovieId, false, this).execute();
+
+//                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+//                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+//                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
             }
 
 //            new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
@@ -278,7 +291,7 @@ public class FragmentMovieDetails extends Fragment
 //            // does not have details data for current mMovieId
 //            // only need to do it if user is not viewing favorites
 ////            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
-////                fireFetchDetailsTaskIfNecessary(); // this will restart the loader if it fires the task
+////                updateVidsReviewsCreditsIfNecessary(); // this will restart the loader if it fires the task
 ////            }
 ////            // should I be using initLoader?  does it matter if savedInstanceState is null?
 ////            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
@@ -314,7 +327,7 @@ public class FragmentMovieDetails extends Fragment
             // does not have details data for current mMovieId
             // only need to do it if user is not viewing favorites
 //            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
-////                fireFetchDetailsTaskIfNecessary(); // this will restart the loader if it fires the task
+////                updateVidsReviewsCreditsIfNecessary(); // this will restart the loader if it fires the task
 //                new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
 //            }
 //            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
@@ -909,28 +922,41 @@ public class FragmentMovieDetails extends Fragment
     private class FetchMovieDetailsTask extends AsyncTask<Void, Void, Void> {
         Context context;
         int movieId;
+        boolean updateVidsReviewsCredits;
         LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks;
 
-        private FetchMovieDetailsTask(Context c, int movieId, LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks) {
+        private FetchMovieDetailsTask(Context c, int movieId, boolean updateVidsReviewsCredits, LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks) {
             context = c;
             this.movieId = movieId;
+            this.updateVidsReviewsCredits = updateVidsReviewsCredits;
             this.loaderCallbacks = loaderCallbacks;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
             Log.i(LOGTAG, "just entered FetchMovieDetailsTask.doInBackground");
-            return new MovieDetailsFetcher(context, mMovieId).fetchMovieDetails();
+            return new MovieDetailsFetcher(context, mMovieId, updateVidsReviewsCredits).fetchMovieDetails();
         }
 
         @Override
         protected void onPostExecute(Void v) {
             Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader");
 
-            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
-            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
-            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
-            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+
+//            FragmentActivity fa = getActivity();
+//            if(fa == null) Log.e(LOGTAG, "FA IS NULL");
+//            else Log.e(LOGTAG, "FA IS **NOT** NULL");
+
+            // need to check for null or app crashes if user clicks posters too rapidly,
+            // because this task finishes after it's activity has been detached
+            if(getActivity() != null) {
+                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
+                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
+                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+            }
+
+
 //            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
 //            getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
 //            getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
@@ -944,7 +970,7 @@ public class FragmentMovieDetails extends Fragment
     // you will end up with duplicate records in videos, credits, and reviews tables, which do not
     // have a UNIQUE constraint on the movie_id column
     // returns TRUE if the task was fired
-    private boolean fireFetchDetailsTaskIfNecessary() {
+    private boolean updateVidsReviewsCreditsIfNecessary() {
 
 //            String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
 //            String[] selectionArgs =
@@ -989,7 +1015,7 @@ public class FragmentMovieDetails extends Fragment
                     // yet been fetched, so go fetch it
 
                     Log.i(LOGTAG, "        about to fire a fetch details task because it appears that the details data for this movieId does not exist in the db");
-                    new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
+                    new FetchMovieDetailsTask(getActivity(), mMovieId, true, this).execute();
                 }
                 cursorReviews.close();
                 return true;
