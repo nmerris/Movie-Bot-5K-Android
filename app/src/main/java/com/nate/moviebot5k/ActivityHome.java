@@ -60,6 +60,7 @@ public class ActivityHome extends ActivitySingleFragment
             // need the current list of movies, in the same order as in the db, for view pager to work
             Bundle bundle = new Bundle();
             bundle.putIntegerArrayList("movie_id_list", moviesList);
+            bundle.putBoolean("use_favorites", false);
             intent.putExtra("bundle_movie_list", bundle);
 
             startActivity(intent);

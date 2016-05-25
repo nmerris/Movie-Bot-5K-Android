@@ -32,6 +32,7 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
 
     private SharedPreferences mSharedPrefs;
     private int mNumMovies;
+    private boolean mUseFavorites;
     ArrayList<Integer> mMovieIds = new ArrayList<>();
 
 
@@ -71,7 +72,7 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
 //        mMovieIds = Utility.getMovieIdList(this);
         Bundle bundle = getIntent().getBundleExtra("bundle_movie_list");
         mMovieIds = bundle.getIntegerArrayList("movie_id_list");
-
+        mUseFavorites = bundle.getBoolean("use_favorites");
 
 
 
@@ -92,7 +93,8 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
 //                Log.i(LOGTAG, "      and about to load new detail frag with movieId: " + movieId);
 
 
-                return FragmentMovieDetails.newInstance(false, movieId, false);
+                return FragmentMovieDetails.newInstance(mUseFavorites, movieId, false);
+//                return FragmentMovieDetails.newInstance(false, movieId, false);
             }
 
             @Override

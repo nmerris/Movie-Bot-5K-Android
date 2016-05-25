@@ -51,13 +51,13 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
      * will display a list of movie posters in grid form: 2 columns in portrait, 3 in landscape.
      * Independence: it's not just an awesome US holiday.
      *
-     * @param useFavoritesTable set to true if host needs to display movies using data from the
+     * @param useFavorites set to true if host needs to display movies using data from the
      *                          favorites table, which can be used with no internet connection
      * @return new FragmentMovieGrid <code>fragment</code>
      */
-    public static FragmentMovieGrid newInstance(boolean useFavoritesTable) {
+    public static FragmentMovieGrid newInstance(boolean useFavorites) {
         Bundle args = new Bundle();
-        args.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, useFavoritesTable);
+        args.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, useFavorites);
         FragmentMovieGrid fragment = new FragmentMovieGrid();
         fragment.setArguments(args);
         return fragment;
@@ -318,10 +318,10 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.i(LOGTAG, "entered onLoadFinished");
 
-        // if this app is using the favorites table, that means it's being hosted by ActivityFavorites,
-        // in which case a fetch movies task will never fire.. so mMovieIds List will not be initialized
-        // in this case since that is normall done when the task completes, instead just need to create
-        // the list from the cursor that was created when the cursor loader was started in onCreate
+        // if this fragment is being hosted by ActivityFavorites,
+        // a fetch movies task will never fire.. so mMovieIds List will not be initialized
+        // since that is normally done when the task completes, instead just need to create
+        // the list from the cursor that was created when the cursor loader was started in onActivityCreated
         if(mUseFavorites) {
             Log.i(LOGTAG, "  and mUseFavorites is TRUE, so about to populate mMovieIds list from cursor that returned all the favorites");
             if(data != null && data.moveToFirst()) {

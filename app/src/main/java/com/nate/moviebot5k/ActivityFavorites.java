@@ -46,16 +46,23 @@ public class ActivityFavorites extends ActivitySingleFragment
 
         if(mTwoPane) {
             // in tablet mode, replace the movie detail fragment, which is in the second pane,
-            // and instruct it to not use the favorites table
+            // and tell it that it's being hosted by ActivityFavorites (the only thing that does is
+            // tell it NOT to fire an api fetch task and instead just initialize the loader with the
+            // movieId that is being passed to it)
             mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
                     FragmentMovieDetails.newInstance(true, movieId, true)).commit();
         }
         else {
             // in phone mode, launch an intent to movie details pager activity
+            // and add in to the bundle: the movieId to display, the current list of movies in the grid,
+            // and tell it that ActivityFavorites is hosting it.. it needs to know that favorties
+            // activity is hosting it so that it can too movie detail fragment NOT to make any api
+            // fetch calls, just like above with the fragment txn
             Intent intent = new Intent(this, ActivityMovieDetailsPager.class);
 
             Bundle bundle = new Bundle();
             bundle.putIntegerArrayList("movie_id_list", moviesList);
+            bundle.putBoolean("use_favorites", true);
             intent.putExtra("bundle_movie_list", bundle);
 
             startActivity(intent);

@@ -163,9 +163,9 @@ public class FragmentMovieDetails extends Fragment
 
 
     // the movieId will be used to read data from either the favorites or movies table
-    public static FragmentMovieDetails newInstance(boolean useFavoritesTable, int movieId, boolean mTwoPane) {
+    public static FragmentMovieDetails newInstance(boolean useFavorites, int movieId, boolean mTwoPane) {
         Bundle args = new Bundle();
-        args.putBoolean(BUNDLE_USE_FAVORITES_KEY, useFavoritesTable);
+        args.putBoolean(BUNDLE_USE_FAVORITES_KEY, useFavorites);
         args.putBoolean(BUNDLE_MTWO_PANE, mTwoPane);
         args.putInt(BUNDLE_MOVIE_ID_KEY, movieId);
         FragmentMovieDetails fragment = new FragmentMovieDetails();
@@ -230,12 +230,14 @@ public class FragmentMovieDetails extends Fragment
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOGTAG, "******** JUST ENTERED ONACTIVITYCREATED ******");
 
+        // this happens if being created from new and hosted by favorites activity
         if(savedInstanceState == null && mUseFavorites) {
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
             getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
             getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
             getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
         }
+        // this happens if being created from new and hosted by home activity
         else if(savedInstanceState == null) {
             Log.e(LOGTAG, "  and since SIS was null, about to MAYBE fire an async task, depends on if this movieId already has detail data in the db");
 
@@ -245,7 +247,6 @@ public class FragmentMovieDetails extends Fragment
             // data get put in the movies table
             boolean updatedVidsReviewsCredits = updateVidsReviewsCreditsIfNecessary();
 
-
             // since the fetch task returned false, that means the db already has data in it for mMovieId
             // for the videos, credits, and reviews tables, but we still need to update the extra few columns
             // of data in the movies table, since that may have been erased the last time the movie grid fragment
@@ -254,53 +255,17 @@ public class FragmentMovieDetails extends Fragment
             // to still fire a fetch details task, but pass in false to tell it to ignore vids, credits,
             // and reviews data/tables
             if(!updatedVidsReviewsCredits) {
-
                 new FetchMovieDetailsTask(getActivity(), mMovieId, false, this).execute();
-
-//                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-//                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-//                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-//                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
             }
 
-//            new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
         }
-        else {
+        else { // this is reached if orientation changes
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
             getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
             getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
             getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
         }
-        
-//        // TODO: I'm really not sure where to put initLoader..
-////                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
-////                getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, this);
-////                getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, this);
-////                getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, this);
-//                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-//                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-//                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
-//                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-//
-//            // if this fragment is null, might need to fetch movie details, will only happen if the db
-//            // does not have details data for current mMovieId
-//            // only need to do it if user is not viewing favorites
-////            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
-////                updateVidsReviewsCreditsIfNecessary(); // this will restart the loader if it fires the task
-////            }
-////            // should I be using initLoader?  does it matter if savedInstanceState is null?
-////            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
-////                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-////                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-////                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
-////                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-////            }
-        
+
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -365,6 +330,9 @@ public class FragmentMovieDetails extends Fragment
     }
 
 
+    // the details view does not care about the is_favorite column, the loader will just load whatever
+    // movieId was clicked from movie grid, which should ONLY be favorites if user is in favorites activity
+    // and it may be a mix of favorites/non favs if in home activity or movie pager activity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i(LOGTAG, "entered onCreateLoader");
@@ -840,10 +808,21 @@ public class FragmentMovieDetails extends Fragment
 //            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
             mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
 
-            // update the db tables
-            ContentValues contentValues = new ContentValues();
 
+            toggleIsFavoriteInAllTables(initialFavState);
+
+
+
+        }
+
+        // updates all db tables that match movieId.. pass in the current fav state and it will toggle it
+        private void toggleIsFavoriteInAllTables(boolean initialFavState) {
+            Log.i(LOGTAG, "in toggleIsFavoriteInAllTables, initialFavState is: " + initialFavState +
+            " and will be updating all db records with movie_id: " + mMovieId + " to: " + !initialFavState);
+
+            ContentValues contentValues = new ContentValues();
             contentValues.put("is_favorite", String.valueOf(!initialFavState));
+
             int numMovieRecordsUpated = getActivity().getContentResolver().update(
                     MovieTheaterContract.MoviesEntry.CONTENT_URI,
                     contentValues,
@@ -877,9 +856,11 @@ public class FragmentMovieDetails extends Fragment
                     null);
             Log.i(LOGTAG, "      num reviews table records updated: " + numReviewsRecordsUpdated);
 
-
-
         }
+
+
+
+
     }
 
 
