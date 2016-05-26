@@ -441,8 +441,9 @@ public class MovieTheaterProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case MOVIES_ALL:
-                Log.i(LOGTAG, "  and about to update MOVIES_ALL, all parameter being passed in will be honored");
-                rowsUpdated = db.update(MoviesEntry.TABLE_NAME, values, selection, selectionArgs);
+            case CREDITS_ALL:
+                Log.i(LOGTAG, "  and about to update MOVIES_ALL or CREDITS_ALL, all parameter being passed in will be honored");
+                rowsUpdated = db.update(uri.getLastPathSegment(), values, selection, selectionArgs);
                 break;
 
             case MOVIE_WITH_MOVIE_ID:

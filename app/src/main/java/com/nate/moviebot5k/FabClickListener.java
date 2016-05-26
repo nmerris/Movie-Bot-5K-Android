@@ -25,22 +25,33 @@ class FabClickListener implements View.OnClickListener {
     private Context mContext;
     private int mMovieId;
     private FloatingActionButton mFabFavorites;
-
+    private int numCreditsImagesToStoreOffline;
     private final String[] projection = {
             MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE,
             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH,
-            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH,
-            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
-            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH
+            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH
+//            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
+//            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH
     };
     private final int COLUMN_IS_FAVORITE = 0;
     private final int COLUMN_POSTER_PATH = 1;
     private final int COLUMN_BACKDROP_PATH = 2;
-    private final int COLUMN_POSTER_FILE_PATH = 3;
-    private final int COLUMN_BACKDROP_FILE_PATH = 4;
+//    private final int COLUMN_POSTER_FILE_PATH = 3;
+//    private final int COLUMN_BACKDROP_FILE_PATH = 4;
+
+    private final String[] creditsProjection = {
+            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH
+//            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
+    };
+    private final int COLUMN_PROFILE_PATH = 0;
+//    private final int COLUMN_PROFILE_FILE_PATH = 1;
 
 
     public FabClickListener(Context context, int movieId, FloatingActionButton fabFavorites) {
+        numCreditsImagesToStoreOffline = context.getResources()
+                .getInteger(R.integer.num_credits_profile_images_to_store_offline);
+
+
         mContext = context;
         mMovieId = movieId;
         mFabFavorites = fabFavorites;
@@ -83,58 +94,6 @@ class FabClickListener implements View.OnClickListener {
     private void saveImagesLocally() {
         Log.i(LOGTAG, "entered saveImagesLocally");
 
-        Target target = new Target() {
-
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.e(LOGTAG, "  entered onBitmapLoaded");
-
-                // create a new File object, set file name to same as themoviedb image id
-                File file = new File(mContext.getExternalFilesDir(null), "testPoster.jpg");
-
-                try {
-                    FileOutputStream ostream = new FileOutputStream(file);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ostream);
-//                    boolean wasWriteToStreamSuccess = bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ostream);
-//                    Log.e(LOGTAG, "    compress bitmap and write to ostream was successful: " + wasWriteToStreamSuccess);
-
-
-
-
-
-                    String localFilePath = file.getPath();
-//                    Log.i(LOGTAG, "    file path is: " + localFilePath);
-
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
-                            "file:" + localFilePath);
-
-                    mContext.getContentResolver().update(
-                            MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-                            contentValues,
-                            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-                            new String[]{String.valueOf(mMovieId)});
-
-
-                    ostream.flush();
-                    ostream.close();
-                } catch (IOException e) {
-                    Log.e("IOException", e.getLocalizedMessage());
-                }
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        };
-    
-
         // update movies table file path columns for poster and backdrop images
         Cursor cursor = mContext.getContentResolver().query(
                 MovieTheaterContract.MoviesEntry.CONTENT_URI,
@@ -146,17 +105,42 @@ class FabClickListener implements View.OnClickListener {
             Picasso.with(mContext)
                     .load(cursor.getString(COLUMN_POSTER_PATH))
                     .into(new PicassoTarget(cursor.getString(COLUMN_POSTER_PATH),
-                            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH));
+                            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
+                            MovieTheaterContract.MoviesEntry.TABLE_NAME));
 
             Picasso.with(mContext)
                     .load(cursor.getString(COLUMN_BACKDROP_PATH))
                     .into(new PicassoTarget(cursor.getString(COLUMN_BACKDROP_PATH),
-                            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH));
-
-            // TODO: same thing for all the credits images, maybe with a separate Target impl.
-
+                            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH,
+                            MovieTheaterContract.MoviesEntry.TABLE_NAME));
+            
             cursor.close();
         }
+
+
+        // update credits table file path columns for credits profile images
+        Cursor creditsCursor = mContext.getContentResolver().query(
+                MovieTheaterContract.CreditsEntry.CONTENT_URI,
+                new String[]{ MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH },
+                MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{ String.valueOf(mMovieId) }, null);
+
+        // only downloading 4 images for offline use at this time
+        if (creditsCursor != null && creditsCursor.moveToFirst()) {
+            for(int i = 0; i < numCreditsImagesToStoreOffline; i++) {
+                if(creditsCursor.isAfterLast()) { break; }
+
+                Picasso.with(mContext)
+                        .load(creditsCursor.getString(0))
+                        .into(new PicassoTarget(creditsCursor.getString(0),
+                                MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
+                                MovieTheaterContract.CreditsEntry.TABLE_NAME));
+
+                creditsCursor.moveToNext();
+            }
+            creditsCursor.close();
+        }
+
 
     }
 
@@ -166,23 +150,22 @@ class FabClickListener implements View.OnClickListener {
 
         String fileName;
         String dbColumnToInsert;
+        String tableName;
+        String theMovieDbImagePath;
 
-        public PicassoTarget(String theMovieDbImagePath, String dbColumnNameToInsert) {
+
+        public PicassoTarget(String theMovieDbImagePath, String dbColumnNameToInsert, String tableName) {
             Log.i(LOGTAG, "IN PICASSOTARGET CONSTRUCTOR, theMDBImagePath is: " + theMovieDbImagePath);
+
 
             Uri uri = Uri.parse(theMovieDbImagePath);
             fileName = uri.getLastPathSegment();
 
             Log.i(LOGTAG, "****** fileName in PicassoTarget constructor is: " + fileName);
 
-//            // in the db, COLUMN_WHATEVER_PATH looks like '/4h8dsheHD89h48HF348.jpg'
-//            // (it's the unique ID from themoviedb) so I'm reusing it as the filepath for local storage
-//            if(theMovieDbImagePath != null) {
-//                String[] s = theMovieDbImagePath.split("/");
-//                this.fileName = s[1] + ".jpg";
-//                Log.i(LOGTAG, "****** fileName in PicassoTarget constructor is: " + this.fileName);
-//            }
             dbColumnToInsert = dbColumnNameToInsert;
+            this.tableName = tableName;
+            this.theMovieDbImagePath = theMovieDbImagePath;
         }
 
         @Override
@@ -195,11 +178,10 @@ class FabClickListener implements View.OnClickListener {
 
                 // this actually writes the file to local device storage
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ostream);
+                ostream.flush();
+                ostream.close();
 
-                // testing
-                boolean wasWriteToStreamSuccess = bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ostream);
-                Log.e(LOGTAG, "    compress bitmap and write to ostream was successful: " + wasWriteToStreamSuccess);
-
+                // get the file path of the just created file and update the appropriate db table and column
                 String localFilePath = file.getPath();
                 Log.i(LOGTAG, "      localFilePath is: " + localFilePath);
 
@@ -207,14 +189,26 @@ class FabClickListener implements View.OnClickListener {
                 // Picasso need the file path to start with 'file:' when it loads favorites
                 contentValues.put(dbColumnToInsert, "file:" + localFilePath);
 
-                mContext.getContentResolver().update(
-                        MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-                        contentValues,
-                        MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-                        new String[]{String.valueOf(mMovieId)});
+//                Uri uri = tableName.equals(MovieTheaterContract.MoviesEntry.TABLE_NAME) ?
+//                        MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId) :
+//                        MovieTheaterContract.CreditsEntry.CONTENT_URI;
 
-                ostream.flush();
-                ostream.close();
+                if(tableName.equals(MovieTheaterContract.MoviesEntry.TABLE_NAME)) {
+                    mContext.getContentResolver().update(
+                            MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
+                            contentValues,
+                            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+                            new String[]{String.valueOf(mMovieId)});
+                }
+                else {
+                    mContext.getContentResolver().update(
+                            MovieTheaterContract.CreditsEntry.CONTENT_URI,
+                            contentValues,
+                            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH + " = ?",
+                            new String[]{ theMovieDbImagePath });
+                }
+
+
             }
             catch (NullPointerException e) {
                 Log.e("NULL POINTER EXCEPTION", "fileName was NULL in PicassoTarget " +

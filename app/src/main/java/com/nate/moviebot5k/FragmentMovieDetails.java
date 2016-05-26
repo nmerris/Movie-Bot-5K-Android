@@ -1,13 +1,10 @@
 package com.nate.moviebot5k;
 
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -26,11 +23,7 @@ import android.widget.TextView;
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import butterknife.Bind;
@@ -146,7 +139,7 @@ public class FragmentMovieDetails extends Fragment
     private static final int COLUMN_CHARACTER = 2;
     private static final int COLUMN_CAST_NAME = 3;
     private static final int COLUMN_PROFILE_PATH = 5;
-    private static final int COLUMN_PROFILE__FILE_PATH = 6;
+    private static final int COLUMN_PROFILE_FILE_PATH = 6;
 
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] VIDEOS_PROJECTION = {
@@ -422,18 +415,21 @@ public class FragmentMovieDetails extends Fragment
                     mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
 
 
-
-
-//                    // backdrop image
-//                    Picasso.with(getActivity())
-//                            .load(data.getString(COLUMN_BACKDROP_PATH))
-//                            .into(mBackdropImageView);
-
-                    // backdrop image
-                    Picasso.with(getActivity())
-                            .load(data.getString(COLUMN_BACKDROP_PATH))
-                            .into(mBackdropImageView);
-
+                    // backdrop image.. load from either local device or from network, depending
+                    // on if this movie is a favorite.. even if this fragment is being hosted by
+                    // HomeActivity (which may or may not have some favorite movies mixed in with
+                    // whatever the api call returned), might as well still load the images from
+                    // local memory to save an expensive image download
+                    if(data.getString(COLUMN_IS_FAVORITE).equals("true")) {
+                        Picasso.with(getActivity())
+                                .load(data.getString(COLUMN_BACKDROP_FILE_PATH))
+                                .into(mBackdropImageView);
+                    }
+                    else {
+                        Picasso.with(getActivity())
+                                .load(data.getString(COLUMN_BACKDROP_PATH))
+                                .into(mBackdropImageView);
+                    }
 
 
 
@@ -540,43 +536,46 @@ public class FragmentMovieDetails extends Fragment
                     // the credits order should already be correct due to the order param passed
                     // in when this particular loader was created
 
+                    int profileImageColumn = mUseFavorites ? COLUMN_PROFILE_FILE_PATH : COLUMN_PROFILE_PATH;
+
                     // testing
-                    if(data.getString(COLUMN_PROFILE_PATH) != null) {
+                    if(data.getString(profileImageColumn) != null) {
                         // cast member profile image path
                         Picasso.with(getActivity())
-                                .load(data.getString(COLUMN_PROFILE_PATH))
+                                .load(data.getString(profileImageColumn))
                                 .into(mCreditsProfile1);
 
                         mCreditsTextView1.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
                                 ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
                     }
                     if(data.moveToNext()) {
-                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
+                        if(data.getString(profileImageColumn) != null) {
                             Picasso.with(getActivity())
-                                    .load(data.getString(COLUMN_PROFILE_PATH))
+                                    .load(data.getString(profileImageColumn))
                                     .into(mCreditsProfile2);
                         }
                         mCreditsTextView2.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
                                 ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
                     }
                     if(data.moveToNext()) {
-                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
+                        if(data.getString(profileImageColumn) != null) {
                             Picasso.with(getActivity())
-                                    .load(data.getString(COLUMN_PROFILE_PATH))
+                                    .load(data.getString(profileImageColumn))
                                     .into(mCreditsProfile3);
                         }
                         mCreditsTextView3.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
                                 ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
                     }
                     if(data.moveToNext()) {
-                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
+                        if(data.getString(profileImageColumn) != null) {
                             Picasso.with(getActivity())
-                                    .load(data.getString(COLUMN_PROFILE_PATH))
+                                    .load(data.getString(profileImageColumn))
                                     .into(mCreditsProfile4);
                         }
                         mCreditsTextView4.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
                                 ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
                     }
+                    
                     break;
 
                 default:

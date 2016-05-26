@@ -252,7 +252,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i(LOGTAG, "entered onCreateLoader");
+        Log.e(LOGTAG, "entered onCreateLoader");
 
 //        boolean isInitLoader = args.getBoolean("bundle_init_loader");
 
@@ -338,7 +338,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         // swap the cursor so the adapter can load the new images
 //        mMoviePosterAdapter.swapCursor(data);
-        mMoviePosterAdapter.changeCursor(data);
+        mMoviePosterAdapter.swapCursor(data);
 
 
 

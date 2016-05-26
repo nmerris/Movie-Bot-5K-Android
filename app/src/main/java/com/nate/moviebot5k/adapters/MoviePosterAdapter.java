@@ -57,7 +57,7 @@ public class MoviePosterAdapter extends CursorAdapter {
         // conveniently, you can stash any object with a view with setTag, and grab it later
         // you can even store multiple objects if you use keys
         // here I'm tagging each view with the same viewholder, and its unique movieId
-        view.setTag(R.id.movie_poster_imageview_viewholder_key, viewHolder);
+        view.setTag(viewHolder);
 //        view.setTag(R.id.movie_poster_imageview_movie_id_key,
 //                cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
 
@@ -67,14 +67,16 @@ public class MoviePosterAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag(R.id.movie_poster_imageview_viewholder_key);
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-//        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH));
-//        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
+        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH));
+        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
 
         if(mUseFavorites) {
+
             Picasso.with(context)
                     .load(cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_FILE_PATH))
+                    .placeholder(mContext.getResources().getDrawable(R.drawable.moviedb_logo))
                     .into(viewHolder.posterImageView);
         }
         else {
