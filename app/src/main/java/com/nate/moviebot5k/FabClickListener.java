@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.View;
@@ -167,13 +168,20 @@ class FabClickListener implements View.OnClickListener {
         String dbColumnToInsert;
 
         public PicassoTarget(String theMovieDbImagePath, String dbColumnNameToInsert) {
-            // in the db, COLUMN_WHATEVER_PATH looks like '/4h8dsheHD89h48HF348.jpg'
-            // (it's the unique ID from themoviedb) so I'm reusing it as the filepath for local storage
-            if(theMovieDbImagePath != null) {
-                String[] s = theMovieDbImagePath.split("/");
-                this.fileName = s[1] + ".jpg";
-                Log.i(LOGTAG, "****** fileName in PicassoTarget constructor is: " + this.fileName);
-            }
+            Log.i(LOGTAG, "IN PICASSOTARGET CONSTRUCTOR, theMDBImagePath is: " + theMovieDbImagePath);
+
+            Uri uri = Uri.parse(theMovieDbImagePath);
+            fileName = uri.getLastPathSegment();
+
+            Log.i(LOGTAG, "****** fileName in PicassoTarget constructor is: " + fileName);
+
+//            // in the db, COLUMN_WHATEVER_PATH looks like '/4h8dsheHD89h48HF348.jpg'
+//            // (it's the unique ID from themoviedb) so I'm reusing it as the filepath for local storage
+//            if(theMovieDbImagePath != null) {
+//                String[] s = theMovieDbImagePath.split("/");
+//                this.fileName = s[1] + ".jpg";
+//                Log.i(LOGTAG, "****** fileName in PicassoTarget constructor is: " + this.fileName);
+//            }
             dbColumnToInsert = dbColumnNameToInsert;
         }
 
