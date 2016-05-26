@@ -166,7 +166,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        Log.i(LOGTAG, "entered onCreateView");
-        mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
+        mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0, mUseFavorites);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         ButterKnife.bind(this, rootView);
 

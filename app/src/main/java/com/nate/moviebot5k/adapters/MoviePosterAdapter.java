@@ -22,10 +22,11 @@ import butterknife.ButterKnife;
  */
 public class MoviePosterAdapter extends CursorAdapter {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovPosterAdapter";
+    private boolean mUseFavorites;
 
-
-    public MoviePosterAdapter(Context context, Cursor c, int flags) {
+    public MoviePosterAdapter(Context context, Cursor c, int flags, boolean useFavorites) {
         super(context, c, flags);
+        mUseFavorites = useFavorites;
         Log.i(LOGTAG, "entered MoviePosterAdapter constructor");
     }
 
@@ -71,9 +72,20 @@ public class MoviePosterAdapter extends CursorAdapter {
 //        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH));
 //        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
 
-        Picasso.with(context)
-                .load(cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH))
-                .into(viewHolder.posterImageView);
+        if(mUseFavorites) {
+            Picasso.with(context)
+                    .load(cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_FILE_PATH))
+                    .into(viewHolder.posterImageView);
+        }
+        else {
+            Picasso.with(context)
+                    .load(cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH))
+                    .into(viewHolder.posterImageView);
+        }
+
+//        Picasso.with(context)
+//                .load(cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH))
+//                .into(viewHolder.posterImageView);
 
         // TODO: use placeholder images? at least in case a movie has no image poster
         // no wait.. poster and backdrop paths are both NOT NULL in the db, so that will never happen

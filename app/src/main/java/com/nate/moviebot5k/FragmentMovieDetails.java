@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,7 +26,11 @@ import android.widget.TextView;
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import butterknife.Bind;
@@ -392,7 +398,7 @@ public class FragmentMovieDetails extends Fragment
 
                     // get the FAB and set it's drawable depending on if movie is a favorite or not
 //                    FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_favorites);
-                    mFabFavorites.setOnClickListener(new FabClickListenerAndDrawableUpdater());
+                    mFabFavorites.setOnClickListener(new FabClickListener(getActivity(), mMovieId, mFabFavorites));
 //                    Cursor cursor = getActivity().getContentResolver().query(
 //                            MovieTheaterContract.MoviesEntry.CONTENT_URI,
 //                            new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE },
@@ -418,10 +424,18 @@ public class FragmentMovieDetails extends Fragment
 
 
 
+//                    // backdrop image
+//                    Picasso.with(getActivity())
+//                            .load(data.getString(COLUMN_BACKDROP_PATH))
+//                            .into(mBackdropImageView);
+
                     // backdrop image
                     Picasso.with(getActivity())
                             .load(data.getString(COLUMN_BACKDROP_PATH))
                             .into(mBackdropImageView);
+
+
+
 
                     // other misc movie detail data
                     String genreName1 = data.getString(COLUMN_GENRE_NAME1);
@@ -572,10 +586,6 @@ public class FragmentMovieDetails extends Fragment
         } // end if(rootView != null...)
 
 
-
-
-
-
 //        if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
 //
 //        if(rootView != null && data.moveToFirst()) {
@@ -585,7 +595,7 @@ public class FragmentMovieDetails extends Fragment
 //
 //                    // get the FAB and set it's drawable depending on if movie is a favorite or not
 ////                    FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_favorites);
-//                    mFabFavorites.setOnClickListener(new FabClickListenerAndDrawableUpdater(data));
+//                    mFabFavorites.setOnClickListener(new FabClickListener(data));
 //
 //
 //
@@ -753,116 +763,191 @@ public class FragmentMovieDetails extends Fragment
         Log.e(LOGTAG, "ENTERED ONLOADER RESET");
     }
 
-
-    private class FabClickListenerAndDrawableUpdater implements View.OnClickListener {
-//        private Cursor cursor;
-
-        private FabClickListenerAndDrawableUpdater() {
-//            Log.e(LOGTAG, "just entered FabListener... constructor");
-
-//            // TODO: really all this constructor db code should just be up in onLoadFinished
+//
+//    private class FabClickListener implements View.OnClickListener {
+////        private Cursor cursor;
+//
+//        private FabClickListener() {
+//        }
+//
+//
+//        private final String[] projection = {
+//                MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE,
+//                MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH,
+//                MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH,
+//                MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
+//                MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH
+//        };
+//        private final int COLUMN_IS_FAVORITE = 0;
+//        private final int COLUMN_POSTER_PATH = 1;
+//        private final int COLUMN_BACKDROP_PATH = 2;
+//        private final int COLUMN_POSTER_FILE_PATH = 3;
+//        private final int COLUMN_BACKDROP_FILE_PATH = 4;
+//
+//
+//        @Override
+//        public void onClick(View v) {
 //            Cursor cursor = getActivity().getContentResolver().query(
 //                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
 //                    new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE },
 //                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
 //                    new String[]{ String.valueOf(mMovieId) }, null);
 //
-//            cursor.moveToFirst();
+//            if(cursor != null && cursor.moveToFirst()) {
+//                cursor.moveToFirst();
+//                boolean initialFavState = Boolean.valueOf(cursor.getString(COLUMN_IS_FAVORITE));
+//                Log.i(LOGTAG, "  FAB listener.onClick, movieId is: " + mMovieId);
+//                Log.i(LOGTAG, "    and before anything else, column is_favorite for that id is: " + initialFavState);
+//                cursor.close();
 //
-//            Log.i(LOGTAG, "  movieId in constructor was: " + mMovieId);
-//            Log.i(LOGTAG, "  and before anything else, column is_favorite for that id is: " + cursor.getString(0));
+//                // toggle the fab drawable
+//                int fabDrawable = initialFavState ?
+//                        R.drawable.btn_star_off_normal_holo_light : R.drawable.btn_star_on_normal_holo_light;
+////            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
+//                mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
+//
+//                toggleIsFavoriteInAllTables(initialFavState);
+//
+//                // if the movie was just saved as a favorite, save all relevant images to local device storage
+//                // and update the db tables with the file paths of these new files
+//                if (!initialFavState) {
+//                    saveImagesLocally();
+//                }
+//            }
+//
+//        }
 //
 //
-//            // set the fab drawable depending on if the movie being displayed is already a favorite or not
-//            int fabDrawable = cursor.getString(0).equals("true") ?
-//                    R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
+//        private void saveImagesLocally() {
+//            Log.i(LOGTAG, "entered saveImagesLocally");
 //
-//            cursor.close();
 //
-//            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
 //
-//            mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
-        }
+//
+//            Target target = new Target() {
+//
+////                String localFilePath;
+////
+////                // may return null if any problems writing file to local device storage
+////                private String getFilePath() {
+////                    return localFilePath;
+////                }
+//
+//                @Override
+//                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+//                    Log.e(LOGTAG, "  entered onBitmapLoaded");
+//
+//                    File file = new File(getActivity().getExternalFilesDir(null), "testPoster.jpg");
+////                    String path;
+//
+//
+//                    try {
+////                        file.createNewFile();
+//                        FileOutputStream ostream = new FileOutputStream(file);
+//
+//
+//                        boolean wasWriteToStreamSuccess = bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ostream);
+//
+//                        Log.e(LOGTAG, "    compress bitmap and write to ostream was successful: " + wasWriteToStreamSuccess);
+//
+//                        String localFilePath = file.getPath();
+//                        Log.i(LOGTAG, "    file path is: " + localFilePath);
+//
+//                        ContentValues contentValues = new ContentValues();
+//                        contentValues.put(MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH, localFilePath);
+//
+//                        getActivity().getContentResolver().update(
+//                                MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
+//                                contentValues,
+//                                MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+//                                new String[]{ String.valueOf(mMovieId) });
+//
+//
+//
+//                        ostream.flush();
+//                        ostream.close();
+//                    } catch (IOException e) {
+//                        Log.e("IOException", e.getLocalizedMessage());
+//                    }
+//
+//
+//                }
+//
+//                @Override
+//                public void onBitmapFailed(Drawable errorDrawable) {
+//
+//                }
+//
+//                @Override
+//                public void onPrepareLoad(Drawable placeHolderDrawable) {
+//
+//                }
+//            };
+//
+//
+//
+//            Cursor cursor = getActivity().getContentResolver().query(
+//                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
+//                    projection,
+//                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+//                    new String[]{ String.valueOf(mMovieId) }, null);
+//
+//            if(cursor != null && cursor.moveToFirst()) {
+//                Picasso.with(getActivity())
+//                        .load(cursor.getString(COLUMN_POSTER_PATH))
+//                        .into(target);
+//
+//                cursor.close();
+//            }
+//
+//
+//        }
 
-        @Override
-        public void onClick(View v) {
-
-            Cursor cursor = getActivity().getContentResolver().query(
-                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
-                    new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE },
-                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-                    new String[]{ String.valueOf(mMovieId) }, null);
-
-            cursor.moveToFirst();
-
-            boolean initialFavState = Boolean.valueOf(cursor.getString(0));
-            Log.i(LOGTAG, "  FAB listener.onClick, movieId is: " + mMovieId);
-            Log.i(LOGTAG, "    and before anything else, column is_favorite for that id is: " + initialFavState);
-            cursor.close();
 
 
 
-            // toggle the fab drawable
-            int fabDrawable = initialFavState ?
-                    R.drawable.btn_star_off_normal_holo_light : R.drawable.btn_star_on_normal_holo_light;
-//            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
-            mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
-
-
-            toggleIsFavoriteInAllTables(initialFavState);
-
-
-
-        }
-
-        // updates all db tables that match movieId.. pass in the current fav state and it will toggle it
-        private void toggleIsFavoriteInAllTables(boolean initialFavState) {
-            Log.i(LOGTAG, "in toggleIsFavoriteInAllTables, initialFavState is: " + initialFavState +
-            " and will be updating all db records with movie_id: " + mMovieId + " to: " + !initialFavState);
-
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("is_favorite", String.valueOf(!initialFavState));
-
-            int numMovieRecordsUpated = getActivity().getContentResolver().update(
-                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
-                    contentValues,
-                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-                    new String[]{ String.valueOf(mMovieId) });
-            Log.i(LOGTAG, "      num movies table records updated: " + numMovieRecordsUpated);
-
-//            contentValues.put(MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
-            int numVideosRecordsUpdated = getActivity().getContentResolver().update(
-                    MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
-                    contentValues,
-                    null,
-                    null);
-            Log.i(LOGTAG, "      num videos table records updated: " + numVideosRecordsUpdated);
-
-
-//            contentValues.put(MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
-            int numCreditsRecordsUpdated = getActivity().getContentResolver().update(
-                    MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
-                    contentValues,
-                    null,
-                    null);
-            Log.i(LOGTAG, "      num credits table records updated: " + numCreditsRecordsUpdated);
-
-
-//            contentValues.put(MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
-            int numReviewsRecordsUpdated = getActivity().getContentResolver().update(
-                    MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
-                    contentValues,
-                    null,
-                    null);
-            Log.i(LOGTAG, "      num reviews table records updated: " + numReviewsRecordsUpdated);
-
-        }
-
-
-
-
-    }
-
+//        // updates all db tables that match movieId.. pass in the current fav state and it will toggle it
+//        private void toggleIsFavoriteInAllTables(boolean initialFavState) {
+//            Log.i(LOGTAG, "in toggleIsFavoriteInAllTables, initialFavState is: " + initialFavState +
+//            " and will be updating all db records with movie_id: " + mMovieId + " to: " + !initialFavState);
+//
+//            ContentValues contentValues = new ContentValues();
+//            contentValues.put("is_favorite", String.valueOf(!initialFavState));
+//
+//            int numMovieRecordsUpated = getActivity().getContentResolver().update(
+//                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
+//                    contentValues,
+//                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+//                    new String[]{ String.valueOf(mMovieId) });
+//            Log.i(LOGTAG, "      num movies table records updated: " + numMovieRecordsUpated);
+//
+////            contentValues.put(MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
+//            int numVideosRecordsUpdated = getActivity().getContentResolver().update(
+//                    MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
+//                    contentValues,
+//                    null,
+//                    null);
+//            Log.i(LOGTAG, "      num videos table records updated: " + numVideosRecordsUpdated);
+//
+//
+////            contentValues.put(MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
+//            int numCreditsRecordsUpdated = getActivity().getContentResolver().update(
+//                    MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
+//                    contentValues,
+//                    null,
+//                    null);
+//            Log.i(LOGTAG, "      num credits table records updated: " + numCreditsRecordsUpdated);
+//
+//
+////            contentValues.put(MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
+//            int numReviewsRecordsUpdated = getActivity().getContentResolver().update(
+//                    MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
+//                    contentValues,
+//                    null,
+//                    null);
+//            Log.i(LOGTAG, "      num reviews table records updated: " + numReviewsRecordsUpdated);
+//
+//        }
 
     private class VideoViewListener implements View.OnClickListener {
         private String key;
@@ -1010,3 +1095,9 @@ public class FragmentMovieDetails extends Fragment
 
 
 }
+
+
+
+
+
+
