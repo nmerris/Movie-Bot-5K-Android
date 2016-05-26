@@ -118,28 +118,28 @@ class FabClickListener implements View.OnClickListener {
         }
 
 
-        // update credits table file path columns for credits profile images
-        Cursor creditsCursor = mContext.getContentResolver().query(
-                MovieTheaterContract.CreditsEntry.CONTENT_URI,
-                new String[]{ MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH },
-                MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID + " = ?",
-                new String[]{ String.valueOf(mMovieId) }, null);
-
-        // only downloading 4 images for offline use at this time
-        if (creditsCursor != null && creditsCursor.moveToFirst()) {
-            for(int i = 0; i < numCreditsImagesToStoreOffline; i++) {
-                if(creditsCursor.isAfterLast()) { break; }
-
-                Picasso.with(mContext)
-                        .load(creditsCursor.getString(0))
-                        .into(new PicassoTarget(creditsCursor.getString(0),
-                                MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
-                                MovieTheaterContract.CreditsEntry.TABLE_NAME));
-
-                creditsCursor.moveToNext();
-            }
-            creditsCursor.close();
-        }
+//        // update credits table file path columns for credits profile images
+//        Cursor creditsCursor = mContext.getContentResolver().query(
+//                MovieTheaterContract.CreditsEntry.CONTENT_URI,
+//                new String[]{ MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH },
+//                MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID + " = ?",
+//                new String[]{ String.valueOf(mMovieId) }, null);
+//
+//        // only downloading 4 images for offline use at this time
+//        if (creditsCursor != null && creditsCursor.moveToFirst()) {
+//            for(int i = 0; i < numCreditsImagesToStoreOffline; i++) {
+//                if(creditsCursor.isAfterLast()) { break; }
+//
+//                Picasso.with(mContext)
+//                        .load(creditsCursor.getString(0))
+//                        .into(new PicassoTarget(creditsCursor.getString(0),
+//                                MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
+//                                MovieTheaterContract.CreditsEntry.TABLE_NAME));
+//
+//                creditsCursor.moveToNext();
+//            }
+//            creditsCursor.close();
+//        }
 
 
     }

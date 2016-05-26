@@ -2,7 +2,7 @@
 <resources>
 
     <!-- larger images for larger screens -->
-    <string name="themoviedb_poster_size" translatable="false">w342</string>
+    <!--<string name="themoviedb_poster_size" translatable="false">w342</string>-->
     <string name="themoviedb_backdrop_size" translatable="false">w780</string>
     <!--<string name="themoviedb_backdrop_size" translatable="false">w1280</string>-->
 
