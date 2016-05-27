@@ -286,21 +286,6 @@ public class FragmentMovieDetails extends Fragment
             mTwoPane = getArguments().getBoolean(BUNDLE_MTWO_PANE);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
             Log.i(LOGTAG, "    mMovieId is now: " + mMovieId);
-
-            // if this fragment is null, might need to fetch movie details, will only happen if the db
-            // does not have details data for current mMovieId
-            // only need to do it if user is not viewing favorites
-//            if(!mUseFavorites) { // ActivityHome or ActivityMovieDetailsPager is hosting this fragment
-////                updateVidsReviewsCreditsIfNecessary(); // this will restart the loader if it fires the task
-//                new FetchMovieDetailsTask(getActivity(), mMovieId, this).execute();
-//            }
-//            else { // ActivityFavorites or ActivityFavoritesPager is hosting this fragment
-//                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
-//                getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, this);
-//                getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, this);
-//                getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, this);
-//            }
-
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
         // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
@@ -984,7 +969,7 @@ public class FragmentMovieDetails extends Fragment
     }
 
 
-    private class FetchMovieDetailsTask extends AsyncTask<Void, Void, Void> {
+    private class FetchMovieDetailsTask extends AsyncTask<Void, Void, Boolean> {
         Context context;
         int movieId;
         boolean updateVidsReviewsCredits;
@@ -998,23 +983,49 @@ public class FragmentMovieDetails extends Fragment
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... params) {
             Log.i(LOGTAG, "just entered FetchMovieDetailsTask.doInBackground");
             return new MovieDetailsFetcher(context, mMovieId, updateVidsReviewsCredits).fetchMovieDetails();
         }
 
         @Override
-        protected void onPostExecute(Void v) {
-            Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader");
+        protected void onPostExecute(Boolean hadNetworkFault) {
+            Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader if no problems during fetch");
 
-            // need to check for null or app crashes if user clicks posters too rapidly,
-            // because this task finishes after it's activity has been detached
-            if(getActivity() != null) {
-                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
-                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
-                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
-                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+            View rootView = getView();
+            if(getActivity() != null && rootView != null) {
+
+                if(hadNetworkFault) {
+                    rootView.findViewById(R.id.problem_message_details).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.scrollview).setVisibility(View.GONE);
+                    rootView.findViewById(R.id.fab_favorites).setVisibility(View.GONE);
+                    mCallbacks.onUpdateToolbar(null, null);
+                }
+                else {
+                    rootView.findViewById(R.id.scrollview).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.fab_favorites).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.problem_message_details).setVisibility(View.GONE);
+
+                    getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+                    getLoaderManager().initLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
+                    getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
+                    getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+                }
             }
+
+//
+//
+//
+//
+//
+//            // need to check for null or app crashes if user clicks posters too rapidly,
+//            // because this task finishes after it's activity has been detached
+//            if(getActivity() != null) {
+//                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+//                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
+//                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
+//                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
+//            }
         }
     }
 

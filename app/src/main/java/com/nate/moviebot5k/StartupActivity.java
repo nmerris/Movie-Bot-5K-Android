@@ -10,7 +10,6 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import com.nate.moviebot5k.api_fetching.GenresAndCertsFetcher;
@@ -31,7 +30,7 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
-        setContentView(R.layout.problem_message);
+        setContentView(R.layout.activity_startup);
         TextView messageTextView = (TextView) findViewById(R.id.problem_message);
 
         initializeSharedPrefs();

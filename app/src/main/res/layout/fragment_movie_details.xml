@@ -7,6 +7,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/problem_message_details"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:padding="16dp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        android:text="Details for this movie could not be found. Please check your internet connection."/>
 
     <android.support.v4.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +30,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
 
             <ImageView
                 android:id="@+id/backdrop_imageview"
@@ -199,6 +210,9 @@
         app:layout_anchorGravity="bottom|right|end"
         app:layout_behavior="com.nate.moviebot5k.ScrollAwareFABBehavior" />
 
-
 </android.support.design.widget.CoordinatorLayout>
+
+
+
+
 

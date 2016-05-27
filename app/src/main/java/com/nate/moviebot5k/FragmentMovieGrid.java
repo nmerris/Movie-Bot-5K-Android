@@ -382,7 +382,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         @Override
         protected void onPostExecute(ArrayList<Integer> movieIdList) {
-            Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, about to restart loader, size of ArrayList movieIdList is: " + movieIdList.size());
+            Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, about to restart loader if at least one movie fetched, size of ArrayList movieIdList is: " + movieIdList.size());
             
             // don't want anything to happen if this task returns and it's fragment or hosting
             // activity is dead, if rootView is not null, then we know that mMovieIds will not be null,

@@ -36,15 +36,9 @@ public class MovieDetailsFetcher {
 //        Log.e(LOGTAG, "in MovieDetailsFetcher contructor, mMovieId is: " + movieId);
     }
 
-
-    // I can't believe that Void and void are different.......
-    // needs to be Void because the async task that launches it needs it to return Void
-    public Void fetchMovieDetails() {
-//        Log.i(LOGTAG, "entered fetchMovieDetails");
-
-        // get the currently selected movieId to use for API queries
-//        int movieId = PreferenceManager.getDefaultSharedPreferences(mContext)
-//                .getInt(mContext.getString(R.string.key_currently_selected_movie_id), 0);
+    // returns true if has network IO exception, or if JSON problems, basically returns true when
+    // the db could not be updated with movie details for this movie for any reason
+    public boolean fetchMovieDetails() {
         Log.i(LOGTAG, "  just inside fetchMovieDetails and the movieId to be used to fetch movie details is: " + mMovieId);
 
         try { // build the URL for themoviedb GET
@@ -74,11 +68,13 @@ public class MovieDetailsFetcher {
 
         } catch (IOException ioe) {
             Log.e(LOGTAG, "Failed to fetch items", ioe);
+            return true;
         } catch (JSONException je) {
             Log.e(LOGTAG, "Failed to parse JSON", je);
+            return true;
         }
 
-        return null;
+        return false;
     }
 
 
