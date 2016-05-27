@@ -18,6 +18,13 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/action_sort_favorites"
+        android:orderInCategory="250"
+        android:title="Sort"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_sort_white_36dp"/>
+
+    <item
         android:id="@+id/action_about_app"
         android:orderInCategory="300"
         android:title="@string/action_about_app"

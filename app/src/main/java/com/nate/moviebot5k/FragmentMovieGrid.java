@@ -2,6 +2,7 @@ package com.nate.moviebot5k;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -172,6 +173,13 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         ButterKnife.bind(this, rootView);
 
+        // there is no spinner fragment when this fragment is hosted by Favorites Activity, so there
+        // is a lot more width to fill the screen in landscape orientation, and 4 columns looks much nicer
+        if(mUseFavorites && getResources().getConfiguration()
+                .orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mMoviePosterGridView.setNumColumns(4);
+        }
+
 //        Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
         mMoviePosterGridView.setAdapter(mMoviePosterAdapter);
 
@@ -275,11 +283,15 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         if(id == MOVIES_LOADER_ID) {
 
             if(mUseFavorites) {
-                Log.i(LOGTAG, "  about to create a new loader for favorites, sortby param is: " +
-                mSharedPrefs.getString(getString(R.string.key_movie_filter_sortby_value), null));
+                // get the sortby filter setting from sharedPrefs.. when this movie grid fragment is
+                // being hosted by FavoritesActivity, the only filter params that make sense are
+                // highest and lowest revenue, popularity, and rating.. could also have year in there,
+                // but I need to stop somewhere, and that might be a bit confusing because then there
+                // would be two simultaneous sortby options, so I would need to really consolidate it
+                // into one spinner, and I just need to get this project done!!
                 String sortBy = mSharedPrefs.getString(getString(R.string.key_movie_filter_sortby_value), null);
                 String[] sortByParts = sortBy.split("\\.");
-                Log.e(LOGTAG, "    key filter sortby after splitting: " + sortByParts[0] + " " + sortByParts[1]);
+//                Log.e(LOGTAG, "    key filter sortby after splitting: " + sortByParts[0] + " " + sortByParts[1]);
 
                 // only load the movies that are marked as favorite in the movies table in db
                 // and in this case just sort them by whatever the filter spinner is set to

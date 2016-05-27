@@ -116,6 +116,9 @@ public class ActivityHome extends ActivitySingleFragment
 //        Log.i(LOGTAG, "entered onCreateOptionsMenu");
 
         getMenuInflater().inflate(R.menu.menu, menu);
+
+        menu.findItem(R.id.action_sort_favorites).setVisible(false);
+
         return true;
     }
 
