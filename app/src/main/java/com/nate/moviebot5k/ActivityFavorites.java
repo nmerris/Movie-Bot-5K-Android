@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -150,10 +151,19 @@ public class ActivityFavorites extends ActivitySingleFragment
             Log.e(LOGTAG, "just in onUpdateToolbar, movieTitle passed in: " + movieTitle +
                     " and tagline: " + movieTagline);
 
+            // set the title or title and tagline in the action bar, depending on if the movie
+            // in question acutally has tagline data stored in the db.. seems about 80% have taglines
             TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
             TextView movieTaglineTextView = (TextView) findViewById(R.id.toolbar_movie_tagline);
-            movieTitleTextView.setText(movieTitle);
-            movieTaglineTextView.setText(movieTagline);
+            if(movieTagline == null) {
+                movieTaglineTextView.setVisibility(View.GONE);
+                movieTitleTextView.setText(movieTitle);
+            }
+            else {
+                movieTaglineTextView.setVisibility(View.VISIBLE);
+                movieTitleTextView.setText(movieTitle);
+                movieTaglineTextView.setText(movieTagline);
+            }
         }
     }
 
