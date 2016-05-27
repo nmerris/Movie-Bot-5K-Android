@@ -126,8 +126,15 @@ class FabClickListener implements View.OnClickListener {
 
         if(cursor != null && cursor.moveToFirst()) {
             while(!cursor.isAfterLast()) {
-                if(cursor.getString(0) == null) break;
+                // skip over db rows that do not have an image path.. there can be credits entries
+                // that have text data but no image path, esp. for older movies.. for example:
+                // "Freaks" (release date 1932)
+                if(cursor.getString(0) == null) {
+                    cursor.moveToNext();
+                    continue;
+                }
 
+                // strip the file path from the URI and delete the file
                 Uri uri = Uri.parse(cursor.getString(0));
                 filePathsToDelete.add(uri.getPath());
                 Log.e(LOGTAG, "  and path extracted from db column for credit file is: " + uri.getPath());
