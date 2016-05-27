@@ -272,31 +272,23 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.e(LOGTAG, "entered onCreateLoader");
 
-//        boolean isInitLoader = args.getBoolean("bundle_init_loader");
-
-//        Log.e(LOGTAG, "  and BUNDLE isInitLoader bool is: " + isInitLoader);
-
         if(id == MOVIES_LOADER_ID) {
-//            Log.i(LOGTAG, "  and about to return new MOVIES_LOADER");
-
 
             if(mUseFavorites) {
-                // only load the movies that are marked as favorite in the movies table in db
+                Log.i(LOGTAG, "  about to create a new loader for favorites, sortby param is: " +
+                mSharedPrefs.getString(getString(R.string.key_movie_filter_sortby_value), null));
+                String sortBy = mSharedPrefs.getString(getString(R.string.key_movie_filter_sortby_value), null);
+                String[] sortByParts = sortBy.split("\\.");
+                Log.e(LOGTAG, "    key filter sortby after splitting: " + sortByParts[0] + " " + sortByParts[1]);
 
+                // only load the movies that are marked as favorite in the movies table in db
+                // and in this case just sort them by whatever the filter spinner is set to
                 return new CursorLoader(getActivity(),
                         MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
                         MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
                         MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?", // not my most proud java coding moment here, but it works
                         new String[]{ "true" }, // select only the rows that match the movieIds returned by movies fetcher
-                        null); // TODO: the sortOrder will be whatever the sorby spinner is set to..
-                // remember this code block can only be reached if FavoritesAct is hosting this fragment
-                // really I think I was going to store a value to sharedPrefs, like currSelectedFavSortBy
-                // and call that up here, elsewhere it would need to be set any time the user changes the
-                // sortby selection in the spinner, it's important to keep track of both a fav sortby
-                // and a 'normal' home act sortby
-
-
-
+                        sortByParts[0] + " " + sortByParts[1]);
             }
             else {
                 // load the movies with id's in mMovieIds, which are exactly the movies that
