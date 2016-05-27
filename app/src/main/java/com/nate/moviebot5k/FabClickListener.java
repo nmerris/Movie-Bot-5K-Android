@@ -17,8 +17,10 @@ import com.squareup.picasso.Target;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
-// handles everything when FAB favorite icon is clicked, including updating icon drawable and db work
+// handles everything when FAB favorite icon is clicked, including updating icon drawable and db work,
+// and saving or deleting local device files
 class FabClickListener implements View.OnClickListener {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "FABClckLstnr";
 
@@ -29,29 +31,27 @@ class FabClickListener implements View.OnClickListener {
     private final String[] projection = {
             MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE,
             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH,
-            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH
-//            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
-//            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH
+            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH,
+            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
+            MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH
     };
     private final int COLUMN_IS_FAVORITE = 0;
     private final int COLUMN_POSTER_PATH = 1;
     private final int COLUMN_BACKDROP_PATH = 2;
-//    private final int COLUMN_POSTER_FILE_PATH = 3;
-//    private final int COLUMN_BACKDROP_FILE_PATH = 4;
+    private final int COLUMN_POSTER_FILE_PATH = 3;
+    private final int COLUMN_BACKDROP_FILE_PATH = 4;
 
-    private final String[] creditsProjection = {
-            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH
-//            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
-    };
-    private final int COLUMN_PROFILE_PATH = 0;
-//    private final int COLUMN_PROFILE_FILE_PATH = 1;
+//    private final String[] creditsProjection = {
+//            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH
+////            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
+//    };
+//    private final int COLUMN_PROFILE_PATH = 0;
+////    private final int COLUMN_PROFILE_FILE_PATH = 1;
 
 
     public FabClickListener(Context context, int movieId, FloatingActionButton fabFavorites) {
         numCreditsImagesToStoreOffline = context.getResources()
                 .getInteger(R.integer.num_credits_profile_images_to_store_offline);
-
-
         mContext = context;
         mMovieId = movieId;
         mFabFavorites = fabFavorites;
@@ -68,27 +68,87 @@ class FabClickListener implements View.OnClickListener {
         
         if (cursor != null && cursor.moveToFirst()) {
             cursor.moveToFirst();
-            boolean initialFavState = Boolean.valueOf(cursor.getString(COLUMN_IS_FAVORITE));
+            boolean removeFromFavorites = Boolean.valueOf(cursor.getString(COLUMN_IS_FAVORITE));
             Log.i(LOGTAG, "  FAB listener.onClick, movieId is: " + mMovieId);
 //            Log.i(LOGTAG, "    and before anything else, column is_favorite for that id is: " + initialFavState);
             cursor.close();
             
             // toggle the fab drawable
-            int fabDrawable = initialFavState ?
+            int fabDrawable = removeFromFavorites ?
                     R.drawable.btn_star_off_normal_holo_light : R.drawable.btn_star_on_normal_holo_light;
 //            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
             mFabFavorites.setImageDrawable(mContext.getResources().getDrawable(fabDrawable));
             
-            toggleIsFavoriteInAllTables(initialFavState);
-            
-            // if the movie was just saved as a favorite, save all relevant images to local device storage
-            // and update the db tables with the file paths of these new files
-            if (!initialFavState) {
+            toggleIsFavoriteInAllTables(removeFromFavorites);
+
+            if(removeFromFavorites){
+                deleteSavedImaged();
+            }
+            else {
                 saveImagesLocally();
             }
+
         }
         
     }
+
+
+    private void deleteSavedImaged() {
+        Log.i(LOGTAG, "entered deleteSavedImaged");
+
+        ArrayList<String> filePathsToDelete = new ArrayList<>();
+
+        // get cursor pointed at relevant movies table row
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieTheaterContract.MoviesEntry.CONTENT_URI,
+                projection,
+                MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{ String.valueOf(mMovieId) }, null);
+
+        if(cursor != null && cursor.moveToFirst()) {
+            Uri uriPoster = Uri.parse(cursor.getString(COLUMN_POSTER_FILE_PATH));
+            filePathsToDelete.add(uriPoster.getPath());
+            Log.e(LOGTAG, "  and path extracted from db column for poster file is: " + uriPoster.getPath());
+    
+            Uri uriBackdrop = Uri.parse(cursor.getString(COLUMN_BACKDROP_FILE_PATH));
+            filePathsToDelete.add(uriBackdrop.getPath());
+            Log.e(LOGTAG, "  and path extracted from db column for poster file is: " + uriBackdrop.getPath());
+
+            cursor.close();
+        }
+        
+        // get cursor pointed at relevant credits table rows
+        cursor = mContext.getContentResolver().query(
+                MovieTheaterContract.CreditsEntry.CONTENT_URI,
+                new String[]{ MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH },
+                MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{ String.valueOf(mMovieId) }, null);
+
+        if(cursor != null && cursor.moveToFirst()) {
+            while(!cursor.isAfterLast()) {
+                if(cursor.getString(0) == null) break;
+
+                Uri uri = Uri.parse(cursor.getString(0));
+                filePathsToDelete.add(uri.getPath());
+                Log.e(LOGTAG, "  and path extracted from db column for credit file is: " + uri.getPath());
+                cursor.moveToNext();
+            }
+            cursor.close();
+        }
+
+        
+        
+        
+        for (String s : filePathsToDelete) {
+            File file = new File(s);
+            boolean wasDeleted = file.delete();
+            Log.i(LOGTAG, "    file with path: " + s + " was deleted: " + wasDeleted);
+        }
+
+    }
+
+
+
     
     
     private void saveImagesLocally() {
@@ -99,7 +159,7 @@ class FabClickListener implements View.OnClickListener {
                 MovieTheaterContract.MoviesEntry.CONTENT_URI,
                 projection,
                 MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-                new String[]{String.valueOf(mMovieId)}, null);
+                new String[]{ String.valueOf(mMovieId) }, null);
 
         if (cursor != null && cursor.moveToFirst()) {
             Picasso.with(mContext)
@@ -128,7 +188,7 @@ class FabClickListener implements View.OnClickListener {
         // only downloading 4 images for offline use at this time
         if (creditsCursor != null && creditsCursor.moveToFirst()) {
             for(int i = 0; i < numCreditsImagesToStoreOffline; i++) {
-                if(creditsCursor.isAfterLast()) { break; }
+                if(creditsCursor.isAfterLast()) break;
 
                 Picasso.with(mContext)
                         .load(creditsCursor.getString(0))
@@ -145,7 +205,6 @@ class FabClickListener implements View.OnClickListener {
     }
 
 
-
     private class PicassoTarget implements Target {
 
         String fileName;
@@ -156,7 +215,6 @@ class FabClickListener implements View.OnClickListener {
 
         public PicassoTarget(String theMovieDbImagePath, String dbColumnNameToInsert, String tableName) {
             Log.i(LOGTAG, "IN PICASSOTARGET CONSTRUCTOR, theMDBImagePath is: " + theMovieDbImagePath);
-
 
             Uri uri = Uri.parse(theMovieDbImagePath);
             fileName = uri.getLastPathSegment();
@@ -189,9 +247,6 @@ class FabClickListener implements View.OnClickListener {
                 // Picasso need the file path to start with 'file:' when it loads favorites
                 contentValues.put(dbColumnToInsert, "file:" + localFilePath);
 
-//                Uri uri = tableName.equals(MovieTheaterContract.MoviesEntry.TABLE_NAME) ?
-//                        MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId) :
-//                        MovieTheaterContract.CreditsEntry.CONTENT_URI;
 
                 if(tableName.equals(MovieTheaterContract.MoviesEntry.TABLE_NAME)) {
                     mContext.getContentResolver().update(
@@ -232,9 +287,6 @@ class FabClickListener implements View.OnClickListener {
     }
 
 
-
-    
-    
     // updates all db tables that match movieId.. pass in the current fav state and it will toggle it
     private void toggleIsFavoriteInAllTables(boolean initialFavState) {
         Log.i(LOGTAG, "in toggleIsFavoriteInAllTables, initialFavState is: " + initialFavState +
@@ -250,7 +302,6 @@ class FabClickListener implements View.OnClickListener {
                 new String[]{ String.valueOf(mMovieId) });
         Log.i(LOGTAG, "      num movies table records updated: " + numMovieRecordsUpated);
 
-//            contentValues.put(MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
         int numVideosRecordsUpdated = mContext.getContentResolver().update(
                 MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
                 contentValues,
@@ -258,8 +309,6 @@ class FabClickListener implements View.OnClickListener {
                 null);
         Log.i(LOGTAG, "      num videos table records updated: " + numVideosRecordsUpdated);
 
-
-//            contentValues.put(MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
         int numCreditsRecordsUpdated = mContext.getContentResolver().update(
                 MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
                 contentValues,
@@ -267,8 +316,6 @@ class FabClickListener implements View.OnClickListener {
                 null);
         Log.i(LOGTAG, "      num credits table records updated: " + numCreditsRecordsUpdated);
 
-
-//            contentValues.put(MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
         int numReviewsRecordsUpdated = mContext.getContentResolver().update(
                 MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
                 contentValues,
