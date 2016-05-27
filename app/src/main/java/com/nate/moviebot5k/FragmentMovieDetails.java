@@ -1007,11 +1007,6 @@ public class FragmentMovieDetails extends Fragment
         protected void onPostExecute(Void v) {
             Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader");
 
-
-//            FragmentActivity fa = getActivity();
-//            if(fa == null) Log.e(LOGTAG, "FA IS NULL");
-//            else Log.e(LOGTAG, "FA IS **NOT** NULL");
-
             // need to check for null or app crashes if user clicks posters too rapidly,
             // because this task finishes after it's activity has been detached
             if(getActivity() != null) {
@@ -1020,12 +1015,6 @@ public class FragmentMovieDetails extends Fragment
                 getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
                 getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
             }
-
-
-//            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
-//            getLoaderManager().restartLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
-//            getLoaderManager().restartLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
-//            getLoaderManager().restartLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
         }
     }
 

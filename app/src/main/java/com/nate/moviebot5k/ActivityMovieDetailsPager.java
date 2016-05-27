@@ -52,7 +52,11 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         setSupportActionBar(actionBarToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setTitle("Movie Details");
+        if(!mUseFavorites) {
+            getSupportActionBar().setTitle("Movie Details");
+        } else {
+            getSupportActionBar().setTitle("Favorite Movie Details");
+        }
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         FragmentManager fragmentManager = getSupportFragmentManager();

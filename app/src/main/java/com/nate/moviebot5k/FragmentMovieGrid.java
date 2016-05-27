@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
@@ -137,7 +138,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             mMovieIds = savedInstanceState.getIntegerArrayList(BUNDLE_MOVIE_ID_LIST);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
 
-//            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+
+
 
         }
 
@@ -199,6 +201,22 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                 mCallbacks.onMovieSelected(movieId, mMovieIds);
             }
         });
+
+
+        // the 'no movies msg' is displayed either here, if no movies are in movieIds list, and
+        // in FetchMoviesTask.onLoadFinished, if no movies were returned, need to swap view here
+        // as well in case of orientation change, to show the correct view (movie grid or msg view)
+        if(savedInstanceState != null) {
+            if (mMovieIds.size() == 0) { // no movies returned, for whatever reason
+                // replace entire movie grid fragment view with a msg
+                rootView.findViewById(R.id.problem_message_movie_grid).setVisibility(View.VISIBLE);
+                rootView.findViewById(R.id.fragment_movie_grid_gridview).setVisibility(View.GONE);
+            } else {
+                rootView.findViewById(R.id.fragment_movie_grid_gridview).setVisibility(View.VISIBLE);
+                rootView.findViewById(R.id.problem_message_movie_grid).setVisibility(View.GONE);
+            }
+        }
+
 
         return rootView;
     }
@@ -331,16 +349,12 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                     data.moveToNext();
                 }
                 Log.i(LOGTAG, "      num movieIds now in list: " + mMovieIds.size());
-
             }
         }
 
 
         // swap the cursor so the adapter can load the new images
-//        mMoviePosterAdapter.swapCursor(data);
         mMoviePosterAdapter.swapCursor(data);
-
-
 
     }
 
@@ -353,7 +367,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
 
     private class FetchMoviesTask extends AsyncTask<Void, Void, ArrayList<Integer>> {
-
         Context context;
         LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks;
 
@@ -364,17 +377,35 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         @Override
         protected ArrayList<Integer> doInBackground(Void... params) {
-//            Log.i(LOGTAG, "just entered FetchMoviesTask.doInBackground");
             return new MoviesFetcher(context).fetchMovies();
         }
 
         @Override
         protected void onPostExecute(ArrayList<Integer> movieIdList) {
             Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, about to restart loader, size of ArrayList movieIdList is: " + movieIdList.size());
-            mMovieIds = movieIdList;
-            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
-//            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+            
+            // don't want anything to happen if this task returns and it's fragment or hosting
+            // activity is dead, if rootView is not null, then we know that mMovieIds will not be null,
+            // I don't think I need to check if getActivity() is null also, but I was getting some strange
+            // detached messages at one point when calling initLoader, so it doesn't hurt to check
+            View rootView = getView();
+            if(getActivity() != null && rootView != null) {
+                mMovieIds = movieIdList; // it's ok if there are zero movies in movieIdList
+
+                if(movieIdList.size() == 0) { // no movies returned, for whatever reason
+                    // replace entire movie grid fragment view with a msg
+                    rootView.findViewById(R.id.problem_message_movie_grid).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.fragment_movie_grid_gridview).setVisibility(View.GONE);
+                }
+                else {
+                    rootView.findViewById(R.id.fragment_movie_grid_gridview).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.problem_message_movie_grid).setVisibility(View.GONE);
+//                    mMovieIds = movieIdList;
+                    getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+                }
+            }
         }
-    }
+
+    } // end FetchMoviesTask
 
 }

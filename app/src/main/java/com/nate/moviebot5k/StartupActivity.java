@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.nate.moviebot5k.api_fetching.GenresAndCertsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
@@ -29,19 +31,18 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.i(LOGTAG, "entered onCreate");
 
+        setContentView(R.layout.problem_message);
+        TextView messageTextView = (TextView) findViewById(R.id.problem_message);
 
         initializeSharedPrefs();
 
         clearCreditsVideosReviewsTables();
 
-
         // go fetch a new list of genres and certs in a background thread, the app will then either continue
         // on to ActivityHome if successful, or the user will be presented with a choice to view
         // their favorites (if they have any), or the app will just show a msg saying that it needs
         // to have internet connection to work (and that they have not favorites)
-        new FetchGenresAndCertsTask(this).execute();
-
-
+        new FetchGenresAndCertsTask(this, messageTextView).execute();
     }
 
 
@@ -67,9 +68,11 @@ public class StartupActivity extends AppCompatActivity {
         // async task needs it's own Context it can hold on to, in case of orientation change while
         // do in background is running
         Context context;
+        TextView messageTV;
 
-        private FetchGenresAndCertsTask(Context c) {
+        private FetchGenresAndCertsTask(Context c, TextView message) {
             context = c;
+            messageTV = message;
         }
 
         @Override
@@ -112,27 +115,30 @@ public class StartupActivity extends AppCompatActivity {
 
                 if(cursor == null) {
                     Log.e(LOGTAG, "    Woah there buddy, somehow a Cursor was null, this should never happen!");
-
-                    // TODO: show msg to user about data being bad, try reinstalling app
-
+                    messageTV.setText("There appears to be a database problem.  Try restarting the" +
+                            " app and if that doesn't work try reinstalling.");
                 }
                 else {
                     try {
                         if (cursor.moveToFirst()) {
                             // user has at least one favorite saved locally
-
                             Log.i(LOGTAG, "    no connection to themoviedb, BUT user has at least one favorite" +
                                     " saved, so about to launch an intent to FavoritesActivity");
 
-                            // TODO: launch intent to FavoritesActivity
+                            Intent intent = new Intent(context, ActivityFavorites.class);
+                            TaskStackBuilder.create(context).addNextIntentWithParentStack(intent).startActivities();
+                            finish();
+
                         } else {
                             // not much can be done at this point, no connection to themoviedb AND
                             // user has no favorites saved, so just need to show them an appropriate msg
 
                             Log.i(LOGTAG, "    NOTHING can be done at this point," +
                                     " no connection to themoviedb and no favorites saved");
-
-                            // TODO: show msg to user
+                            messageTV.setText("Unfortunately there was a connection problem.  If you had" +
+                                    " any favorites saved, you would be able to view them now even without" +
+                                    " an internet connection, but it appears you do not have any.  Please" +
+                                    " try again when a connection is available and consider adding some favorites!");
                         }
                     } finally {
                         cursor.close();

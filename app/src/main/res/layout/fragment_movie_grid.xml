@@ -1,26 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
-
-<GridView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-android:id="@+id/fragment_movie_grid_gridview"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:numColumns="@integer/gridview_view_num_columns"
-android:layout_margin="@dimen/movie_grid_poster_margin"
-android:verticalSpacing="@dimen/movie_grid_poster_margin"
-android:horizontalSpacing="@dimen/movie_grid_poster_margin"/>
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/problem_message_movie_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:padding="16dp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        android:text="No movies could be found. Try adjusting your search filters and check your internet connection."/>
+
+    <GridView
+        android:id="@+id/fragment_movie_grid_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="@integer/gridview_view_num_columns"
+        android:layout_margin="@dimen/movie_grid_poster_margin"
+        android:verticalSpacing="@dimen/movie_grid_poster_margin"
+        android:horizontalSpacing="@dimen/movie_grid_poster_margin"/>
+
+</LinearLayout>
 
 
-
-<!--
-<GridView
-xmlns:android="http://schemas.android.com/apk/res/android"
-android:id="@+id/fragment_movie_grid_gridview"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:numColumns="@integer/gridview_view_num_columns"
-android:layout_margin="@dimen/movie_grid_poster_margin"
-android:verticalSpacing="@dimen/movie_grid_poster_margin"
-android:horizontalSpacing="@dimen/movie_grid_poster_margin"/>-->
+    <!--
+    <GridView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_movie_grid_gridview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:numColumns="@integer/gridview_view_num_columns"
+    android:layout_margin="@dimen/movie_grid_poster_margin"
+    android:verticalSpacing="@dimen/movie_grid_poster_margin"
+    android:horizontalSpacing="@dimen/movie_grid_poster_margin"/>-->

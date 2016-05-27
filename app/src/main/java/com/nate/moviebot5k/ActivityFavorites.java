@@ -98,6 +98,8 @@ public class ActivityFavorites extends ActivitySingleFragment
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle("Favorites");
 
+
+
         // TODO: need to use the smaller spinner fragment here
         // create and ADD the movie filter spinner fragment if necessary
         Fragment spinnerfragment = mFragmentManager.findFragmentById(R.id.filter_spinner_container);
@@ -117,6 +119,10 @@ public class ActivityFavorites extends ActivitySingleFragment
 
         // hide the favorites menu item
         menu.findItem(R.id.action_favorites).setVisible(false);
+
+        if(!mTwoPane) {
+            menu.findItem(R.id.action_about_app).setVisible(false);
+        }
 
         return true;
     }
