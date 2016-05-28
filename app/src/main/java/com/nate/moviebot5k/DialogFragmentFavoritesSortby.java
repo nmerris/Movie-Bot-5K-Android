@@ -1,6 +1,7 @@
 package com.nate.moviebot5k;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,6 +18,29 @@ public class DialogFragmentFavoritesSortby extends DialogFragment
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "DialogFragFavs";
 
     private SharedPreferences mSharedPrefs;
+    private Callbacks mCallbacks;
+
+    /**
+     * Required interface for any activity that hosts this fragment
+     */
+    public interface Callbacks {
+        void onFavoriteSortbyChanged();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        // associate the fragment's mCallbacks object with the activity it was just attached to
+        mCallbacks = (Callbacks) getActivity();
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        mCallbacks = null; // need to make sure this member variable is up to date with the correct activity
+        // so nullify it every time this fragment gets detached from it's hosting activity
+        super.onDetach();
+    }
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -40,16 +64,20 @@ public class DialogFragmentFavoritesSortby extends DialogFragment
     public void onClick(DialogInterface dialog, int which) {
         Log.e(LOGTAG, "entered onClick, int which is: " + which);
 
-        // update sharedPrefs with new favorites sortby dialog label position and value
-        SharedPreferences.Editor editor = mSharedPrefs.edit();
-        editor.putInt(getString(R.string.key_favorites_sortby_selected_item_position), which);
-        editor.putString(getString(R.string.key_favorites_sortby_value),
-                getResources().getStringArray(R.array.favorites_sortby_values)[which]);
-        editor.commit();
+        int positionBeforeClick = mSharedPrefs
+                .getInt(getString(R.string.key_favorites_sortby_selected_item_position), 0);
 
-        // callback to hosting Activity (which is ActivityFavorites)
+        if(positionBeforeClick != which) {
+            // update sharedPrefs with new favorites sortby dialog label position and value
+            SharedPreferences.Editor editor = mSharedPrefs.edit();
+            editor.putInt(getString(R.string.key_favorites_sortby_selected_item_position), which);
+            editor.putString(getString(R.string.key_favorites_sortby_value),
+                    getResources().getStringArray(R.array.favorites_sortby_values)[which]);
+            editor.commit();
 
-
+            // callback to hosting Activity (which is ActivityFavorites)
+            mCallbacks.onFavoriteSortbyChanged();
+        }
         dismiss();
     }
 

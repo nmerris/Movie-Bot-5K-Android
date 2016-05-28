@@ -18,7 +18,8 @@ import java.util.ArrayList;
 
 // this is very similar to ActivityHome but only shows favorites, and the
 public class ActivityFavorites extends ActivitySingleFragment
-        implements FragmentMovieGrid.Callbacks, FragmentMovieDetails.Callbacks {
+        implements FragmentMovieGrid.Callbacks, FragmentMovieDetails.Callbacks,
+        DialogFragmentFavoritesSortby.Callbacks {
     private final String LOGTAG = N8LOG + "ActivityFavs";
 
     private final String TAG_FAV_SORTBY_DIALOG_FRAGMENT = "favorites_sortby_df";
@@ -138,12 +139,8 @@ public class ActivityFavorites extends ActivitySingleFragment
 //                startActivity(intent);
 
             case R.id.action_sort_favorites:
-
                 new DialogFragmentFavoritesSortby().show(getSupportFragmentManager(),
                         TAG_FAV_SORTBY_DIALOG_FRAGMENT);
-
-//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-//                        FragmentMovieGrid.newInstance(true)).commit();
 
         }
 
@@ -173,6 +170,17 @@ public class ActivityFavorites extends ActivitySingleFragment
                 movieTaglineTextView.setText(movieTagline);
             }
         }
+    }
+
+
+    @Override
+    public void onFavoriteSortbyChanged() {
+        // sharedPrefs have already been updated in DialogFragmentFavoritesSortby, so now just
+        // need to replace the movie grid fragment.. it will read the sortby value from sharedPrefs
+        // and query the db tables as appropriate
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+        FragmentMovieGrid.newInstance(true)).commit();
+
     }
 
 }

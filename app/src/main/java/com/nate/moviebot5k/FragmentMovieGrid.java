@@ -151,16 +151,22 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOGTAG, "entered onActivityCreated");
 
-        if(savedInstanceState == null && mUseFavorites) {
-            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-        }
-        else if(savedInstanceState == null) {
+//        if(savedInstanceState == null && mUseFavorites) {
+//            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//        }
+//        else if(savedInstanceState == null && !mUseFavorites) {
+//            new FetchMoviesTask(getActivity(), this).execute();
+//        }
+//        else {
+//            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+//        }
+
+        if(savedInstanceState == null && !mUseFavorites) {
             new FetchMoviesTask(getActivity(), this).execute();
         }
         else {
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
         }
-
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -214,8 +220,10 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         // the 'no movies msg' is displayed either here, if no movies are in movieIds list, and
         // in FetchMoviesTask.onLoadFinished, if no movies were returned, need to swap view here
         // as well in case of orientation change, to show the correct view (movie grid or msg view)
+        // but only want to show the msg when not showing favorites.. it's ok if the screen is just
+        // empty if user navigates to favorites but doesn't actually have any
         if(savedInstanceState != null) {
-            if (mMovieIds.size() == 0) { // no movies returned, for whatever reason
+            if (mMovieIds.size() == 0 && !mUseFavorites) { // no movies returned, for whatever reason
                 // replace entire movie grid fragment view with a msg
                 rootView.findViewById(R.id.problem_message_movie_grid).setVisibility(View.VISIBLE);
                 rootView.findViewById(R.id.fragment_movie_grid_gridview).setVisibility(View.GONE);
@@ -289,8 +297,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                 // but I need to stop somewhere, and that might be a bit confusing because then there
                 // would be two simultaneous sortby options, so I would need to really consolidate it
                 // into one spinner, and I just need to get this project done!!
-                String sortBy = mSharedPrefs.getString(getString(R.string.key_movie_filter_sortby_value), null);
-                String[] sortByParts = sortBy.split("\\.");
+                String sortBy = mSharedPrefs.getString(getString(R.string.key_favorites_sortby_value), null);
+//                String[] sortByParts = sortBy.split("\\.");
 //                Log.e(LOGTAG, "    key filter sortby after splitting: " + sortByParts[0] + " " + sortByParts[1]);
 
                 // only load the movies that are marked as favorite in the movies table in db
@@ -300,7 +308,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                         MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
                         MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?", // not my most proud java coding moment here, but it works
                         new String[]{ "true" }, // select only the rows that match the movieIds returned by movies fetcher
-                        sortByParts[0] + " " + sortByParts[1]);
+                        sortBy);
             }
             else {
                 // load the movies with id's in mMovieIds, which are exactly the movies that

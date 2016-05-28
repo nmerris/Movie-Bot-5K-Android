@@ -432,6 +432,8 @@ public class FragmentMovieDetails extends Fragment
                     int runtime = data.getInt(COLUMN_RUNTIME);
                     String tagline = data.getString(COLUMN_TAGLINE);
 
+
+
                     // update the toolbar title and subtitle
                     if(mTwoPane) {
                         // app is running in tablet mode, let hosting activity deal with toolbar update

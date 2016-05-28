@@ -16,23 +16,23 @@
     </string-array>
     
     <string-array name="favorites_sortby_labels">
-        <item>@string/favorites_sortby_most_popular_label</item>
-        <item>@string/favorites_sortby_least_popular_label</item>
-        <item>@string/favorites_sortby_highest_revenue_label</item>
-        <item>@string/favorites_sortby_lowest_revenue_label</item>
+<!--        <item>@string/favorites_sortby_most_popular_label</item>
+        <item>@string/favorites_sortby_least_popular_label</item>-->
         <item>@string/favorites_sortby_highest_rated_label</item>
         <item>@string/favorites_sortby_lowest_rated_label</item>
+        <item>@string/favorites_sortby_highest_revenue_label</item>
+        <item>@string/favorites_sortby_lowest_revenue_label</item>
         <item>@string/favorites_sortby_newest_year_label</item>
         <item>@string/favorites_sortby_oldest_year_label</item>
     </string-array>
     <!-- the values array is used in FragmentMovieGrid to sort the favorites records in the db -->
     <string-array name="favorites_sortby_values">
+<!--        <item>@string/default_favorites_sortby_value</item>
+        <item>popularity ASC</item>-->
         <item>@string/default_favorites_sortby_value</item>
-        <item>popularity ASC</item>
+        <item>vote_average ASC</item>
         <item>revenue DESC</item>
         <item>revenue ASC</item>
-        <item>rating DESC</item>
-        <item>rating ASC</item>
         <item>release_date DESC</item>
         <item>release_date ASC</item>
     </string-array>
