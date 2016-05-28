@@ -39,6 +39,7 @@ public class FragmentMovieDetails extends Fragment
     private static final String BUNDLE_USE_FAVORITES_KEY = "use_favorites";
     private static final String BUNDLE_MOVIE_ID_KEY = "movie_id";
     private static final String BUNDLE_MTWO_PANE = "mtwopane_mode";
+
     private Callbacks mCallbacks;
 
     private static final int MOVIES_LOADER_ID = R.id.loader_movies_fragment_movie_details;
@@ -229,15 +230,8 @@ public class FragmentMovieDetails extends Fragment
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOGTAG, "******** JUST ENTERED ONACTIVITYCREATED ******");
 
-        // this happens if being created from new and hosted by favorites activity
-        if(savedInstanceState == null && mUseFavorites) {
-            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
-            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
-            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
-        }
-        // this happens if being created from new and hosted by home activity
-        else if(savedInstanceState == null) {
+
+        if(savedInstanceState == null && !mUseFavorites) {
             Log.e(LOGTAG, "  and since SIS was null, about to MAYBE fire an async task, depends on if this movieId already has detail data in the db");
 
             // returns true only if vids, credits, and reviews tables have no entries with mMovieId
@@ -258,7 +252,18 @@ public class FragmentMovieDetails extends Fragment
             }
 
         }
-        else { // this is reached if orientation changes
+        // the movies loader has to be restarted if phone orientation changes or the fab icon
+        // drawable may not be correct: if the user clicked the favorite button, then rotated their phone,
+        // unless the loader is restarted (as opposed to just calling initLoader), the old cursor will
+        // be reused and the icon will not have the correct drawable
+        // but it's more efficient to reuse the old loader, so just call initLoader on the others
+        else if(savedInstanceState != null && !mTwoPane) {
+            getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+            getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
+            getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
+            getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+        }
+        else { // this is reached in tablet mode, which does not allow orientation changes
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
             getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
             getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
@@ -377,28 +382,15 @@ public class FragmentMovieDetails extends Fragment
                     // get the FAB and set it's drawable depending on if movie is a favorite or not
 //                    FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_favorites);
                     mFabFavorites.setOnClickListener(new FabClickListener(getActivity(), mMovieId, mFabFavorites));
-//                    Cursor cursor = getActivity().getContentResolver().query(
-//                            MovieTheaterContract.MoviesEntry.CONTENT_URI,
-//                            new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE },
-//                            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-//                            new String[]{ String.valueOf(mMovieId) }, null);
-//
-//                    cursor.moveToFirst();
 
                     Log.i(LOGTAG, "  movieId in onLoadFinished for MOVIES_LOADER was: " + mMovieId);
 
-                    boolean favoriteState = Boolean.valueOf(data.getString(COLUMN_IS_FAVORITE));
-
-                    Log.i(LOGTAG, "  and before anything else, column is_favorite for that id is: " + favoriteState);
-
                     // set the fab drawable depending on if the movie being displayed is already a favorite or not
+                    // and depending on if the device was just rotated or not
+                    boolean favoriteState = Boolean.valueOf(data.getString(COLUMN_IS_FAVORITE));
                     int fabDrawable = favoriteState ?
                             R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
-
-//                    Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
-
                     mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
-
 
                     // backdrop image.. load from either local device or from network, depending
                     // on if this movie is a favorite.. even if this fragment is being hosted by
@@ -415,7 +407,6 @@ public class FragmentMovieDetails extends Fragment
                                 .load(data.getString(COLUMN_BACKDROP_PATH))
                                 .into(mBackdropImageView);
                     }
-
 
 
                     // other misc movie detail data

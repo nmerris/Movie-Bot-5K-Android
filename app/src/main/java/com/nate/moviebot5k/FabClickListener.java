@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
 import android.util.Log;
 import android.view.View;
 
@@ -27,7 +28,8 @@ class FabClickListener implements View.OnClickListener {
     private Context mContext;
     private int mMovieId;
     private FloatingActionButton mFabFavorites;
-    private int numCreditsImagesToStoreOffline;
+    private int mNumCreditsImagesToStoreOffline;
+
     private final String[] projection = {
             MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE,
             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH,
@@ -50,7 +52,7 @@ class FabClickListener implements View.OnClickListener {
 
 
     public FabClickListener(Context context, int movieId, FloatingActionButton fabFavorites) {
-        numCreditsImagesToStoreOffline = context.getResources()
+        mNumCreditsImagesToStoreOffline = context.getResources()
                 .getInteger(R.integer.num_credits_profile_images_to_store_offline);
         mContext = context;
         mMovieId = movieId;
@@ -87,6 +89,8 @@ class FabClickListener implements View.OnClickListener {
             else {
                 saveImagesLocally();
             }
+
+
 
         }
         
@@ -194,7 +198,7 @@ class FabClickListener implements View.OnClickListener {
 
         // only downloading 4 images for offline use at this time
         if (creditsCursor != null && creditsCursor.moveToFirst()) {
-            for(int i = 0; i < numCreditsImagesToStoreOffline; i++) {
+            for(int i = 0; i < mNumCreditsImagesToStoreOffline; i++) {
                 if(creditsCursor.isAfterLast()) break;
 
                 Picasso.with(mContext)
