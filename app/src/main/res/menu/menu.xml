@@ -22,6 +22,7 @@
         android:orderInCategory="250"
         android:title="Sort"
         app:showAsAction="always"
+
         android:icon="@drawable/ic_sort_white_36dp"/>
 
     <item

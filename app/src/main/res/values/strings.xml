@@ -4,6 +4,8 @@
     <string name="movie_filters_activity_label">Movie Filters</string>
     <string name="content_authority" translatable="false">com.nate.moviebot5k</string>
 
+   <!-- <string name="cancel">Cancel</string>-->
+
     <!-- api fetching basics, specific endpoint paths are in the java code -->
     <string name="themoviedb_authority" translatable="false">api.themoviedb.org</string>
     <string name="themoviedb_scheme" translatable="false">https</string>
@@ -28,6 +30,16 @@
     <string name="filter_sortby_highest_rated_label">Highest Rated</string>
     <string name="filter_sortby_highest_revenue_label">Highest Revenue</string>
     <string name="filter_sortby_lowest_revenue_label">Lowest Revenue</string>
+
+    <!-- favorites activity labels -->
+    <string name="favorites_sortby_most_popular_label">Most Popular</string>
+    <string name="favorites_sortby_least_popular_label">Least Popular</string>
+    <string name="favorites_sortby_highest_revenue_label">Highest Revenue</string>
+    <string name="favorites_sortby_lowest_revenue_label">Lowest Revenue</string>
+    <string name="favorites_sortby_highest_rated_label">Highest Rated</string>
+    <string name="favorites_sortby_lowest_rated_label">Lowest Rated</string>
+    <string name="favorites_sortby_newest_year_label">Newest Release Date</string>
+    <string name="favorites_sortby_oldest_year_label">Oldest Release Date</string>
 
     <!-- spinners -->
     <string name="spinner_year_label">Year:</string>

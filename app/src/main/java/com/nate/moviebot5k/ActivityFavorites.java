@@ -1,6 +1,7 @@
 package com.nate.moviebot5k;
 
 import android.content.Intent;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 public class ActivityFavorites extends ActivitySingleFragment
         implements FragmentMovieGrid.Callbacks, FragmentMovieDetails.Callbacks {
     private final String LOGTAG = N8LOG + "ActivityFavs";
+
+    private final String TAG_FAV_SORTBY_DIALOG_FRAGMENT = "favorites_sortby_df";
 
 
     // see ActivitySingleFragment
@@ -128,16 +131,19 @@ public class ActivityFavorites extends ActivitySingleFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        Intent intent;
 
-        switch(id) {
+        switch(item.getItemId()) {
 //            case R.id.action_about_app:
 //                intent = new Intent(this, ActivityAboutApp.class);
 //                startActivity(intent);
 
             case R.id.action_sort_favorites:
-                getSupportFragmentManager().beginTransaction().replace(FragmentMovieGrid.newInstance(true))
+
+                new DialogFragmentFavoritesSortby().show(getSupportFragmentManager(),
+                        TAG_FAV_SORTBY_DIALOG_FRAGMENT);
+
+//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+//                        FragmentMovieGrid.newInstance(true)).commit();
 
         }
 

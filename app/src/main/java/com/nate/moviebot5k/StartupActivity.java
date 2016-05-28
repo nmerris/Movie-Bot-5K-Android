@@ -192,7 +192,9 @@ public class StartupActivity extends AppCompatActivity {
             editor.putInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0);
             editor.putInt(getString(R.string.key_movie_filter_cert_spinner_position), 0);
             editor.putInt(getString(R.string.key_movie_filter_genre_spinner_position), 0);
-            editor.putInt(getString(R.string.key_favorites_sortby_spinner_position), 0);
+
+            // the favorites sortby dialog fragment also starts in zeroth position
+            editor.putInt(getString(R.string.key_favorites_sortby_selected_item_position), 0);
 
 //            editor.commit();
         }

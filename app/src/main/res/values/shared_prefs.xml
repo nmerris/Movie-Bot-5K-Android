@@ -25,8 +25,8 @@
     <!-- favorites sortby, sorts only favorites in favorites table locally, this sortby filter is
     not associated with any API calls -->
     <string name="key_favorites_sortby_value">favorites_sortby</string> <!-- value type String -->
-    <string name="default_favorites_sortby_value">popularity.desc</string> <!-- most popular -->
-    <string name="key_favorites_sortby_spinner_position">fav_sortby_spinner_position</string>
+    <string name="default_favorites_sortby_value">popularity DESC</string> <!-- most popular -->
+    <string name="key_favorites_sortby_selected_item_position">fav_sortby_spinner_position</string>
 
 
     <string name="key_currently_selected_movie_id">curr_sel_movie_id</string>
