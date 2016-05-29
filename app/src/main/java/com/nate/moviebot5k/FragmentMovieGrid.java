@@ -36,11 +36,13 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MovGridFragment";
 
     private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
+    private static final String BUNDLE_TWO_PANE = "two_pane_mode";
     private static final String BUNDLE_MOVIE_ID_LIST = "movie_id_list";
     private static final int MOVIES_LOADER_ID = R.id.loader_movies_table_fragment_movie_grid;
 
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
+    private boolean mTwoPane;
     private MoviePosterAdapter mMoviePosterAdapter;
     private SharedPreferences mSharedPrefs;
     private ArrayList<Integer> mMovieIds;
@@ -57,9 +59,10 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
      *                          favorites table, which can be used with no internet connection
      * @return new FragmentMovieGrid <code>fragment</code>
      */
-    public static FragmentMovieGrid newInstance(boolean useFavorites) {
+    public static FragmentMovieGrid newInstance(boolean useFavorites, boolean mTwoPane) {
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, useFavorites);
+        args.putBoolean(BUNDLE_TWO_PANE, mTwoPane);
         FragmentMovieGrid fragment = new FragmentMovieGrid();
         fragment.setArguments(args);
         return fragment;
@@ -109,27 +112,15 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Log.i(LOGTAG, "entered onCreate");
 
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mMovieIds = new ArrayList<>();
 
-
         if(savedInstanceState == null) {
             Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
+            mTwoPane = getArguments().getBoolean(BUNDLE_TWO_PANE);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
-
-            // this fragment is being hosted by ActivityHome
-//            if(!mUseFavorites /*&& mSharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)*/) {
-//                Log.i(LOGTAG, "  and since !mUseFavorites, about to fire a FetchMoviesTask");
-//                new FetchMoviesTask(getActivity(), this).execute();
-//            }
-//            else { // this fragment is being hosted by ActivityFavorites
-//                Log.i(LOGTAG, "  and since mUseFavorites is TRUE, about to restart LOADER, which will only select favorites records");
-////                mMovieIds = new ArrayList<>();
-////                getLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
-//            }
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
         // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
@@ -137,11 +128,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool AND mMovieIds List from SIS Bundle");
             mUseFavorites = savedInstanceState.getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             mMovieIds = savedInstanceState.getIntegerArrayList(BUNDLE_MOVIE_ID_LIST);
+            mTwoPane = savedInstanceState.getBoolean(BUNDLE_TWO_PANE);
             Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
-
-
-
-
         }
 
     }
@@ -151,23 +139,12 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOGTAG, "entered onActivityCreated");
 
-//        if(savedInstanceState == null && mUseFavorites) {
-//            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-//        }
-//        else if(savedInstanceState == null && !mUseFavorites) {
-//            new FetchMoviesTask(getActivity(), this).execute();
-//        }
-//        else {
-//            getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
-//        }
-
         if(savedInstanceState == null && !mUseFavorites) {
             new FetchMoviesTask(getActivity(), this).execute();
         }
         else {
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
         }
-
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -181,8 +158,9 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         // there is no spinner fragment when this fragment is hosted by Favorites Activity, so there
         // is a lot more width to fill the screen in landscape orientation, and 4 columns looks much nicer
-        if(mUseFavorites && getResources().getConfiguration()
-                .orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        // in phone landscape
+        // in all other cases the num columns is defined in the xml for the gridlayout
+        if(mUseFavorites && !mTwoPane) {
             mMoviePosterGridView.setNumColumns(4);
         }
 
@@ -197,7 +175,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                 // get the movieId from the tag attached to the view that was just clicked
 //                int movieId = (int) view.getTag(R.id.movie_poster_imageview_movie_id_key);
                 int movieId = mMovieIds.get(position);
-
 
                 // store the currently selected movieId in sharedPrefs
                 // so when the user comes back to this app, the same movie will be on screen

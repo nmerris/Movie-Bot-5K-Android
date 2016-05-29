@@ -29,15 +29,3 @@
         android:horizontalSpacing="@dimen/movie_grid_poster_margin"/>
 
 </LinearLayout>
-
-
-    <!--
-    <GridView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_movie_grid_gridview"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:numColumns="@integer/gridview_view_num_columns"
-    android:layout_margin="@dimen/movie_grid_poster_margin"
-    android:verticalSpacing="@dimen/movie_grid_poster_margin"
-    android:horizontalSpacing="@dimen/movie_grid_poster_margin"/>-->

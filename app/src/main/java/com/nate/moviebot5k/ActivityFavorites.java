@@ -31,18 +31,15 @@ public class ActivityFavorites extends ActivitySingleFragment
 //        Log.i(LOGTAG, "entered createFragment, about to return a NEW FragmentMovieGrid to ActivitySingleFragment");
 
         // tell FMG to load ONLY the favorites movies from the db
-        return FragmentMovieGrid.newInstance(true);
+        return FragmentMovieGrid.newInstance(true, mTwoPane);
     }
 
 
-//    // see ActivitySingleFragment
-//    @Override
-//    protected int getLayoutResourceId() {
-//        return R.layout.activity_home;
-//    }
-//    // TODO: needs a new layout, spinner block can only have sortby spinner, others don't make sense with favorites
-//    // prob. have the spinner in the toolbar in phone landscape?
-
+    // see ActivitySingleFragment
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_favorites_ref;
+    }
 
 
     @Override
@@ -79,22 +76,6 @@ public class ActivityFavorites extends ActivitySingleFragment
     }
 
 
-//    // replace the current FragmentMovieGrid any time a filter parameter has changed
-//    // NOTE: MGF checks sharedPrefs key fetch_new_movies to see if it should make an API call,
-//    // so there is no need to pass over a fragment argument in this case
-//    @Override
-//    public void onFilterChanged() {
-//        Log.i(LOGTAG, "entered onFilterChanged, about to REPLACE FragmentMovieGrid");
-//
-//        // create and REPLACE the movie filter spinner fragment, pass over true so that the
-//        // favorites table will be used
-//        mFragmentManager.beginTransaction().replace(R.id.fragment_container,
-//                FragmentMovieGrid.newInstance(true)).commit();
-//
-//
-//    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,16 +83,6 @@ public class ActivityFavorites extends ActivitySingleFragment
 
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle("Favorites");
-
-
-//
-//        // TODO: need to use the smaller spinner fragment here
-//        // create and ADD the movie filter spinner fragment if necessary
-//        Fragment spinnerfragment = mFragmentManager.findFragmentById(R.id.filter_spinner_container);
-//        if (spinnerfragment == null) {
-//            spinnerfragment = new FragmentMovieFiltersSpinner();
-//            mFragmentManager.beginTransaction().add(R.id.filter_spinner_container, spinnerfragment).commit();
-//        }
 
     }
 
@@ -179,7 +150,7 @@ public class ActivityFavorites extends ActivitySingleFragment
         // need to replace the movie grid fragment.. it will read the sortby value from sharedPrefs
         // and query the db tables as appropriate
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-        FragmentMovieGrid.newInstance(true)).commit();
+        FragmentMovieGrid.newInstance(true, mTwoPane)).commit();
 
     }
 

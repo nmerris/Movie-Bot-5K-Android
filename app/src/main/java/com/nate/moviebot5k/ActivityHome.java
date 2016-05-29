@@ -30,7 +30,7 @@ public class ActivityHome extends ActivitySingleFragment
 
         // NOTE: MGF always just checks sharePrefs for fetch_new_movies boolean when it is created,
         // so there is no need to pass it any arguments to tell it if it should or should not do a fetch
-        return FragmentMovieGrid.newInstance(false);
+        return FragmentMovieGrid.newInstance(false, mTwoPane);
 
     }
 
@@ -79,7 +79,7 @@ public class ActivityHome extends ActivitySingleFragment
         // create and REPLACE the movie filter spinner fragment, pass over false so that the
         // favorites table will not be used
         mFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                FragmentMovieGrid.newInstance(false)).commit();
+                FragmentMovieGrid.newInstance(false, mTwoPane)).commit();
 
 
     }

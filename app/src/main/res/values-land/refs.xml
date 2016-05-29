@@ -2,5 +2,7 @@
 <resources>
     <!-- phone landscape mode uses vertical spinner fragment layout -->
     <item name="fragment_filter_spinners_ref" type="layout">@layout/fragment_filter_spinners_vertical</item>
+
+    <!-- the details layout is a bit different in phone landscape -->
     <item name="fragment_movie_details_ref" type="layout">@layout/fragment_movie_details_wide</item>
 </resources>

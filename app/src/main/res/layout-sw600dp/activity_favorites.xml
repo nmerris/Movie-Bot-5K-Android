@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <!-- left pane in tablet mode -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="45">
+
+        <!-- this is the action bar with menu and app title -->
+        <include layout="@layout/toolbar_movie_grid"/>
+
+        <!-- contains FragmentMovieGrid -->
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <!-- right pane in tablet mode -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_weight="55"
+        android:layout_height="wrap_content">
+
+        <!-- the toolbar above the details view -->
+        <include layout="@layout/toolbar_details"/>
+
+        <!-- the meaty part of the details view -->
+        <FrameLayout
+            android:id="@+id/container_second_pane"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</LinearLayout>
+
+
+
