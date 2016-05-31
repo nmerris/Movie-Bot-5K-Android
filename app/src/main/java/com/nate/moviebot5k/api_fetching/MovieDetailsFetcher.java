@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.util.Vector;
 
 /**
+ * Fetches movie details from themoviedb servers.  The api calls made here are different than those
+ * made by MoviesFetcher.  Reviews, Credits, Videos, budget, and revenue data are grabbed here for
+ * whatever movieId is passed to the constructor.
+ *
  * Created by Nathan Merris on 5/17/2016.
  */
 public class MovieDetailsFetcher {
@@ -28,16 +32,30 @@ public class MovieDetailsFetcher {
     private int mMovieId; // the movieId this fetcher be fetchin'
     private boolean updateVidsReviewsCredits;
 
+
+    /**
+     * Before creating a new MovieDetailsFetcher, make sure there are not already records in the db
+     * with the same movieId, or you may end up with duplicates for videos, reviews, and credits.
+     * One movieId may have, for example, 50 credits table records associated with it, so can't rely on
+     * the UNIQUE constraint to prevent duplicates.  On the other hand, movies table does have a UNIQUE constraint.
+     *
+     * @param movieId themoviedb movieId
+     * @param updateVidsReviewsCredits only pass in true if there are currently NO db records
+     *                                 with movieId, or else you may get duplicate records
+     */
     public MovieDetailsFetcher(Context context, int movieId, boolean updateVidsReviewsCredits) {
         mContext = context;
         mMovieId = movieId;
         this.updateVidsReviewsCredits = updateVidsReviewsCredits;
-
-//        Log.e(LOGTAG, "in MovieDetailsFetcher contructor, mMovieId is: " + movieId);
     }
 
-    // returns true if has network IO exception, or if JSON problems, basically returns true when
-    // the db could not be updated with movie details for this movie for any reason
+
+    /**
+     * Initiates a network api call to fetch all the details for the movie with id passed in to
+     * MovieDetailsFetcher constructor.
+     *
+     * @return true if there were no network faults and the db was successfully updated
+     */
     public boolean fetchMovieDetails() {
         Log.i(LOGTAG, "  just inside fetchMovieDetails and the movieId to be used to fetch movie details is: " + mMovieId);
 
@@ -56,34 +74,35 @@ public class MovieDetailsFetcher {
             String url = builder.build().toString();
             Log.i(LOGTAG, "  just built URL: " + url);
 
-            String jsonString = Utility.getUrlString(url); // call getUrlString, which will query themoviedb API
-            Log.i(LOGTAG, "    Received JSON: " + jsonString);
+            String jsonString = Utility.getUrlString(url);
+//            Log.i(LOGTAG, "    Received JSON: " + jsonString);
 
-            JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
+            JSONObject jsonBody = new JSONObject(jsonString);
 
             // parse and insert the movie details to the appropriate db tables
-            // ie the movies table will get 4 more columsn of data, and the credits, reviews, and
-            // videos tables will be updated with data, everything is tied to it's movieId as usual
             parseJsonAndInsertToDb(jsonBody);
 
         } catch (IOException ioe) {
             Log.e(LOGTAG, "Failed to fetch items", ioe);
-            return true;
+            return false;
         } catch (JSONException je) {
             Log.e(LOGTAG, "Failed to parse JSON", je);
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
-
-
-
-
+    
+    
+    /**
+     * Parses the movies data from json and updates the db.  If there is already a record in the
+     * movies table with the same movieId, no records are updated or inserted.  Launches methods to
+     * parse and update the videos, reviews, and credits tables depending on how this class was
+     * constructed.
+     * 
+     * @see #MovieDetailsFetcher(Context, int, boolean) 
+     */
     private void parseJsonAndInsertToDb(JSONObject jsonBody) throws JSONException {
-//        Log.i(LOGTAG, "entered parseJsonAndInsertToDb (in movie details fetcher)");
-
-
         // get the relevant pieces of extra data and update the MOVIES table
         ContentValues values = new ContentValues();
         values.put(MovieTheaterContract.MoviesEntry.COLUMN_BUDGET, jsonBody.getLong("budget")); // in dollars
@@ -103,38 +122,54 @@ public class MovieDetailsFetcher {
                 Log.i(LOGTAG, "  there were less than 4 genre names associated with this movie, this is not an error");
         }
 
-        int numUpdated = mContext.getContentResolver()
+        // update the movies table record
+        mContext.getContentResolver()
                 .update(MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
                        values, null, null);
 
 
+        // only attempt to update these table if instructed to do so by caller
+        // need to avoid duplicate records
         if(updateVidsReviewsCredits) {
             try {
                 processVideosJson(jsonBody);
-            } catch (JSONException je) {
-                Log.e(LOGTAG, "Failed to parse JSON in processVideosJson", je);
-            }
-
-            try {
                 processReviewsJson(jsonBody);
-            } catch (JSONException je) {
-                Log.e(LOGTAG, "Failed to parse JSON in processReviewsJson", je);
-            }
-
-            try {
                 processCreditsJson(jsonBody);
             } catch (JSONException je) {
-                Log.e(LOGTAG, "Failed to parse JSON in processCreditsJson", je);
+                Log.e(LOGTAG, "Failed to parse JSON", je);
             }
         }
 
+//        if(updateVidsReviewsCredits) {
+//            try {
+//                processVideosJson(jsonBody);
+//            } catch (JSONException je) {
+//                Log.e(LOGTAG, "Failed to parse JSON in processVideosJson", je);
+//            }
+//
+//            try {
+//                processReviewsJson(jsonBody);
+//            } catch (JSONException je) {
+//                Log.e(LOGTAG, "Failed to parse JSON in processReviewsJson", je);
+//            }
+//
+//            try {
+//                processCreditsJson(jsonBody);
+//            } catch (JSONException je) {
+//                Log.e(LOGTAG, "Failed to parse JSON in processCreditsJson", je);
+//            }
+//        }
+
     }
-
-
+    
+    
+    /**
+     * Parses the videos data from json, builds video thumbnail URLs, and updates the videos
+     * table with all the new data.
+     */
     private void processVideosJson (JSONObject jsonBody) throws JSONException {
         JSONObject videosJsonObject = jsonBody.getJSONObject("videos");
         JSONArray videosJsonArray = videosJsonObject.getJSONArray("results");
-
         int numVideos = videosJsonArray.length();
         int numVideosInserted = 0;
         Vector<ContentValues> valuesVidsVector = new Vector<>(numVideos);
@@ -154,17 +189,10 @@ public class MovieDetailsFetcher {
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_SIZE, jsonObject.getInt("size"));
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_TYPE, jsonObject.getString("type"));
 
+            // build a video thumbnail URL, youtube only per design specs
             String youtubeVideoThumbnailUrl = "http://img.youtube.com/vi/" +
                     jsonObject.getString("key") + "/hqdefault.jpg";
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_THUMBNAIL_URL, youtubeVideoThumbnailUrl);
-
-            // testing
-//            Log.i(LOGTAG, "  added video table ContenValues obj with movie_id: " + mMovieId);
-//            Log.i(LOGTAG, "    and with key: " + jsonObject.getString("key"));
-//            Log.i(LOGTAG, "    and with size: " + jsonObject.getInt("size"));
-//            Log.i(LOGTAG, "    and with type: " + jsonObject.getString("type"));
-//            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
-//            Log.e(LOGTAG, "    and with thumbnail URL: " + youtubeVideoThumbnailUrl);
 
             // set the is_favorite column to FALSE
             valuesVideos.put(MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE, "false");
@@ -172,12 +200,7 @@ public class MovieDetailsFetcher {
             valuesVidsVector.add(valuesVideos);
         }
 
-//        Log.i(LOGTAG, "      num video records extracted from json array was: " + numVideos);
-
         if(valuesVidsVector.size() > 0) { // no point in doing anything if no data could be obtained
-            // TODO: can get rid of numDeleted after testing
-
-//            Log.i(LOGTAG, "      about to call bulkInsert");
             // insert the new data
             ContentValues[] valuesVidsArray = new ContentValues[valuesVidsVector.size()];
             valuesVidsVector.toArray(valuesVidsArray);
@@ -185,16 +208,17 @@ public class MovieDetailsFetcher {
             numVideosInserted = mContext.getContentResolver()
                     .bulkInsert(MovieTheaterContract.VideosEntry.CONTENT_URI, valuesVidsArray);
         }
-        Log.d(LOGTAG, "        num videos inserted to videos table was: " + numVideosInserted);
-
+        Log.i(LOGTAG, "  num videos inserted to videos table was: " + numVideosInserted);
     }
-
-
+    
+    
+    /**
+     * Parses the reviews data from json, and updates the reviews
+     * table with all the new data.
+     */
     private void processReviewsJson (JSONObject jsonBody) throws JSONException {
-
         JSONObject reviewsJsonObject = jsonBody.getJSONObject("reviews");
         JSONArray reviewsJsonArray = reviewsJsonObject.getJSONArray("results");
-
         int numReviews = reviewsJsonArray.length();
         int numReviewsInserted = 0;
         Vector<ContentValues> valuesReviewsVector = new Vector<>(numReviews);
@@ -211,24 +235,14 @@ public class MovieDetailsFetcher {
             valuesReviews.put(MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR, jsonObject.getString("author"));
             valuesReviews.put(MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT, jsonObject.getString("content"));
 
-            // testing
-//            Log.i(LOGTAG, "  added review table record with movie_id: " + mMovieId);
-//            Log.i(LOGTAG, "    and with author: " + jsonObject.getString("author"));
-//            Log.i(LOGTAG, "    and with content: " + jsonObject.getString("content"));
-
             // set the is_favorite column to FALSE
             valuesReviews.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, "false");
 
             // add the single object to the ContentValues Vector
             valuesReviewsVector.add(valuesReviews);
         }
-
-//        Log.i(LOGTAG, "      num review records extracted from json array was: " + numReviews);
-
+        
         if(valuesReviewsVector.size() > 0) { // no point in doing anything if no data could be obtained
-            // TODO: can get rid of numDeleted after testing
-
-//            Log.i(LOGTAG, "      about to call bulkInsert");
             // insert the new data
             ContentValues[] valuesReviewsArray = new ContentValues[valuesReviewsVector.size()];
             valuesReviewsVector.toArray(valuesReviewsArray);
@@ -236,15 +250,17 @@ public class MovieDetailsFetcher {
             numReviewsInserted = mContext.getContentResolver()
                     .bulkInsert(MovieTheaterContract.ReviewsEntry.CONTENT_URI, valuesReviewsArray);
         }
-        Log.d(LOGTAG, "        num reviews inserted to reviews table was: " + numReviewsInserted);
-
+        Log.i(LOGTAG, "  num reviews inserted to reviews table was: " + numReviewsInserted);
     }
-
-
+    
+    
+    /**
+     * Parses the credits data from json, builds credit thumbnail URLs, and updates the credits
+     * table with all the new data.
+     */
     private void processCreditsJson(JSONObject jsonBody) throws JSONException {
         JSONObject creditsJsonObject = jsonBody.getJSONObject("credits");
         JSONArray creditsJsonArray = creditsJsonObject.getJSONArray("cast");
-
         int numCredits = creditsJsonArray.length();
         int numCreditsInserted = 0;
         Vector<ContentValues> valuesCreditsVector = new Vector<>(numCredits);
@@ -274,26 +290,14 @@ public class MovieDetailsFetcher {
                     + jsonObject.getString("profile_path");
             valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH, profileImageUrl);
 
-            // testing
-//            Log.i(LOGTAG, "  added credit table record with movie_id: " + mMovieId);
-//            Log.i(LOGTAG, "    and with character: " + jsonObject.getString("character"));
-//            Log.i(LOGTAG, "    and with name: " + jsonObject.getString("name"));
-//            Log.i(LOGTAG, "    and with profile path: " + profileImageUrl);
-//            Log.i(LOGTAG, "    and with profile order: " + jsonObject.getInt("order"));
-
             // set the is_favorite column to FALSE
             valuesCredits.put(MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE, "false");
 
             // add the single object to the ContentValues Vector
             valuesCreditsVector.add(valuesCredits);
         }
-
-//        Log.i(LOGTAG, "      num credit records extracted from json array was: " + numCredits);
-
+        
         if(valuesCreditsVector.size() > 0) { // no point in doing anything if no data could be obtained
-            // TODO: can get rid of numDeleted after testing
-
-            Log.i(LOGTAG, "      about to call bulkInsert");
             // insert the new data
             ContentValues[] valuesCreditsArray = new ContentValues[valuesCreditsVector.size()];
             valuesCreditsVector.toArray(valuesCreditsArray);
@@ -301,9 +305,7 @@ public class MovieDetailsFetcher {
             numCreditsInserted = mContext.getContentResolver()
                     .bulkInsert(MovieTheaterContract.CreditsEntry.CONTENT_URI, valuesCreditsArray);
         }
-        Log.d(LOGTAG, "        num credits inserted to credits table was: " + numCreditsInserted);
-
+        Log.i(LOGTAG, "  num credits inserted to credits table was: " + numCreditsInserted);
     }
-
     
 }

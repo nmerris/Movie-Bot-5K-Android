@@ -23,30 +23,32 @@ import java.util.List;
 import java.util.Vector;
 
 /**
+ * Fetches movie metadata from themoviedb servers.  The query parameters are retrieved from
+ * sharedPrefs: release date, genre id, sort order, and certification (like G, PG, R, etc)
+ *
  * Created by Nathan Merris on 5/9/2016.
  */
 public class MoviesFetcher {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "MoviesFetcher";
-
     private Context mContext; // used to retrieve String resources for API queries
 
     public MoviesFetcher(Context context) { mContext = context; }
 
-
-
+    /**
+     * Reads query params from sharePrefs, builds a URL, gets the json, and passes it to
+     * parseMoviesAndInsertToDb to complete the work.  If a network or json exception occurs, the
+     * process is aborted.  If the fetch is successful, the sharePrefs key fetch_new_movies is set to
+     * false, otherwise it remains true.
+     *
+     * @return A List of all the movieIds that were fetched, which may be empty if the query parameters
+     * are too restrictive (like if user is trying to search by the most popular R-rated western
+     * movies made in 1923.. that will prob. return zero movies)
+     */
     public ArrayList<Integer> fetchMovies() {
-        Log.i(LOGTAG, "entered fetchMovies, only possible to get here if key_fetch_new_movies in sharedPrefs is TRUE");
-
-//        int numMoviesFetched = 0;
         ArrayList<Integer> movieIdList = new ArrayList<>();
-
-
-        // compile a list to use as query params for the discover movie endpoint
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-//        Log.i(LOGTAG, "  but just to check, here is it's current value: "
-//                + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
-
+        // read the current query params
         String selectedCert = sharedPrefs
                 .getString(mContext.getString(R.string.key_movie_filter_cert), "");
         String selectedYear = sharedPrefs
@@ -97,16 +99,16 @@ public class MoviesFetcher {
             String url = builder.build().toString();
             Log.i(LOGTAG, "  just built URL: " + url);
 
-
-            String jsonString = Utility.getUrlString(url); // call getUrlString, which will query themoviedb API
-            Log.i(LOGTAG, "    Received JSON: " + jsonString);
+            // call getUrlString, which will query themoviedb API
+            String jsonString = Utility.getUrlString(url);
+//            Log.i(LOGTAG, "    Received JSON: " + jsonString);
 
             JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
-//            numMoviesFetched = parseMoviesAndInsertToDb(jsonBody);
+
             parseMoviesAndInsertToDb(jsonBody, movieIdList);
 
             // if this code is reached, there must not have been any exceptions thrown,
-            // so set key_fetch_new_movies to false.. we don't really care if zero movies was return,
+            // so set key_fetch_new_movies to false.. we don't really care if zero movies were returned,
             // this could only happen if the user has filter criteria that is too restrictive, in
             // which case they will need to adjust their filter, and will be shown a msg
             // however if an exception is thrown, that implies a network or json error, so
@@ -116,34 +118,36 @@ public class MoviesFetcher {
             SharedPreferences.Editor editor = sharedPrefs.edit();
             editor.putBoolean(mContext.getString(R.string.key_fetch_new_movies), false);
             editor.commit();
-            Log.i(LOGTAG, "      fetch had no exceptions, don't care if zero movies fetched, so just set sharedPrefs key_fetch_new_movies to ****FALSE****");
+            Log.i(LOGTAG, "    fetch had no exceptions, don't care if zero movies fetched, so just set sharedPrefs key_fetch_new_movies to ****FALSE****");
 
 
         } catch (IOException ioe) {
             Log.e(LOGTAG, "Failed to fetch items", ioe);
-            Log.i(LOGTAG, "  so sharedPrefs key_fetch_new_movies should still be true, here's what it is: "
-                    + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
+//            Log.i(LOGTAG, "  so sharedPrefs key_fetch_new_movies should still be true, here's what it is: "
+//                    + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
         } catch (JSONException je) {
             Log.e(LOGTAG, "Failed to parse JSON", je);
-            Log.i(LOGTAG, "  so sharedPrefs key_fetch_new_movies should still be true, here's what it is: "
-                    + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
+//            Log.i(LOGTAG, "  so sharedPrefs key_fetch_new_movies should still be true, here's what it is: "
+//                    + sharedPrefs.getBoolean(mContext.getString(R.string.key_fetch_new_movies), false));
         }
 
-//        return numMoviesFetched;
         return movieIdList;
-
     }
 
 
+    /**
+     * Parses json, builds a URL for the movie poster and backdrop path, deletes all the old non
+     * favorite movies table records (only if at least one movie was fetched), and inserts the new
+     * movies data to the movies table.
+     *
+     * @param movieIdList a list of all the movieIds that were inserted to the movies table
+     * @throws JSONException
+     */
     private void parseMoviesAndInsertToDb(JSONObject jsonBody, ArrayList<Integer> movieIdList) throws JSONException {
-//        Log.i(LOGTAG, "entered parseMoviesAndInsertToDb");
-        
         JSONArray moviesJsonArray = jsonBody.getJSONArray("results");
         int numMovies = moviesJsonArray.length();
         int numInserted = 0;
         Vector<ContentValues> valuesVector = new Vector<>(numMovies);
-
-//        List<Long> movieIdList = new ArrayList<>();
 
         for (int i = 0; i < numMovies; i++) {
             // get a single JSON object from jsonBody
@@ -151,25 +155,13 @@ public class MoviesFetcher {
             ContentValues values = new ContentValues();
 
             // extract the data from the json object and put it in a single ContentValues object
-            values.put(MoviesEntry.COLUMN_MOVIE_ID, jsonObject.getLong("id")); // NOT NULL COLUMN
+            values.put(MoviesEntry.COLUMN_MOVIE_ID, jsonObject.getLong("id")); // UNIQUE NOT NULL COLUMN
             values.put(MoviesEntry.COLUMN_VOTE_COUNT, jsonObject.getLong("vote_count"));
-
             values.put(MoviesEntry.COLUMN_OVERVIEW, jsonObject.getString("overview")); // NOT NULL COLUMN
             values.put(MoviesEntry.COLUMN_RELEASE_DATE, jsonObject.getString("release_date")); // NOT NULL COLUMN
-//            values.put(MoviesEntry.COLUMN_ORIGINAL_TITLE, jsonObject.getString("original_title"));
             values.put(MoviesEntry.COLUMN_TITLE, jsonObject.getString("title")); // NOT NULL COLUMN
-
-//            values.put(MoviesEntry.COLUMN_ORIGINAL_LANGUAGE, jsonObject.getString("original_language"));
-
-//            values.put(MoviesEntry.COLUMN_HAS_VIDEO, jsonObject.getString("video"));
-//            values.put(MoviesEntry.COLUMN_ADULT, jsonObject.getString("adult"));
-
             values.put(MoviesEntry.COLUMN_POPULARITY, jsonObject.getDouble("popularity")); // NOT NULL COLUMN
             values.put(MoviesEntry.COLUMN_VOTE_AVG, jsonObject.getDouble("vote_average")); // NOT NULL COLUMN
-
-//            values.put(MoviesEntry.COLUMN_BACKDROP_PATH, jsonObject.getString("backdrop_path")); // NOT NULL COLUMN
-//            values.put(MoviesEntry.COLUMN_POSTER_PATH, jsonObject.getString("poster_path")); // NOT NULL COLUMN
-
 
             // put the fully formed image URL's in the db, this URL will point to an image size that
             // is appropriate for the device this app is running on
@@ -201,89 +193,59 @@ public class MoviesFetcher {
                 values.put(MoviesEntry.COLUMN_GENRE_ID3, genresJsonArray.getInt(2));
                 values.put(MoviesEntry.COLUMN_GENRE_ID4, genresJsonArray.getInt(3));
             } catch (JSONException e) {
-//                Log.i(LOGTAG, "  there were less than 4 genres associated with this movie, this is not an error");
+                // there may be less than 4 genres associated with a given movie, which is not
+                // an error, so do nothing if excpetion thrown
             }
-            
 
-            // print the data for all the NON NULL columns
-//            Log.d(LOGTAG, "  added movie id: " + jsonObject.getLong("id") + "  title: " + jsonObject.getString("title"));
-//            Log.d(LOGTAG, "  and overview: " + jsonObject.getString("overview"));
-//            Log.d(LOGTAG, "  and release_date: " + jsonObject.getString("release_date"));
-//            Log.d(LOGTAG, "  and movie title: " + jsonObject.getString("title"));
-//            Log.d(LOGTAG, "  and backdrop_path: " + jsonObject.getString("backdrop_path"));
-//            Log.d(LOGTAG, "  and poster_path: " + jsonObject.getString("poster_path"));
-//            Log.d(LOGTAG, "  and popularity: " + jsonObject.getDouble("popularity"));
-//            Log.d(LOGTAG, "  and vote_avg: " + jsonObject.getDouble("vote_average"));
-//
-//            // print the data for genre id(s)
-//            Log.d(LOGTAG, "  and genre_id_1: " + genresJsonArray.getInt(0));
-////            Log.d(LOGTAG, "  and genre_id_2: " + genresJsonArray.getInt(1));
-////            Log.d(LOGTAG, "  and genre_id_3: " + genresJsonArray.getInt(2));
-////            Log.d(LOGTAG, "  and genre_id_4: " + genresJsonArray.getInt(3));
-
-
-            // set the is_favorite column to FALSE
-            //
-            values.put(MoviesEntry.COLUMN_IS_FAVORITE, "false"); // assume all are not favorites here,
+            // set the is_favorite column to FALSE,
             // but below the bulkinsert will reject any movies that are already in the db due to UNIQUE
             // constraint on movie_id column, so no danger of overriding a users favorites list
-
-            values.put(MoviesEntry.COLUMN_FETCH_ORDER, i); // keep track of the order of the movies
-
+            values.put(MoviesEntry.COLUMN_IS_FAVORITE, "false"); // assume all are not favorites here,
 
 
+            // keep track of the order of the movies, they are returned from themoviedb in a
+            // meaningful order that depends on the query parameters
+            values.put(MoviesEntry.COLUMN_FETCH_ORDER, i);
 
             // need a list of movieIds so that MovieGridFragment will know which ones to select
             // from the db when it creates the loader that populates the movie grid
             movieIdList.add(jsonObject.getInt("id"));
 
-
             // check if the movie just parsed from the json is already in the db and is a favorite,
-            // if it is, update it's fetch_order so that the movie grid will display it in the right
+            // if it is, UPDATE it's fetch_order so that the movie grid will display it in the right
             // order along with all the other non favorites movies that may have been parsed out
             ContentValues fetchOrderCV = new ContentValues();
             fetchOrderCV.put(MoviesEntry.COLUMN_FETCH_ORDER, i);
-
-            int favoriteFetchOrderUpdated = mContext.getContentResolver().update(
+            mContext.getContentResolver().update(
                     MoviesEntry.CONTENT_URI,
                     fetchOrderCV,
                     MoviesEntry.COLUMN_MOVIE_ID + " = ? AND " + MoviesEntry.COLUMN_IS_FAVORITE + " = ?",
                     new String[]{ jsonObject.getString("id"), "true" });
-            Log.e(LOGTAG, "    IN MOVIES FETCHER, favoriteFetchOrderUpdated for movieId: " + jsonObject.getString("id") +
-                " is (0 means no update performed because " +
-                    "that movieId was not in db already and was not a favorite): " + favoriteFetchOrderUpdated);
-
 
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
         }
 
         if(valuesVector.size() > 0) { // no point in doing anything if no data could be obtained
-            // TODO: can get rid of numDeleted after testing
-
-            Log.i(LOGTAG, "  about to wipe out old movies table data but only NON favorites, calling delete with uri: " + MoviesEntry.CONTENT_URI);
             // wipe out the old data
             int numDeleted = mContext.getContentResolver()
                     .delete(MoviesEntry.CONTENT_URI,
                             MoviesEntry.COLUMN_IS_FAVORITE + " = ?",
                             new String[]{ "false" });
 
-            Log.i(LOGTAG, "    number of NON favorites records deleted: " + numDeleted);
+            Log.i(LOGTAG, "  after fetching movie data, just cleaned out old movies, " +
+                    "number of NON favorites records deleted: " + numDeleted);
 
-
-            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
-            // insert the new data
+            // INSERT the new data
             ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
             valuesVector.toArray(valuesArray);
 
             numInserted = mContext.getContentResolver()
                     .bulkInsert(MoviesEntry.CONTENT_URI, valuesArray);
-
-
         }
 
-        Log.d(LOGTAG, "        before return from parseMoviesAndInsertToDb, numInserted is: " + numInserted);
-//        return numInserted;
+        Log.i(LOGTAG, "    before return from parseMoviesAndInsertToDb," +
+                " num records inserted was: " + numInserted);
     }
 
 }

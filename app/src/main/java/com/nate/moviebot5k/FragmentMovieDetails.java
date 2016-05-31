@@ -982,13 +982,13 @@ public class FragmentMovieDetails extends Fragment
         }
 
         @Override
-        protected void onPostExecute(Boolean hadNetworkFault) {
+        protected void onPostExecute(Boolean wasSuccessful) {
             Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader if no problems during fetch");
 
             View rootView = getView();
             if(getActivity() != null && rootView != null) {
 
-                if(hadNetworkFault) {
+                if(!wasSuccessful) {
                     rootView.findViewById(R.id.problem_message_details).setVisibility(View.VISIBLE);
                     rootView.findViewById(R.id.scrollview).setVisibility(View.GONE);
                     rootView.findViewById(R.id.fab_favorites).setVisibility(View.GONE);
