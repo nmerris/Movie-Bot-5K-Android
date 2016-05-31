@@ -347,9 +347,9 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         // swap the cursor so the adapter can load the new images
         mMoviePosterAdapter.swapCursor(data);
 
-        // callback to hosting activity so that a new fragment can be loaded in tablet mode in the
-        // second pane (ie the details view)
-        mCallbacks.onGridLoaded(mMovieIds);
+//        // callback to hosting activity so that a new fragment can be loaded in tablet mode in the
+//        // second pane (ie the details view)
+//        mCallbacks.onGridLoaded(mMovieIds);
 
     }
 
@@ -397,6 +397,13 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                     rootView.findViewById(R.id.problem_message_movie_grid).setVisibility(View.GONE);
 //                    mMovieIds = movieIdList;
                     getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
+
+
+                    // callback to hosting activity so that a new fragment can be loaded in tablet mode in the
+                    // second pane (ie the details view)
+                    mCallbacks.onGridLoaded(mMovieIds);
+
+
                 }
             }
         }

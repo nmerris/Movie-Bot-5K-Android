@@ -2,10 +2,12 @@ package com.nate.moviebot5k;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.util.Log;
@@ -69,10 +71,11 @@ class FabClickListener implements View.OnClickListener {
                 new String[]{String.valueOf(mMovieId)}, null);
         
         if (cursor != null && cursor.moveToFirst()) {
-            cursor.moveToFirst();
+//            cursor.moveToFirst();
             boolean removeFromFavorites = Boolean.valueOf(cursor.getString(COLUMN_IS_FAVORITE));
             Log.i(LOGTAG, "  FAB listener.onClick, movieId is: " + mMovieId);
 //            Log.i(LOGTAG, "    and before anything else, column is_favorite for that id is: " + initialFavState);
+
             cursor.close();
             
             // toggle the fab drawable
@@ -83,14 +86,61 @@ class FabClickListener implements View.OnClickListener {
             
             toggleIsFavoriteInAllTables(removeFromFavorites);
 
+
+
+
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            int initialNumFavorites = sharedPrefs.getInt(mContext.getString(R.string.key_num_favorites), 0);
+            int currSelectedFavorite = sharedPrefs.getInt(mContext.getString(R.string.key_currently_selected_favorite_id), 0);
+            Log.i(LOGTAG, "    and numFavorites when button clicked was: " + initialNumFavorites);
+            Log.i(LOGTAG, "      and currently selected favoriteId stored in sharedPrefs is: " + currSelectedFavorite);
+
+            // REMOVIE FROM FAVORITES:
             if(removeFromFavorites){
+                if(initialNumFavorites == 1) {
+                    // user just removed the last favorite, so now their favs list is empty
+                    // I indicate 'no movie id' with -1
+                    editor.putInt(mContext.getString(R.string.key_currently_selected_favorite_id), -1);
+                } else if(currSelectedFavorite == mMovieId) {
+                    // user just removed the favorite movie they had selected in favorites activity
+                    // detail view, so just reset it to the first favorite
+                    Cursor c = mContext.getContentResolver().query(
+                            MovieTheaterContract.MoviesEntry.CONTENT_URI,
+                            new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID },
+                            MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE + " = ?",
+                            new String[]{ "true" }, null);
+
+                    if(c != null && c.moveToFirst()) {
+                        editor.putInt(mContext.getString(R.string.key_currently_selected_favorite_id),
+                                c.getInt(0));
+                        c.close();
+                    }
+                }
+
+                // decrement the favorites counter and update in sharedPrefs
+                editor.putInt(mContext.getString(R.string.key_num_favorites), initialNumFavorites - 1);
+                editor.commit();
+                Log.i(LOGTAG,  "numFavorites is now: " + (initialNumFavorites - 1));
+
                 deleteSavedImaged();
             }
+            // ADD TO FAVORITES:
             else {
+                if(initialNumFavorites == 0) {
+                    // the only way for this code to execute is if the user just added a movie to
+                    // their favs list and they didn't have any favorites before, so this is the one
+                    // and only favorite.. in which case set it to be their 'selected' favorite so
+                    // that favorites activity can politely load a details fragment when the user
+                    // navigates to there, other times the last selected favorite is loaded
+//                    SharedPreferences.Editor editor = sharedPrefs.edit();
+                    editor.putInt(mContext.getString(R.string.key_currently_selected_favorite_id), mMovieId);
+                }
+                editor.putInt(mContext.getString(R.string.key_num_favorites), initialNumFavorites + 1);
+                editor.commit();
+                Log.i(LOGTAG,  "numFavorites is now: " + (initialNumFavorites + 1));
                 saveImagesLocally();
             }
-
-
 
         }
         

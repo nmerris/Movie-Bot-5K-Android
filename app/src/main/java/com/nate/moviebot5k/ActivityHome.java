@@ -78,18 +78,25 @@ public class ActivityHome extends ActivitySingleFragment
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
             int currSelectedMovieId = sharedPrefs.getInt(getString(R.string.key_currently_selected_movie_id), 0);
 
-            if(currSelectedMovieId == -1) {
-                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-                        FragmentMovieDetails.newInstance(true, moviesList.get(0), true)).commit();
-            }
-            else {
+//            if(currSelectedMovieId == -1) {
+//                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+//                        FragmentMovieDetails.newInstance(false, moviesList.get(0), true)).commit();
+//            }
+//            else {
+
+
                 for (int movieId : moviesList) {
                     if(movieId == currSelectedMovieId) {
                         mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-                                FragmentMovieDetails.newInstance(true, movieId, true)).commit();
+                                FragmentMovieDetails.newInstance(false, movieId, true)).commit();
+                        return;
                     }
                 }
-            }
+                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+                        FragmentMovieDetails.newInstance(false, moviesList.get(0), true)).commit();
+
+
+//            }
         }
 
     }
@@ -109,15 +116,6 @@ public class ActivityHome extends ActivitySingleFragment
 
 
     }
-
-
-//    // callback from FragmentMovieDetails
-//    @Override
-//    public void onFavoriteRemoved(int movieId) {
-//        Log.i(LOGTAG, "entered onFavoriteRemoved");
-//
-//
-//    }
 
 
     @Override
@@ -144,6 +142,13 @@ public class ActivityHome extends ActivitySingleFragment
         getMenuInflater().inflate(R.menu.menu, menu);
 
         menu.findItem(R.id.action_sort_favorites).setVisible(false);
+
+//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        int currSelectedFavoriteId = sharedPrefs.getInt(getString(R.string.key_currently_selected_favorite_id), 0);
+//        // disable the favorites menu if user has no favorites
+//        if(currSelectedFavoriteId == -1) {
+//            menu.findItem(R.id.action_favorites).setEnabled(false);
+//        }
 
         return true;
     }

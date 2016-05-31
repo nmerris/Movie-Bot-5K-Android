@@ -81,23 +81,25 @@ public class ActivityFavorites extends ActivitySingleFragment
     @Override
     public void onGridLoaded(ArrayList<Integer> moviesList) {
 
-        if(mTwoPane && moviesList.size() > 0) {
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-            int currSelectedFavoriteId = sharedPrefs.getInt(getString(R.string.key_currently_selected_favorite_id), 0);
-
-            if(currSelectedFavoriteId == -1) {
-                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-                        FragmentMovieDetails.newInstance(true, moviesList.get(0), true)).commit();
-            }
-            else {
-                for (int movieId : moviesList) {
-                    if(movieId == currSelectedFavoriteId) {
-                        mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-                                FragmentMovieDetails.newInstance(true, movieId, true)).commit();
-                    }
-                }
-            }
-        }
+//        if(mTwoPane && moviesList.size() > 0) {
+//            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+//            int currSelectedFavoriteId = sharedPrefs.getInt(getString(R.string.key_currently_selected_favorite_id), 0);
+//
+//            if(currSelectedFavoriteId == -1) {
+//                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+//                        FragmentMovieDetails.newInstance(true, moviesList.get(0), true)).commit();
+//            }
+//            else {
+//                for (int movieId : moviesList) {
+//                    if(movieId == currSelectedFavoriteId) {
+////                        mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+////                                FragmentMovieDetails.newInstance(true, movieId, true)).commit();
+//                        mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+//                                FragmentMovieDetails.newInstance(true, movieId, true)).commit();
+//                    }
+//                }
+//            }
+//        }
         
     }
     
@@ -109,6 +111,23 @@ public class ActivityFavorites extends ActivitySingleFragment
 
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle("Favorites");
+
+        if(mTwoPane) {
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            int numFavorites = sharedPrefs.getInt(getString(R.string.key_num_favorites), 0);
+
+            Log.e(LOGTAG, "  ^^^^^^^^^^^ in onCreate, numFavorites: " + numFavorites);
+
+            if(numFavorites > 0) {
+                // if there is more than 1 favorites saved, then currSelectedFavoriteId is
+                // guaranteed to be valid as that is taken care of in FabClickListener
+                int currSelectedFavoriteId = sharedPrefs.getInt(getString(R.string.key_currently_selected_favorite_id), 0);
+                Log.i(LOGTAG, "  and currSelectedFavId: " + currSelectedFavoriteId);
+
+                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+                        FragmentMovieDetails.newInstance(true, currSelectedFavoriteId, true)).commit();
+            }
+        }
 
     }
 
