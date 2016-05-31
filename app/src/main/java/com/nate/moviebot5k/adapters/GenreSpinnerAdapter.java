@@ -10,6 +10,10 @@ import com.nate.moviebot5k.R;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
+ * A very simple spinner adapter that uses a simple_spinner_item layout.
+ * Each view in the adapter is set with a tag that represents themoviedb genreId to
+ * use for discovery api calls.
+ *
  * Created by Nathan Merris on 5/13/2016.
  */
 public class GenreSpinnerAdapter extends SimpleCursorAdapter {

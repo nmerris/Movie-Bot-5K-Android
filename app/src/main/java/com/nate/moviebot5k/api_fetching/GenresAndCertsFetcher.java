@@ -20,29 +20,23 @@ import java.io.IOException;
 import java.util.Vector;
 
 /**
+ * Fetches genres and certs json data from themoviedb, parses it, and updates the appropriate db tables.
+ * 
  * Created by Nathan Merris on 5/6/2016.
  */
 public class GenresAndCertsFetcher {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "GnresCertsFtcher";
-
     private Context mContext; // used to retrieve String resources for API queries
-
     public GenresAndCertsFetcher(Context context) { mContext = context; }
-
-
+    
     /**
-     * Fetches all of the available genres from themoviedb.  The resulting json body is passed to
-     * parseGenresAndInsertToDb, which converts updates the genres db table.  It is up to the caller
-     * to determine what should happen if 0 items are returned.
+     * Fetches all of the available genres from themoviedb.  The resulting 
+     * json body is parsed and the genres db table updated.
      *
      * @return the number of genres that were fetched, 0 if there was a problem
-     *
      */
     public int fetchAvailableGenres() {
-//        Log.i(LOGTAG, "entered fetchAvailableGenres");
-
         int numGenresFetched = 0;
-
 
         try { // build the URL for themoviedb GET for genres
             Uri.Builder builder = new Uri.Builder();
@@ -56,10 +50,13 @@ public class GenresAndCertsFetcher {
                     .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY);
 
             String url = builder.build().toString();
-            String jsonString = Utility.getUrlString(url); // call getUrlString, which will query themoviedb API
+            
+            // call getUrlString, which will query themoviedb API
+            String jsonString = Utility.getUrlString(url); 
 //            Log.i(LOGTAG, "  Received JSON: " + jsonString);
-
-            JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
+    
+            // convert the returned data to a JSON object
+            JSONObject jsonBody = new JSONObject(jsonString);
             numGenresFetched = parseGenresAndInsertToDb(jsonBody);
 
         } catch (IOException ioe) {
@@ -69,13 +66,15 @@ public class GenresAndCertsFetcher {
         }
 
         return numGenresFetched;
-
     }
-
-
+    
+    /**
+     * Fetches all of the available certifications from themoviedb.  The resulting 
+     * json body is parsed and the certs db table updated.
+     *
+     * @return the number of certifications that were fetched, 0 if there was a problem
+     */
     public void fetchAvailableCertifications() {
-//        Log.i(LOGTAG, "entered fetchAvailableCertifications");
-
         try { // build the URL for themoviedb GET for certs
             Uri.Builder builder = new Uri.Builder();
             builder.scheme(mContext.getString(R.string.themoviedb_scheme))
@@ -88,10 +87,13 @@ public class GenresAndCertsFetcher {
                     .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY);
 
             String url = builder.build().toString();
-            String jsonString = Utility.getUrlString(url); // call getUrlString, which will query themoviedb API
+    
+            // call getUrlString, which will query themoviedb API
+            String jsonString = Utility.getUrlString(url);
 //            Log.i(LOGTAG, "  Received JSON: " + jsonString);
-
-            JSONObject jsonBody = new JSONObject(jsonString); // convert the returned data to a JSON object
+    
+            // convert the returned data to a JSON object
+            JSONObject jsonBody = new JSONObject(jsonString); 
             parseCertsAndInsertToDb(jsonBody);
 
         } catch (IOException ioe) {
@@ -101,11 +103,16 @@ public class GenresAndCertsFetcher {
         }
 
     }
-
-
+    
+    
+    /**
+     * Takes a json body containing all available themoviedb certifications, parses it, and updates the
+     * certs table in the database via MovieTheaterProvider.
+     *
+     * @param jsonBody the unparsed json
+     */
     private void parseCertsAndInsertToDb(JSONObject jsonBody)
             throws IOException, JSONException {
-//        Log.i(LOGTAG, "entered parseCertsAndInsertToDb");
 
         // get the US certs array out of the certifications json object
         JSONArray certsJsonArray = jsonBody.getJSONObject("certifications").getJSONArray("US");
@@ -134,36 +141,22 @@ public class GenresAndCertsFetcher {
             values.put(CertsEntry.COLUMN_ORDER, certJsonObject.getInt("order"));
             values.put(CertsEntry.COLUMN_MEANING, certJsonObject.getString("meaning"));
             values.put(CertsEntry.COLUMN_NAME, certJsonObject.getString("certification"));
-
-
+            
             // add the single object to the ContentValues Vector
             valuesVector.add(values);
-
-//            Log.d(LOGTAG, "  added certification name: " + certJsonObject.getString("certification"));
-//            Log.d(LOGTAG, "  and certification order: " + certJsonObject.getInt("order"));
         }
 
         // greater than 1 below because there will always be a single 'Any Rating' in valuesVector
         if(valuesVector.size() > 1) { // no point in doing anything if no genres could be obtained
-            // TODO: can get rid of numDeleted and numInserted after testing
-
-//            Log.i(LOGTAG, "  about to wipe out old certification table data, calling delete with uri: " + CertsEntry.CONTENT_URI);
-            // wipe out the old data
-            int numDeleted = mContext.getContentResolver()
+            mContext.getContentResolver()
                     .delete(CertsEntry.CONTENT_URI, null, null);
 
-//            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
-
-//            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
             // insert the new data
             ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
             valuesVector.toArray(valuesArray);
 
-            int numInserted = mContext.getContentResolver()
+            mContext.getContentResolver()
                     .bulkInsert(CertsEntry.CONTENT_URI, valuesArray);
-
-//            Log.i(LOGTAG, "        and number of records inserted: " + numInserted);
-
         }
 
     }
@@ -173,22 +166,17 @@ public class GenresAndCertsFetcher {
      * Takes a json body containing all available themoviedb genres, parses it, and updates the
      * genres table in the database via MovieTheaterProvider.
      * The moviedb genre for 'Foreign' is stripped out here.
+     * This method is used by ActivityStartup to determine if a connection to themoviedb servers
+     * is available, which is why it returns an int.
      *
      * @param jsonBody the unparsed json body to devour
      * @return the number of genres that were successfully inserted to the db
      */
     private int parseGenresAndInsertToDb(JSONObject jsonBody)
             throws IOException, JSONException {
-//        Log.i(LOGTAG, "entered parseGenresAndInsertToDb");
-
-
         JSONArray genresJsonArray = jsonBody.getJSONArray("genres");
         int numInserted = 0;
         int numGenres = genresJsonArray.length();
-
-        // Vector is synchronized, prob. not necessary here because this code should only be reached
-        // once each time StartupActivity runs, unlike when the movies table is updated which is
-        // more likely to have simultaneous movies table writes
         Vector<ContentValues> valuesVector = new Vector<>(numGenres);
         
         // first add the 'Any Genre' record
@@ -213,25 +201,15 @@ public class GenresAndCertsFetcher {
 
             // add the single object to the ContentValues Vector
             valuesVector.add(cv);
-
-//            Log.d(LOGTAG, "  added genre id: " + genreJsonObject.getInt("id") + "  name: " + genreJsonObject.getString("name"));
-//            Log.d(LOGTAG, "  and genre name: " + genreJsonObject.getString("name"));
         }
-
 
         // conditioning on greater than 1 because there will always be a single 'Any Genre' in the Vector
         if(valuesVector.size() > 1) { // no point in doing anything if no genres could be obtained
-            // TODO: can get rid of numDeleted after testing
 
-//            Log.i(LOGTAG, "  about to wipe out old genre table data, calling delete with uri: " + GenresEntry.CONTENT_URI);
             // wipe out the old data
-            int numDeleted = mContext.getContentResolver()
+            mContext.getContentResolver()
                     .delete(GenresEntry.CONTENT_URI, null, null);
 
-//            Log.i(LOGTAG, "    number or records deleted: " + numDeleted);
-
-
-//            Log.i(LOGTAG, "      about to call bulkInsert with the same URI");
             // insert the new data
             ContentValues[] valuesArray = new ContentValues[valuesVector.size()];
             valuesVector.toArray(valuesArray);
@@ -240,7 +218,6 @@ public class GenresAndCertsFetcher {
                     .bulkInsert(GenresEntry.CONTENT_URI, valuesArray);
         }
 
-//        Log.d(LOGTAG, "        before return from parseGenresAndInsertToDb, numInserted is: " + numInserted);
         return numInserted;
     }
 
