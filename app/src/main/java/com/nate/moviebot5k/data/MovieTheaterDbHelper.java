@@ -36,7 +36,6 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.i(LOGTAG, "entered onCreate");
 
         // generally, only absolutely critical data columns use NOT NULL constraint because
         // I can just make the views work around any movies that lack some of the data
@@ -81,7 +80,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
 
 
-
+        // create the videos table
         final String SQL_VIDEOS_COLUMNS =
                 VideosEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
                         VideosEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
@@ -99,7 +98,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_VIDEOS_TABLE);
 
 
-
+        // create the credits table
         final String SQL_CREDITS_COLUMNS =
                 CreditsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
                         CreditsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
@@ -116,7 +115,7 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_CREDITS_TABLE);
 
 
-
+        // create the reviews table
         final String SQL_REVIEWS_COLUMNS =
                 ReviewsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // from BaseColumns
                         ReviewsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
@@ -153,8 +152,6 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
                 
     }
 
-
-    
     
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -164,7 +161,6 @@ public class MovieTheaterDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + MoviesEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + GenresEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + CertsEntry.TABLE_NAME);
-
         db.execSQL("DROP TABLE IF EXISTS " + CreditsEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + VideosEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ReviewsEntry.TABLE_NAME);

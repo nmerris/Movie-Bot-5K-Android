@@ -3,50 +3,54 @@ package com.nate.moviebot5k;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 
-// this is very similar to ActivityHome but only shows favorites, and the
+/**
+ * Similar to ActivityHome, but only loads movie grid and detail fragments for favorites movies.
+ * Additionally, all the spinners are gone because there is no network activity when in favorites
+ * mode (ie when user is in this Activity).  However, there is still some ability to sort in here:
+ * the users list of movies can be sorted by revenue, release date, and popularity.  The sorting
+ * is a menu action button here, mostly for space reasons, but also to avoid confusion with the
+ * spinners in HomeActivity.  StartupActivity will send the user straight to here if it detects
+ * no connection to themoviedb server.
+ *
+ * @see FragmentMovieGrid
+ * @see FragmentMovieDetails
+ */
 public class ActivityFavorites extends ActivitySingleFragment
         implements FragmentMovieGrid.Callbacks, FragmentMovieDetails.Callbacks,
         DialogFragmentFavoritesSortby.Callbacks {
-    private final String LOGTAG = N8LOG + "ActivityFavs";
 
+    private final String LOGTAG = N8LOG + "ActivityFavs";
     private final String TAG_FAV_SORTBY_DIALOG_FRAGMENT = "favorites_sortby_df";
 
 
-    // see ActivitySingleFragment
     @Override
     protected Fragment createFragment() {
-//        Log.i(LOGTAG, "entered createFragment, about to return a NEW FragmentMovieGrid to ActivitySingleFragment");
-
         // tell FMG to load ONLY the favorites movies from the db
         return FragmentMovieGrid.newInstance(true, mTwoPane);
     }
 
 
-    // see ActivitySingleFragment
     @Override
     protected int getLayoutResourceId() {
+        // the layout resource loaded here is basically the same as ActivityHome, except there is
+        // no container for the spinner fragment, because there is no spinner fragment
         return R.layout.activity_favorites_ref;
     }
 
 
     @Override
     public void onMovieSelected(int movieId, ArrayList<Integer> moviesList) {
-        Log.i(LOGTAG, "entered onMovieSelected");
 
         if(mTwoPane) {
             // in tablet mode, replace the movie detail fragment, which is in the second pane,
@@ -57,13 +61,10 @@ public class ActivityFavorites extends ActivitySingleFragment
                     FragmentMovieDetails.newInstance(true, movieId, true)).commit();
         }
         else {
-
-            Log.e(LOGTAG, "  and movieId passed in was: " + movieId);
-
             // in phone mode, launch an intent to movie details pager activity
             // and add in to the bundle: the movieId to display, the current list of movies in the grid,
-            // and tell it that ActivityFavorites is hosting it.. it needs to know that favorties
-            // activity is hosting it so that it can too movie detail fragment NOT to make any api
+            // and tell it that ActivityFavorites is hosting it.. it needs to know that favorites
+            // activity is hosting it so that it can tell movie detail fragment NOT to make any api
             // fetch calls, just like above with the fragment txn
             Intent intent = new Intent(this, ActivityMovieDetailsPager.class);
 
@@ -80,50 +81,27 @@ public class ActivityFavorites extends ActivitySingleFragment
     
     @Override
     public void onGridLoaded(ArrayList<Integer> moviesList) {
-
-//        if(mTwoPane && moviesList.size() > 0) {
-//            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-//            int currSelectedFavoriteId = sharedPrefs.getInt(getString(R.string.key_currently_selected_favorite_id), 0);
-//
-//            if(currSelectedFavoriteId == -1) {
-//                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-//                        FragmentMovieDetails.newInstance(true, moviesList.get(0), true)).commit();
-//            }
-//            else {
-//                for (int movieId : moviesList) {
-//                    if(movieId == currSelectedFavoriteId) {
-////                        mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-////                                FragmentMovieDetails.newInstance(true, movieId, true)).commit();
-//                        mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-//                                FragmentMovieDetails.newInstance(true, movieId, true)).commit();
-//                    }
-//                }
-//            }
-//        }
-        
+        // this does something only when ActivityHome hosts FragmentMovieGrid
     }
     
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Log.i(LOGTAG, "entered onCreate");
 
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle("Favorites");
 
+        // in tablet mode, it is nice to load the last viewed movie detail fragment in to the second
+        // pane, but only if there is at least 1 favorite saved, note that saveInstanceState does
+        // not matter here because orientation is fixed at landscape on tablet devices
         if(mTwoPane) {
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
             int numFavorites = sharedPrefs.getInt(getString(R.string.key_num_favorites), 0);
-
-            Log.e(LOGTAG, "  ^^^^^^^^^^^ in onCreate, numFavorites: " + numFavorites);
 
             if(numFavorites > 0) {
                 // if there is more than 1 favorites saved, then currSelectedFavoriteId is
                 // guaranteed to be valid as that is taken care of in FabClickListener
                 int currSelectedFavoriteId = sharedPrefs.getInt(getString(R.string.key_currently_selected_favorite_id), 0);
-                Log.i(LOGTAG, "  and currSelectedFavId: " + currSelectedFavoriteId);
-
                 mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
                         FragmentMovieDetails.newInstance(true, currSelectedFavoriteId, true)).commit();
             }
@@ -134,27 +112,24 @@ public class ActivityFavorites extends ActivitySingleFragment
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        Log.i(LOGTAG, "entered onCreateOptionsMenu");
-
         getMenuInflater().inflate(R.menu.menu, menu);
 
-        // hide the favorites menu item
+        // hide the favorites and about app menu items
         menu.findItem(R.id.action_favorites).setVisible(false);
         menu.findItem(R.id.action_about_app).setVisible(false);
-
-
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch(item.getItemId()) {
-//            case R.id.action_about_app:
-//                intent = new Intent(this, ActivityAboutApp.class);
-//                startActivity(intent);
-
             case R.id.action_sort_favorites:
+                // launch a custom dialog fragment to allow user to select how they would like
+                // to sort their favorites.. this could be really useful if you have a large list
+                // of favorites and, for example, you might want to know which was one had the
+                // lowest or highest revenue
                 new DialogFragmentFavoritesSortby().show(getSupportFragmentManager(),
                         TAG_FAV_SORTBY_DIALOG_FRAGMENT);
 
@@ -169,13 +144,13 @@ public class ActivityFavorites extends ActivitySingleFragment
 
         // update the toolbar, but only if the details toolbar is present, which is only in tablet mode
         if(mTwoPane) {
-            Log.e(LOGTAG, "just in onUpdateToolbar, movieTitle passed in: " + movieTitle +
-                    " and tagline: " + movieTagline);
-
-            // set the title or title and tagline in the action bar, depending on if the movie
-            // in question acutally has tagline data stored in the db.. seems about 80% have taglines
+            // set the title and tagline in the action bar, depending on if the movie
+            // in question actually has tagline data stored in the db.. seems about 80% have taglines
             TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
             TextView movieTaglineTextView = (TextView) findViewById(R.id.toolbar_movie_tagline);
+
+            // it's nice to have the title centered when there is no tagline, so remove the tagline
+            // view from the layout temporarily so the title can center itself
             if(movieTagline == null) {
                 movieTaglineTextView.setVisibility(View.GONE);
                 movieTitleTextView.setText(movieTitle);
@@ -196,7 +171,6 @@ public class ActivityFavorites extends ActivitySingleFragment
         // and query the db tables as appropriate
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
         FragmentMovieGrid.newInstance(true, mTwoPane)).commit();
-
     }
 
 }

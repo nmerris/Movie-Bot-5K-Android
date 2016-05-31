@@ -317,6 +317,10 @@ class FabClickListener implements View.OnClickListener {
                             new String[]{String.valueOf(mMovieId)});
                 }
                 else {
+                    // update the credits table: use the same image file name as the one we already
+                    // got when we queried themoviedb server for more movie details, but now since
+                    // the movie is being stored as a favorite, update the appropriate record with
+                    // the locally stored file path
                     mContext.getContentResolver().update(
                             MovieTheaterContract.CreditsEntry.CONTENT_URI,
                             contentValues,

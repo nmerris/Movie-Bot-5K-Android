@@ -10,39 +10,44 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 
+/**
+ * The starting point for the user if ActivityStartup does not encounter any problems when it is
+ * running through it's initialization procedures.  Any fragments being hosted by this activity
+ * can assume that a network connection is available.  Of course if the user looses network while
+ * in the middle of using this app, maybe in a tunnel, all fragments are designed to handle that and
+ * report an appropriate msg to the user.
+ *
+ * @see FragmentMovieGrid
+ * @see FragmentMovieDetails
+ * @see FragmentMovieFiltersSpinner
+ */
 public class ActivityHome extends ActivitySingleFragment
     implements FragmentMovieGrid.Callbacks, FragmentMovieFiltersSpinner.Callbacks,
         FragmentMovieDetails.Callbacks {
+
     private final String LOGTAG = N8LOG + "ActivityHome";
 
 
-    // see ActivitySingleFragment
     @Override
     protected Fragment createFragment() {
-//        Log.i(LOGTAG, "entered createFragment, about to return a NEW FragmentMovieGrid to ActivitySingleFragment");
-
-        // ActivityHome never shows movies from the favorites table, see FavoritesActivity
+        // ActivityHome never shows movies from the favorites table
         // phone and tablet mode both always have a FragmentMovieGrid, so no need to check here
         // ActivitySingleFragment will just put FragmentMovieGrid in fragment_container
 
         // NOTE: MGF always just checks sharePrefs for fetch_new_movies boolean when it is created,
         // so there is no need to pass it any arguments to tell it if it should or should not do a fetch
+        // it does need to know if it should use favorites and if app is running in tablet mode
         return FragmentMovieGrid.newInstance(false, mTwoPane);
-
     }
 
 
-    // see ActivitySingleFragment
     @Override
     protected int getLayoutResourceId() {
         return R.layout.activity_home;
     }
-
 
 
     @Override
@@ -143,12 +148,6 @@ public class ActivityHome extends ActivitySingleFragment
 
         menu.findItem(R.id.action_sort_favorites).setVisible(false);
 
-//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        int currSelectedFavoriteId = sharedPrefs.getInt(getString(R.string.key_currently_selected_favorite_id), 0);
-//        // disable the favorites menu if user has no favorites
-//        if(currSelectedFavoriteId == -1) {
-//            menu.findItem(R.id.action_favorites).setEnabled(false);
-//        }
 
         return true;
     }

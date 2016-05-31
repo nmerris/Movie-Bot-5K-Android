@@ -4,10 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.provider.ContactsContract;
-
-import com.nate.moviebot5k.ActivitySingleFragment;
-import com.nate.moviebot5k.ScrollAwareFABBehavior;
 
 /**
  * Defines the table and column names for movie_theater SQLite database.
@@ -15,7 +11,7 @@ import com.nate.moviebot5k.ScrollAwareFABBehavior;
  * Created by Nathan Merris on 5/4/2016.
  */
 public class MovieTheaterContract {
-    private static final String LOGTAG = ActivitySingleFragment.N8LOG + "MovieThetrContrct";
+//    private static final String LOGTAG = ActivitySingleFragment.N8LOG + "MovieThetrContrct";
 
     public static final String CONTENT_AUTHORITY = "com.nate.moviebot5k";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
@@ -27,8 +23,6 @@ public class MovieTheaterContract {
     public static final String PATH_REVIEWS = "reviews";
 
 
-    // private but not final: private to protect it from malevolent code goblins outside this class,
-    // not final because MoviesEntry and FavoritesEntry extend it
     private static class MoviesEntryColumns {
 
         // only used to more easily populate the genre names in MovieDetailsFetcher
@@ -63,7 +57,8 @@ public class MovieTheaterContract {
         public static final String COLUMN_RUNTIME = "runtime";
         public static final String COLUMN_TAGLINE = "tagline";
 
-        // stored local file path so that the favorites table can be accessed while offline
+        // device local file path so that the favorites table can be accessed while offline
+        // including pics
         public static final String COLUMN_POSTER_FILE_PATH = "poster_file_path";
         public static final String COLUMN_BACKDROP_FILE_PATH = "backdrop_file_path";
 
@@ -71,8 +66,7 @@ public class MovieTheaterContract {
         public static final String COLUMN_FETCH_ORDER = "fetch_order";
     }
     
-    
-    // both FavoritesReviewsEntry and ReviewsEntry use these same columns
+
     private static class ReviewsEntryColumns {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_AUTHOR = "author";
@@ -80,8 +74,7 @@ public class MovieTheaterContract {
         public static final String COLUMN_IS_FAVORITE = "is_favorite";
     }
     
-    
-    // both FavoritesCreditsEntry and CreditsEntry use these same columns
+
     private static class CreditsEntryColumns {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_CHARACTER = "character";
@@ -89,13 +82,12 @@ public class MovieTheaterContract {
         public static final String COLUMN_ORDER = "credits_order";
         public static final String COLUMN_PROFILE_PATH = "profile_path";
 
-        // needed to store local profile image file paths so they can be accessed in offline mode
+        // local profile image file paths so they can be accessed in offline mode
         public static final String COLUMN_PROFILE_FILE_PATH = "profile_file_path";
         public static final String COLUMN_IS_FAVORITE = "is_favorite";
     }
     
-    
-    // both FavoritesVideosEntry and VideosEntry use these same columsn
+
     private static class VideosEntryColumns {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_KEY = "key";
@@ -111,9 +103,6 @@ public class MovieTheaterContract {
     /**
      * Defines the table contents that FragmentMovieGrid and MovieDetailFragment will access when
      * hosted by ActivityHome and MovieDetailPagerActivity (in phone mode).
-     * Basically this will be the table that is used when user is NOT viewing their favorites.
-     * It will only ever hold one set of data, and will be written over completely every time a
-     * FetchMoviesTask returns at least 1 movie.
      */
     public static final class MoviesEntry extends MoviesEntryColumns implements BaseColumns {
 
@@ -130,8 +119,6 @@ public class MovieTheaterContract {
         // MovieTheaterProvider's uri matcher will know what to do if any of it's db related
         // methods receive a call with a uri as described below, which would look like:
         // "content://com.nate.moviebot5k/movies/[movieId]"
-        // used by MovieDetailFragment to get a cursor that points to a movie with id = movieId
-        // NOTE: movieId is not the same as the primary key, which is just _id
         public static Uri buildMovieUriFromMovieId(long movieId) {
             return ContentUris.withAppendedId(CONTENT_URI, movieId);
         }
@@ -139,10 +126,6 @@ public class MovieTheaterContract {
     }
 
 
-
-    // I am choosing not to store performer profile images locally, so if in favorites mode and
-    // no internet, there will not be an image of the actor/actress.. I need to get this project done
-    // with enough time, that could be implemented
     public static final class CreditsEntry extends CreditsEntryColumns implements BaseColumns {
 
         // "content://com.nate.moviebot5k/credits"
