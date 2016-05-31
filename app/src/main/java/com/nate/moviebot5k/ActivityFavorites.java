@@ -1,6 +1,8 @@
 package com.nate.moviebot5k;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -74,8 +76,32 @@ public class ActivityFavorites extends ActivitySingleFragment
             startActivity(intent);
         }
     }
+    
+    
+    @Override
+    public void onGridLoaded(ArrayList<Integer> moviesList) {
 
+        if(mTwoPane && moviesList.size() > 0) {
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            int currSelectedFavoriteId = sharedPrefs.getInt(getString(R.string.key_currently_selected_favorite_id), 0);
 
+            if(currSelectedFavoriteId == -1) {
+                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+                        FragmentMovieDetails.newInstance(true, moviesList.get(0), true)).commit();
+            }
+            else {
+                for (int movieId : moviesList) {
+                    if(movieId == currSelectedFavoriteId) {
+                        mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+                                FragmentMovieDetails.newInstance(true, movieId, true)).commit();
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

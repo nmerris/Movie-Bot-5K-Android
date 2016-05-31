@@ -81,6 +81,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
          *
          */
         void onMovieSelected(int movieId, ArrayList<Integer> moviesList);
+
+        void onGridLoaded(ArrayList<Integer> moviesList);
     }
 
     @Override
@@ -152,7 +154,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        Log.i(LOGTAG, "entered onCreateView");
-        mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0, mUseFavorites);
+        mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0, mUseFavorites, mTwoPane);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         ButterKnife.bind(this, rootView);
 
@@ -344,6 +346,10 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         // swap the cursor so the adapter can load the new images
         mMoviePosterAdapter.swapCursor(data);
+
+        // callback to hosting activity so that a new fragment can be loaded in tablet mode in the
+        // second pane (ie the details view)
+        mCallbacks.onGridLoaded(mMovieIds);
 
     }
 
