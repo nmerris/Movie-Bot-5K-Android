@@ -66,8 +66,10 @@
     <string name="vote_average">Vote Average:</string>
     <string name="format_num_votes">Total Votes: <xliff:g id="num_votes">%,1d</xliff:g></string>
     <string name="genres">Genres:</string>
-    <string name="format_release_date">Release Date: <xliff:g id="release_date">%1$tm %1$te,%1$tY</xliff:g></string>
-
+    <!-- looks like: October 29, 1929 (extra credit if you know why that date is significant) -->
+    <string name="format_release_date">Release Date: <xliff:g id="release_date">%1$tB %1$te, %1$tY</xliff:g></string>
     <string name="format_runtime">Runtime: <xliff:g id="runtime">%1d</xliff:g> min</string>
+
+    <string name="overview">Overview</string>
 
 </resources>

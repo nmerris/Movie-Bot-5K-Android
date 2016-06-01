@@ -24,12 +24,15 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/scrollview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/movie_grid_poster_margin"
+            android:layout_marginRight="@dimen/movie_grid_poster_margin"
+            android:layout_marginLeft="@dimen/coordinator_layout_margin_left">
 
             <!-- backdrop image-->
             <ImageView
@@ -38,9 +41,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
                 android:adjustViewBounds="true" />
 
             <!-- movie details data container -->
@@ -53,25 +53,29 @@
                 <TextView
                     android:id="@+id/movie_title_textview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/movie_detail_movie_title_text_size"/>
 
                 <!-- movie tagline -->
                 <TextView
                     android:id="@+id/movie_tagline_textview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/movie_detail_tagline_text_size"/>
 
                 <!-- genres -->
                 <TextView
                     android:id="@+id/movie_genre_textview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/movie_detail_general_text_size"/>
 
                 <!-- release date -->
                 <TextView
                     android:id="@+id/movie_release_date_textview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/movie_detail_general_text_size"/>
 
                 <!-- vote avg and num votes: 50/50 horizontally-->
                 <LinearLayout
@@ -82,197 +86,65 @@
                         android:id="@+id/movie_vote_avg_textview"
                         android:layout_width="0dp"
                         android:layout_weight="50"
-                        android:layout_height="match_parent"/>
+                        android:layout_height="match_parent"
+                        android:textSize="@dimen/movie_detail_general_text_size"/>
                     <TextView
                         android:id="@+id/movie_num_votes_textview"
                         android:layout_width="0dp"
                         android:layout_weight="50"
-                        android:layout_height="match_parent"/>
+                        android:layout_height="match_parent"
+                        android:textSize="@dimen/movie_detail_general_text_size"/>
                 </LinearLayout>
 
                 <!-- budget -->
                 <TextView
                     android:id="@+id/movie_budget_textview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/movie_detail_general_text_size"/>
 
                 <!-- revenue -->
                 <TextView
                     android:id="@+id/movie_revenue_textview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/movie_detail_general_text_size"/>
 
                 <!-- runtime -->
                 <TextView
                     android:id="@+id/movie_runtime_textview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/movie_detail_general_text_size"/>
 
             </LinearLayout>
 
 
-
-
-
-
-
-
-
-
-
-            <!--
-
-
-
-            &lt;!&ndash; testing &ndash;&gt;
+            <!-- overview -->
             <TextView
-                android:id="@+id/test_details_textview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="20sp"
-                android:gravity="center" />
-
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/video_thumbnail1_imageview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:scaleType="centerCrop"
-                    android:paddingLeft="0dp"
-                    android:paddingBottom="0dp"
-                    android:adjustViewBounds="true" />
-
-                <TextView
-                    android:id="@+id/test_videos1_textview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:text="VIDEO 1 NO DATA" />
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/video_thumbnail2_imageview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:scaleType="centerCrop"
-                    android:paddingLeft="0dp"
-                    android:paddingBottom="0dp"
-                    android:adjustViewBounds="true" />
-
-                <TextView
-                    android:id="@+id/test_videos2_textview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:text="VIDEO 1 NO DATA" />
-
-            </LinearLayout>
-
-
-            &lt;!&ndash;            <TextView
-                            android:id="@+id/test_videos3_textview"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="20sp"
-                            android:text="VIDEO 3 NO DATA"/>
-
-                        <TextView
-                            android:id="@+id/test_videos4_textview"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="20sp"
-                            android:text="VIDEO 4 NO DATA"/>&ndash;&gt;
-
-
+                android:textSize="@dimen/movie_detail_overview_title_text_size"
+                android:text="@string/overview"/>
             <TextView
-                android:id="@+id/test_reviews_textview"
+                android:id="@+id/movie_overview_textview"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
+                android:layout_height="match_parent"/>
 
 
-            <LinearLayout
+            <!-- videos -->
+
+
+
+
+
+
+            <!-- I do not know why the scrollview is cutting off the at the bottom, but having
+            this dummy Framelayout is a quick workaround -->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/test_credits_profile_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/test_credits_textview_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/test_credits_profile_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/test_credits_textview_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/test_credits_profile_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/test_credits_textview_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/test_credits_profile_4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/test_credits_textview_4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp" />
-            </LinearLayout>-->
-
+                android:layout_height="16dp">
+            </FrameLayout>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

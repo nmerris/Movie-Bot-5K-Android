@@ -69,6 +69,7 @@ public class FragmentMovieDetails extends Fragment
     @Bind(R.id.movie_budget_textview) TextView mBudgetTV;
     @Bind(R.id.movie_revenue_textview) TextView mRevenueTV;
     @Bind(R.id.movie_runtime_textview) TextView mRuntimeTV;
+    @Bind(R.id.movie_overview_textview) TextView mOverviewTV;
 
 
 
@@ -492,6 +493,11 @@ public class FragmentMovieDetails extends Fragment
                     else {
                         mRuntimeTV.setVisibility(View.GONE);
                     }
+
+
+
+                    mOverviewTV.setText(data.getString(COLUMN_OVERVIEW));
+
 
 
                     if(mTwoPane) {

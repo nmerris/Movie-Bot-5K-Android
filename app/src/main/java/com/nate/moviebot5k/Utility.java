@@ -29,7 +29,6 @@ import java.util.Locale;
  * Created by Nathan Merris on 5/6/2016.
  */
 public class Utility {
-    private final String LOGTAG = ActivitySingleFragment.N8LOG + "Utility";
 
     // boilerplate networking code taken from Big Nerd Ranch Android Programming, 2nd ed
     // use getUrlBytes when downloading pics or other non-string data
@@ -153,7 +152,7 @@ public class Utility {
 //            return month + " " + day + ", " + year;
 
         } catch (ParseException e) {
-            Log.e(LOGTAG, "  dateFormat.parse error: " + e);
+            Log.e("EXCEPTION", "  dateFormat.parse error: " + e);
             e.printStackTrace();
             return null;
         }
