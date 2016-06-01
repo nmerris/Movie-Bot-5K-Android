@@ -31,17 +31,119 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- backdrop image-->
             <ImageView
                 android:id="@+id/backdrop_imageview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
-                android:paddingLeft="0dp"
-                android:paddingBottom="0dp"
+                android:layout_margin="10dp"
                 android:adjustViewBounds="true" />
 
-            <!-- testing -->
+            <!-- movie details data container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- movie title -->
+                <TextView
+                    android:id="@+id/movie_title_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <!-- movie tagline -->
+                <TextView
+                    android:id="@+id/movie_tagline_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <!-- genres: 4 in a row horizontally -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/movie_genre_1_textview"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:layout_height="match_parent"/>
+                    <TextView
+                        android:id="@+id/movie_genre_2_textview"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:layout_height="match_parent"/>
+                    <TextView
+                        android:id="@+id/movie_genre_3_textview"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:layout_height="match_parent"/>
+                    <TextView
+                        android:id="@+id/movie_genre_4_textview"
+                        android:layout_width="0dp"
+                        android:layout_weight="25"
+                        android:layout_height="match_parent"/>
+                </LinearLayout>
+
+                <!-- release date -->
+                <TextView
+                    android:id="@+id/movie_release_date_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <!-- vote avg and num votes: 50/50 horizontally-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/movie_vote_avg_textview"
+                        android:layout_width="0dp"
+                        android:layout_weight="50"
+                        android:layout_height="match_parent"/>
+                    <TextView
+                        android:id="@+id/movie_num_votes_textview"
+                        android:layout_width="0dp"
+                        android:layout_weight="50"
+                        android:layout_height="match_parent"/>
+                </LinearLayout>
+
+                <!-- budget -->
+                <TextView
+                    android:id="@+id/movie_budget_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <!-- revenue -->
+                <TextView
+                    android:id="@+id/movie_revenue_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <!-- runtime -->
+                <TextView
+                    android:id="@+id/movie_runtime_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+            <!--
+
+
+
+            &lt;!&ndash; testing &ndash;&gt;
             <TextView
                 android:id="@+id/test_details_textview"
                 android:layout_width="match_parent"
@@ -100,7 +202,7 @@
             </LinearLayout>
 
 
-            <!--            <TextView
+            &lt;!&ndash;            <TextView
                             android:id="@+id/test_videos3_textview"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -112,7 +214,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="20sp"
-                            android:text="VIDEO 4 NO DATA"/>-->
+                            android:text="VIDEO 4 NO DATA"/>&ndash;&gt;
 
 
             <TextView
@@ -188,7 +290,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp" />
-            </LinearLayout>
+            </LinearLayout>-->
 
 
         </LinearLayout>
