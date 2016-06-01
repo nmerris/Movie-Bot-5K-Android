@@ -59,13 +59,13 @@ public class DialogFragmentFavoritesSortby extends DialogFragment
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        builder.setTitle("Sort Favorites By")
-
-            // set the item labels for the dialog content area radio button list
-            // set the selected button to whatever is stored in sharedPrefs
-            // and set this class to be the item click listener
-            .setSingleChoiceItems(R.array.favorites_sortby_labels,
+        builder.setTitle(getString(R.string.favorites_sortby_dialog_title))
+            .setSingleChoiceItems(
+                    // set the item labels for the dialog content area radio button list
+                    R.array.favorites_sortby_labels,
+                    // set the selected button to whatever is stored in sharedPrefs
                     mSharedPrefs.getInt(getString(R.string.key_favorites_sortby_selected_item_position), 0),
+                    // and set this class to be the item click listener
                     this);
 
         return builder.create();
@@ -74,8 +74,6 @@ public class DialogFragmentFavoritesSortby extends DialogFragment
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        Log.e(LOGTAG, "entered onClick, int which is: " + which);
-
         int positionBeforeClick = mSharedPrefs
                 .getInt(getString(R.string.key_favorites_sortby_selected_item_position), 0);
 
@@ -90,6 +88,7 @@ public class DialogFragmentFavoritesSortby extends DialogFragment
             // callback to hosting Activity (which is ActivityFavorites)
             mCallbacks.onFavoriteSortbyChanged();
         }
+        // if no actual change in sortby, just dismiss the dialog
         dismiss();
     }
 

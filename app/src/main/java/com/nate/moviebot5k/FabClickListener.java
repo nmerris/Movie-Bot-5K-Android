@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.LoaderManager;
 import android.util.Log;
 import android.view.View;
 
@@ -22,16 +21,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-// handles everything when FAB favorite icon is clicked, including updating icon drawable and db work,
-// and saving or deleting local device files
+
+
+/**
+ * Handles everything when Floating Action Button (FAB) favorite icon is clicked,
+ * including updating icon drawable, db work, and saving or deleting local device files.
+ * Note that FragmentMovieDetail is responsible for drawing the correct icon in the FAB when it
+ * initially loads all the views; however, this class takes care of updating the icon when the
+ * user actually CLICKS on the FAB.
+ *
+ */
 class FabClickListener implements View.OnClickListener {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "FABClckLstnr";
-
     private Context mContext;
     private int mMovieId;
     private FloatingActionButton mFabFavorites;
-    private int mNumCreditsImagesToStoreOffline;
+    private int mNumCreditsImagesToStoreOffline; // only storing a limited number of profile images on device
 
+    // the order of the Strings in projection must match the ints below it
     private final String[] projection = {
             MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE,
             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH,
@@ -45,15 +52,16 @@ class FabClickListener implements View.OnClickListener {
     private final int COLUMN_POSTER_FILE_PATH = 3;
     private final int COLUMN_BACKDROP_FILE_PATH = 4;
 
-//    private final String[] creditsProjection = {
-//            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH
-////            MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
-//    };
-//    private final int COLUMN_PROFILE_PATH = 0;
-////    private final int COLUMN_PROFILE_FILE_PATH = 1;
 
-
+    /**
+     * Creates a new listener to handle what happens when a user clicks the Floating Action Button
+     * to add or remove a favorite movie.
+     *
+     * @param movieId The movieId that was just added or removed as a favorite
+     * @param fabFavorites The actual FAB object that was just clicked
+     */
     public FabClickListener(Context context, int movieId, FloatingActionButton fabFavorites) {
+        // going with 4 offline profile images for now... but with enough time anything is possible!
         mNumCreditsImagesToStoreOffline = context.getResources()
                 .getInteger(R.integer.num_credits_profile_images_to_store_offline);
         mContext = context;
@@ -71,38 +79,45 @@ class FabClickListener implements View.OnClickListener {
                 new String[]{String.valueOf(mMovieId)}, null);
         
         if (cursor != null && cursor.moveToFirst()) {
-//            cursor.moveToFirst();
-            boolean removeFromFavorites = Boolean.valueOf(cursor.getString(COLUMN_IS_FAVORITE));
-            Log.i(LOGTAG, "  FAB listener.onClick, movieId is: " + mMovieId);
-//            Log.i(LOGTAG, "    and before anything else, column is_favorite for that id is: " + initialFavState);
+            Log.i(LOGTAG, "just entered FAB onClick, movieId is: " + mMovieId);
 
+            // if this movie is ALREADY a favorite, then user must want to remove it from favs,
+            // so set removeFromFavorites to true, or vice-versa
+            boolean removeFromFavorites = Boolean.valueOf(cursor.getString(COLUMN_IS_FAVORITE));
             cursor.close();
             
             // toggle the fab drawable
             int fabDrawable = removeFromFavorites ?
                     R.drawable.btn_star_off_normal_holo_light : R.drawable.btn_star_on_normal_holo_light;
-//            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
             mFabFavorites.setImageDrawable(mContext.getResources().getDrawable(fabDrawable));
-            
+
+            // update all the db records in all tables so they reflect the correct favorite status
             toggleIsFavoriteInAllTables(removeFromFavorites);
-
-
 
 
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
             SharedPreferences.Editor editor = sharedPrefs.edit();
+
+            // get the number of favorites saved before the FAB was clicked
             int initialNumFavorites = sharedPrefs.getInt(mContext.getString(R.string.key_num_favorites), 0);
+
+            // get the currently selected favorite from sharedPrefs
             int currSelectedFavorite = sharedPrefs.getInt(mContext.getString(R.string.key_currently_selected_favorite_id), 0);
-            Log.i(LOGTAG, "    and numFavorites when button clicked was: " + initialNumFavorites);
-            Log.i(LOGTAG, "      and currently selected favoriteId stored in sharedPrefs is: " + currSelectedFavorite);
+
+            Log.i(LOGTAG, "  and numFavorites when button clicked was: " + initialNumFavorites);
+            Log.i(LOGTAG, "    and currently selected favoriteId stored in sharedPrefs is: " + currSelectedFavorite);
 
             // REMOVIE FROM FAVORITES:
             if(removeFromFavorites){
                 if(initialNumFavorites == 1) {
+                    Log.i(LOGTAG, "      and you just removed the last favorite");
                     // user just removed the last favorite, so now their favs list is empty
                     // I indicate 'no movie id' with -1
                     editor.putInt(mContext.getString(R.string.key_currently_selected_favorite_id), -1);
                 } else if(currSelectedFavorite == mMovieId) {
+                    Log.i(LOGTAG, "      and you just removed a favorite that happened to be the same " +
+                            "as the last favorite you viewed in details fragment, so now resetting " +
+                            "the 'last viewed favorite' in sharedPrefs");
                     // user just removed the favorite movie they had selected in favorites activity
                     // detail view, so just reset it to the first favorite
                     Cursor c = mContext.getContentResolver().query(
@@ -113,6 +128,7 @@ class FabClickListener implements View.OnClickListener {
 
                     if(c != null && c.moveToFirst()) {
                         editor.putInt(mContext.getString(R.string.key_currently_selected_favorite_id),
+                                // just grab the first record in the db that is a favorite
                                 c.getInt(0));
                         c.close();
                     }
@@ -121,24 +137,26 @@ class FabClickListener implements View.OnClickListener {
                 // decrement the favorites counter and update in sharedPrefs
                 editor.putInt(mContext.getString(R.string.key_num_favorites), initialNumFavorites - 1);
                 editor.commit();
-                Log.i(LOGTAG,  "numFavorites is now: " + (initialNumFavorites - 1));
+                Log.i(LOGTAG,  "        numFavorites was decremented, now: " + (initialNumFavorites - 1));
 
+                // delete images from local storage
                 deleteSavedImaged();
             }
             // ADD TO FAVORITES:
             else {
                 if(initialNumFavorites == 0) {
                     // the only way for this code to execute is if the user just added a movie to
-                    // their favs list and they didn't have any favorites before, so this is the one
+                    // their favs list and they didn't have any favorites before, so this is their one
                     // and only favorite.. in which case set it to be their 'selected' favorite so
                     // that favorites activity can politely load a details fragment when the user
                     // navigates to there, other times the last selected favorite is loaded
-//                    SharedPreferences.Editor editor = sharedPrefs.edit();
                     editor.putInt(mContext.getString(R.string.key_currently_selected_favorite_id), mMovieId);
                 }
                 editor.putInt(mContext.getString(R.string.key_num_favorites), initialNumFavorites + 1);
                 editor.commit();
-                Log.i(LOGTAG,  "numFavorites is now: " + (initialNumFavorites + 1));
+                Log.i(LOGTAG,  "      after incrementing, numFavorites is now: " + (initialNumFavorites + 1));
+
+                // save images to local device storage
                 saveImagesLocally();
             }
 
@@ -147,9 +165,12 @@ class FabClickListener implements View.OnClickListener {
     }
 
 
+    /**
+     * Queries the movies and credits tables in the db for all records matching mMovieId, grabs the file
+     * path from each entry, adds it to a list, and then deletes all the locally stored images.
+     */
     private void deleteSavedImaged() {
-        Log.i(LOGTAG, "entered deleteSavedImaged");
-
+        // build a list of file paths to delete and then wipe them all out at once
         ArrayList<String> filePathsToDelete = new ArrayList<>();
 
         // get cursor pointed at relevant movies table row
@@ -160,13 +181,17 @@ class FabClickListener implements View.OnClickListener {
                 new String[]{ String.valueOf(mMovieId) }, null);
 
         if(cursor != null && cursor.moveToFirst()) {
+            // the poster URI is stored in the db with 'file:' at beginning because that's the way
+            // Picasso wants it, so strip that out to get the simple file path that android will
+            // understand in order to delete the file
             Uri uriPoster = Uri.parse(cursor.getString(COLUMN_POSTER_FILE_PATH));
             filePathsToDelete.add(uriPoster.getPath());
-            Log.e(LOGTAG, "  and path extracted from db column for poster file is: " + uriPoster.getPath());
-    
+//            Log.e(LOGTAG, "  and path extracted from db column for poster image is: " + uriPoster.getPath());
+
+            // similar for backdrop image path
             Uri uriBackdrop = Uri.parse(cursor.getString(COLUMN_BACKDROP_FILE_PATH));
             filePathsToDelete.add(uriBackdrop.getPath());
-            Log.e(LOGTAG, "  and path extracted from db column for poster file is: " + uriBackdrop.getPath());
+//            Log.e(LOGTAG, "  and path extracted from db column for backdrop image is: " + uriBackdrop.getPath());
 
             cursor.close();
         }
@@ -188,18 +213,16 @@ class FabClickListener implements View.OnClickListener {
                     continue;
                 }
 
-                // strip the file path from the URI and delete the file
+                // strip the file path from the URI and add it to the list of paths to delete
                 Uri uri = Uri.parse(cursor.getString(0));
                 filePathsToDelete.add(uri.getPath());
-                Log.e(LOGTAG, "  and path extracted from db column for credit file is: " + uri.getPath());
+//                Log.e(LOGTAG, "  and path extracted from db column for credit file is: " + uri.getPath());
                 cursor.moveToNext();
             }
             cursor.close();
         }
 
-        
-        
-        
+        // and finally delete all the files
         for (String s : filePathsToDelete) {
             File file = new File(s);
             boolean wasDeleted = file.delete();
@@ -209,12 +232,10 @@ class FabClickListener implements View.OnClickListener {
     }
 
 
-
-    
-    
+    /**
+     *
+     */
     private void saveImagesLocally() {
-        Log.i(LOGTAG, "entered saveImagesLocally");
-
         // update movies table file path columns for poster and backdrop images
         Cursor cursor = mContext.getContentResolver().query(
                 MovieTheaterContract.MoviesEntry.CONTENT_URI,

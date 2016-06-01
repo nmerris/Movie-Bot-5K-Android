@@ -39,6 +39,7 @@
     <string name="favorites_sortby_lowest_rated_label">Lowest Rated</string>
     <string name="favorites_sortby_newest_year_label">Newest Release Date</string>
     <string name="favorites_sortby_oldest_year_label">Oldest Release Date</string>
+    <string name="favorites_sortby_dialog_title">Sort Favorites By</string>
 
     <!-- spinners -->
     <string name="spinner_year_label">Year:</string>
