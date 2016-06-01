@@ -233,7 +233,10 @@ class FabClickListener implements View.OnClickListener {
 
 
     /**
-     *
+     * Queries the movies and credits tables to get themoviedb image URL for all records that match
+     * mMovieId, then uses Picasso to save the images locally, using a custom Picasso Target.
+     * Picasso automatically grabs images from it's cache, so typically no additional network
+     * activity is necessary.
      */
     private void saveImagesLocally() {
         // update movies table file path columns for poster and backdrop images
@@ -244,12 +247,14 @@ class FabClickListener implements View.OnClickListener {
                 new String[]{ String.valueOf(mMovieId) }, null);
 
         if (cursor != null && cursor.moveToFirst()) {
+            // save the poster image
             Picasso.with(mContext)
                     .load(cursor.getString(COLUMN_POSTER_PATH))
                     .into(new PicassoTarget(cursor.getString(COLUMN_POSTER_PATH),
                             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
                             MovieTheaterContract.MoviesEntry.TABLE_NAME));
 
+            // save the backdrop image
             Picasso.with(mContext)
                     .load(cursor.getString(COLUMN_BACKDROP_PATH))
                     .into(new PicassoTarget(cursor.getString(COLUMN_BACKDROP_PATH),
@@ -270,6 +275,7 @@ class FabClickListener implements View.OnClickListener {
         // only downloading 4 images for offline use at this time
         if (creditsCursor != null && creditsCursor.moveToFirst()) {
             for(int i = 0; i < mNumCreditsImagesToStoreOffline; i++) {
+                // some movies have less than 4 credits, so bail out in that case
                 if(creditsCursor.isAfterLast()) break;
 
                 Picasso.with(mContext)
@@ -283,36 +289,46 @@ class FabClickListener implements View.OnClickListener {
             creditsCursor.close();
         }
 
-
     }
 
 
+    /**
+     * Implements Picasso Target interface such that when onBitmapLoaded is called, the bitmap
+     * is converted to a jpg and stored on the local device.  The appropriate db tables are updated
+     * to point to the newly created files.
+     */
     private class PicassoTarget implements Target {
-
         String fileName;
         String dbColumnToInsert;
         String tableName;
         String theMovieDbImagePath;
 
 
+        /**
+         * Creates a new PicassoTarget which will save the bitmap that Picasso loads to local
+         * device storage.  The file NAME will be the same as themoviedb uses, but the file PATH
+         * will point to the image on the local device.
+         *
+         * @param theMovieDbImagePath The URL of the image on themoviedb server
+         * @param dbColumnNameToInsert The db column name to update with the new file's path
+         * @param tableName The db table name to update (either movies or credits)
+         */
         public PicassoTarget(String theMovieDbImagePath, String dbColumnNameToInsert, String tableName) {
-            Log.i(LOGTAG, "IN PICASSOTARGET CONSTRUCTOR, theMDBImagePath is: " + theMovieDbImagePath);
-
+            // extract the filename from themoviedb's URL for the image, makes sense to use the same
+            // filename here, it's just a bunch of random alphanumeric characters
             Uri uri = Uri.parse(theMovieDbImagePath);
             fileName = uri.getLastPathSegment();
-
-            Log.i(LOGTAG, "****** fileName in PicassoTarget constructor is: " + fileName);
 
             dbColumnToInsert = dbColumnNameToInsert;
             this.tableName = tableName;
             this.theMovieDbImagePath = theMovieDbImagePath;
         }
 
+
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            Log.e(LOGTAG, "  entered onBitmapLoaded");
-
             try {
+                // create a new File object
                 File file = new File(mContext.getExternalFilesDir(null), fileName);
                 FileOutputStream ostream = new FileOutputStream(file);
 
@@ -323,14 +339,15 @@ class FabClickListener implements View.OnClickListener {
 
                 // get the file path of the just created file and update the appropriate db table and column
                 String localFilePath = file.getPath();
-                Log.i(LOGTAG, "      localFilePath is: " + localFilePath);
+                Log.i(LOGTAG, "saved image, the device local file path is: " + localFilePath);
 
                 ContentValues contentValues = new ContentValues();
                 // Picasso need the file path to start with 'file:' when it loads favorites
                 contentValues.put(dbColumnToInsert, "file:" + localFilePath);
 
-
                 if(tableName.equals(MovieTheaterContract.MoviesEntry.TABLE_NAME)) {
+                    // update the movies table so poster and backdrop file path columns point to
+                    // the correct place on the local device
                     mContext.getContentResolver().update(
                             MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
                             contentValues,
@@ -338,18 +355,15 @@ class FabClickListener implements View.OnClickListener {
                             new String[]{String.valueOf(mMovieId)});
                 }
                 else {
-                    // update the credits table: use the same image file name as the one we already
-                    // got when we queried themoviedb server for more movie details, but now since
-                    // the movie is being stored as a favorite, update the appropriate record with
-                    // the locally stored file path
+                    // update the credits table similarly, except the credits table can have
+                    // multiple entries with the same movieId, so query for the one record that
+                    // has the same themoviedb image URL, but UPDATE the profile_file_path column
                     mContext.getContentResolver().update(
                             MovieTheaterContract.CreditsEntry.CONTENT_URI,
                             contentValues,
                             MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH + " = ?",
                             new String[]{ theMovieDbImagePath });
                 }
-
-
             }
             catch (NullPointerException e) {
                 Log.e("NULL POINTER EXCEPTION", "fileName was NULL in PicassoTarget " +
@@ -360,24 +374,28 @@ class FabClickListener implements View.OnClickListener {
             }
         }
 
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-
-        }
 
         @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
+        public void onBitmapFailed(Drawable errorDrawable) {}
 
-        }
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {}
 
     }
 
 
-    // updates all db tables that match movieId.. pass in the current fav state and it will toggle it
+    /**
+     * Toggles the column is_favorite in all db tables for records that match mMovieId.  The records
+     * will be updated such that their is_favorite column will all be changed to !initialFavState.
+     *
+     * @param initialFavState pass true if this movie was already a favorite before the user
+     *                        clicked the favorite FAB, pass false otherwise
+     */
     private void toggleIsFavoriteInAllTables(boolean initialFavState) {
-        Log.i(LOGTAG, "in toggleIsFavoriteInAllTables, initialFavState is: " + initialFavState +
-                " and will be updating all db records with movie_id: " + mMovieId + " to: " + !initialFavState);
-        
+        // I am not particularly proud of this... it's slow and obnoxious and really it would be nice
+        // if all the db work in this class was done off the main thread.  I just need to get this
+        // project done so I'm leaving it as-is for now.
+
         ContentValues contentValues = new ContentValues();
         contentValues.put("is_favorite", String.valueOf(!initialFavState));
         
@@ -386,28 +404,28 @@ class FabClickListener implements View.OnClickListener {
                 contentValues,
                 MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
                 new String[]{ String.valueOf(mMovieId) });
-        Log.i(LOGTAG, "      num movies table records updated: " + numMovieRecordsUpated);
+//        Log.i(LOGTAG, "      num movies table records updated: " + numMovieRecordsUpated);
 
         int numVideosRecordsUpdated = mContext.getContentResolver().update(
                 MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
                 contentValues,
                 null,
                 null);
-        Log.i(LOGTAG, "      num videos table records updated: " + numVideosRecordsUpdated);
+//        Log.i(LOGTAG, "      num videos table records updated: " + numVideosRecordsUpdated);
 
         int numCreditsRecordsUpdated = mContext.getContentResolver().update(
                 MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
                 contentValues,
                 null,
                 null);
-        Log.i(LOGTAG, "      num credits table records updated: " + numCreditsRecordsUpdated);
+//        Log.i(LOGTAG, "      num credits table records updated: " + numCreditsRecordsUpdated);
 
         int numReviewsRecordsUpdated = mContext.getContentResolver().update(
                 MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
                 contentValues,
                 null,
                 null);
-        Log.i(LOGTAG, "      num reviews table records updated: " + numReviewsRecordsUpdated);
+//        Log.i(LOGTAG, "      num reviews table records updated: " + numReviewsRecordsUpdated);
         
     }
     
