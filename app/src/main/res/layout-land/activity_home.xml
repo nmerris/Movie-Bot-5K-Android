@@ -25,7 +25,7 @@
             android:id="@+id/filter_spinner_container"
             android:layout_width="0dp"
             android:layout_weight="35"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 </LinearLayout>

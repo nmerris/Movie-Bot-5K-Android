@@ -6,24 +6,35 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 /**
+ * Displays a simple radio button list of choices user can select to sort their locally saved
+ * favorite movies in the GridView.  onFavoriteSortbyChanged callback is invoked when the user
+ * actually changes their selection, so clicking on the item that was already selected will do nothing.
+ * SharedPreferences for each sortby parameter are updated as needed.
+ *
  * Created by Nathan Merris on 5/28/2016.
  */
 public class DialogFragmentFavoritesSortby extends DialogFragment
     implements DialogInterface.OnClickListener{
-    private final String LOGTAG = ActivitySingleFragment.N8LOG + "DialogFragFavs";
 
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "DialogFragFavs";
     private SharedPreferences mSharedPrefs;
     private Callbacks mCallbacks;
+
 
     /**
      * Required interface for any activity that hosts this fragment
      */
     public interface Callbacks {
+        /**
+         * Invoked when any favorites sorby parameter is changed by user.  The sortby must actually
+         * change values in order for this callback to fire.
+         */
         void onFavoriteSortbyChanged();
     }
 
@@ -42,6 +53,7 @@ public class DialogFragmentFavoritesSortby extends DialogFragment
     }
 
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
