@@ -162,7 +162,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
         // is a lot more width to fill the screen in landscape orientation, and 4 columns looks much nicer
         // in phone landscape
         // in all other cases the num columns is defined in the xml for the gridlayout
-        if(mUseFavorites && !mTwoPane) {
+        if(mUseFavorites && !mTwoPane &&
+                getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mMoviePosterGridView.setNumColumns(4);
         }
 

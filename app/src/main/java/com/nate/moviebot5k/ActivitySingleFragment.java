@@ -12,20 +12,22 @@ import android.util.Log;
 
 // I am attempting a min SDK of 11.. thus all the support libraries
 // I have also read that it is good practice to use support libraries when possible, even if not
-// necessarily needed, because that will allow the app to address Google API bugs between
+// necessarily needed, because that will allow the app to address Google API bug fixes between
 // full releases, because Google publishes support library revisions more often than full OS
-// version updgrades.  Addressing Google bugs would simply be a matter of repackaging and shipping
-// out the same app, but with updated support libraries in the APK.
+// version updgrades.
 
 
 /**
  * A convenience class that prevents subclassing Activities from having to contain the same
  * FragmentManager code repeatedly, when loading a fragment into an Activity that hosts at least one single
- * fragment in a simple FrameLayout.
+ * fragment in a simple FrameLayout.  It also makes a few universally necessary members available
+ * to all subclassing Activities: mTwoPane and mFragmentManager.
+ * Finally, the movie grid toolbar is inflated here.  Note that when this app is running in tablet
+ * mode, a second toolbar is added above the movie details fragment pane.
  *
  * <p>
  * In some cases, the subclassing Activity many not even need
- * to override onCreate at all.  Note that MenuDetailPagerActivity does not subclass this because
+ * to override onCreate at all.  Note that ActivityMovieDetailPager does not subclass this because
  * it needs it's FrameLayout to be wrapped in a ViewPager.
  * </p>
  *
@@ -37,11 +39,7 @@ import android.util.Log;
  * Each subclassing Activity MAY override getLayoutResourceId if it wants to provide it's own
  * layout.  Every subclassing Activity that needs to run fragments in two different containers
  * MUST override getLayoutResourceId, as the default layout that this Activity inflates
- * has only one container for one fragment.
- *
- * <p>
- * Note: MenuActivity extends AppCompatActivity
- * </p>
+ * has only one container for one fragment (with id 'fragment_container')
  *
  * @author Nathan Merris
  */
@@ -51,7 +49,7 @@ public abstract class ActivitySingleFragment extends AppCompatActivity
     public static final String N8LOG = "N8LOG "; // logtag prefix to use for entire app
     private final String LOGTAG = N8LOG + "SingleFragmentAct";
     boolean mTwoPane; // true if subclassing activity is hosting a dual pane layout
-    FragmentManager mFragmentManager;
+    FragmentManager mFragmentManager; // for use by any subclassing Activity
 
     /**
      * Loads a Fragment into a simple FrameLayout that fills entire screen for Activities that
@@ -89,9 +87,8 @@ public abstract class ActivitySingleFragment extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Log.i(LOGTAG, "just entered onCreate()");
 
-        displayScreenDP();
+//        Utility.displayScreenDP(this, LOGTAG);
 
         // load the layout resource, subclassing Activity may or may not provide it's own
         setContentView(getLayoutResourceId());
@@ -103,11 +100,13 @@ public abstract class ActivitySingleFragment extends AppCompatActivity
         Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(actionBarToolbar);
 
+        // if there is a container for a second fragment, app must be running in tablet mode
         mTwoPane = findViewById(R.id.container_second_pane) != null;
 
         mFragmentManager = getSupportFragmentManager();
         Fragment fragment = mFragmentManager.findFragmentById(R.id.fragment_container);
 
+        // add the fragment to fragment_container
         if (fragment == null) {
             fragment = createFragment();
             mFragmentManager.beginTransaction().add(R.id.fragment_container, fragment).commit();
@@ -120,18 +119,7 @@ public abstract class ActivitySingleFragment extends AppCompatActivity
     protected void onResume() {
         // it really works better to just keep the app in landscape on tablet and larger devices
         if(mTwoPane) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-
         super.onResume();
     }
-
-    public void displayScreenDP() {
-        // TESTING: just want to see what screen dp of device is..
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        //Log.i(LOGTAG, "just entered onCreate");
-//        Log.i(LOGTAG, "==== screen dpWidth is: " + dpWidth + ", and dpHeight is: " + dpHeight + " ====");
-    }
-
 
 }

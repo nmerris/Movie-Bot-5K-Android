@@ -3,7 +3,12 @@ package com.nate.moviebot5k;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
@@ -72,33 +77,34 @@ public class Utility {
         return years;
     }
     
-    
-//    public static ArrayList<Integer> getMovieIdList(Context context) {
-//
-//        ArrayList<Integer> movieIds = new ArrayList<>();
-//        Cursor cursor = context.getContentResolver().query(
-//                MovieTheaterContract.MoviesEntry.CONTENT_URI,
-//                new String[]{MovieTheaterContract.MoviesEntry._ID, MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID},
-//                null, null,
-//                "_id ASC");
-//
-//        if(cursor != null && cursor.moveToFirst()) {
-//
-//            do {
-////                Log.i("UTILITY", "******** cursor _id is: " + cursor.getInt(0));
-////                Log.i("UTILITY", "********    and added movieId to list: " + cursor.getInt(1));
-//
-//                movieIds.add(cursor.getInt(1));
-//                cursor.moveToNext();
-//
-//            } while(!cursor.isAfterLast());
-//
-////            Log.i("UTILITY", "    and numMovies is: " + movieIds.size());
-//
-//            cursor.close();
-//        }
-//        return movieIds;
-//    }
+    /**
+     * Updates the title and subtitle in the textviews contained in the details toolbar.
+     * Only call this method if the app is running in tablet mode, because only table mode has
+     * a details toolbar.
+     *
+     * @param activity The calling activity which should have a details toolbar
+     * @param title The toolbar title to display, will center it if tagline is null
+     * @param tagline The toolbar subtitle to display
+     */
+    public static void updateToolbarTitleAndTagline(AppCompatActivity activity, String title, String tagline) {
+        // set the title and tagline in the action bar, depending on if the movie
+        // in question actually has tagline data stored in the db.. seems about 80% have taglines
+        TextView movieTitleTextView = (TextView) activity.findViewById(R.id.toolbar_movie_title);
+        TextView movieTaglineTextView = (TextView) activity.findViewById(R.id.toolbar_movie_tagline);
+
+        // it's nice to have the title centered when there is no tagline, so remove the tagline
+        // view from the layout temporarily so the title can center itself
+        if(movieTaglineTextView != null && movieTitleTextView != null) {
+            if (tagline == null) {
+                movieTaglineTextView.setVisibility(View.GONE);
+                movieTitleTextView.setText(title);
+            } else {
+                movieTaglineTextView.setVisibility(View.VISIBLE);
+                movieTitleTextView.setText(title);
+                movieTaglineTextView.setText(tagline);
+            }
+        }
+    }
 
 
     public static Uri buildYouTubeUri(String youTubeKey) {
@@ -109,6 +115,15 @@ public class Utility {
                 .appendQueryParameter("v", youTubeKey);
 
         return youTubeUrl.build();
+    }
+
+
+    public static void displayScreenDP(Context context, String logtag) {
+        // TESTING: just want to see what screen dp of device is..
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        Log.i(logtag, "==== screen dpWidth is: " + dpWidth + ", and dpHeight is: " + dpHeight + " ====");
     }
 
     

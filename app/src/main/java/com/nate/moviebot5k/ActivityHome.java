@@ -19,6 +19,12 @@ import java.util.ArrayList;
  * can assume that a network connection is available.  Of course if the user looses network while
  * in the middle of using this app, maybe in a tunnel, all fragments are designed to handle that and
  * report an appropriate msg to the user.
+ * <br><br>
+ *     FragmentMovieGrid is loaded by ActivitySingleFragment by overriding createFragment
+ * <br>
+ *     Fragment MovieFiltersSpinner is loaded in onCreate
+ * <br>
+ *     FragmentMovieDetails is loaded in onGridLoaded callback, if app is in tablet mode
  *
  * @see FragmentMovieGrid
  * @see FragmentMovieDetails
@@ -33,7 +39,7 @@ public class ActivityHome extends ActivitySingleFragment
 
     @Override
     protected Fragment createFragment() {
-        // ActivityHome never shows movies from the favorites table
+        // ActivityHome never shows movies from the favorites table.
         // phone and tablet mode both always have a FragmentMovieGrid, so no need to check here
         // ActivitySingleFragment will just put FragmentMovieGrid in fragment_container
 
@@ -52,7 +58,7 @@ public class ActivityHome extends ActivitySingleFragment
 
     @Override
     public void onMovieSelected(int movieId, ArrayList<Integer> moviesList) {
-        Log.i(LOGTAG, "entered onMovieSelected");
+        Log.i(LOGTAG, "entered onMovieSelected, movieId passed in was: " + movieId);
 
         if(mTwoPane) {
             // in tablet mode, replace the movie detail fragment, which is in the second pane,
@@ -61,72 +67,56 @@ public class ActivityHome extends ActivitySingleFragment
                     FragmentMovieDetails.newInstance(false, movieId, true)).commit();
         }
         else {
-
-            Intent intent = new Intent(this, ActivityMovieDetailsPager.class);
-
-            // need the current list of movies, in the same order as in the db, for view pager to work
-            Bundle bundle = new Bundle();
-            bundle.putIntegerArrayList("movie_id_list", moviesList);
-            bundle.putBoolean("use_favorites", false);
-            bundle.putInt("movie_id_just_clicked", movieId);
-            intent.putExtra("bundle_movie_list", bundle);
-
-            startActivity(intent);
+            // in phone mode.. much more complicated: start a details pager activity and pass it
+            // the list of movieIds in the grid (order matters for view pager),
+            // tell it not to use the favorites table,
+            // and tell it what movieId was just clicked
+            startActivity(ActivityMovieDetailsPager.newIntent(this, moviesList, false, movieId));
         }
     }
 
 
     @Override
     public void onGridLoaded(ArrayList<Integer> moviesList) {
-
+        // in tablet mode there is both a movie grid and movie details fragment on screen at the same
+        // time, and we want to have a movie detail load even before the user clicks on a movie
+        // poster from the grid.  First choice is to have the users last clicked movie be presented
+        // in the details pane, but it's possible that the user had changed the filter spinners and
+        // then NOT clicked on any movies, so it's possible that the last clicked movie will not be
+        // in the movie grid, which would be confusing, so in that case just default to loading
+        // the first movie from the grid in the second pane
         if(mTwoPane && moviesList.size() > 0) {
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
             int currSelectedMovieId = sharedPrefs.getInt(getString(R.string.key_currently_selected_movie_id), 0);
 
-//            if(currSelectedMovieId == -1) {
-//                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-//                        FragmentMovieDetails.newInstance(false, moviesList.get(0), true)).commit();
-//            }
-//            else {
-
-
-                for (int movieId : moviesList) {
-                    if(movieId == currSelectedMovieId) {
-                        mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-                                FragmentMovieDetails.newInstance(false, movieId, true)).commit();
-                        return;
-                    }
+            for (int movieId : moviesList) {
+                if(movieId == currSelectedMovieId) {
+                    mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+                            FragmentMovieDetails.newInstance(false, movieId, true)).commit();
+                    return;
                 }
-                mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
-                        FragmentMovieDetails.newInstance(false, moviesList.get(0), true)).commit();
-
-
-//            }
+            }
+            mFragmentManager.beginTransaction().replace(R.id.container_second_pane,
+                    FragmentMovieDetails.newInstance(false, moviesList.get(0), true)).commit();
         }
 
     }
 
 
-    // replace the current FragmentMovieGrid any time a filter parameter has changed
-    // NOTE: MGF checks sharedPrefs key fetch_new_movies to see if it should make an API call,
-    // so there is no need to pass over a fragment argument in this case
+
     @Override
     public void onFilterChanged() {
-        Log.i(LOGTAG, "entered onFilterChanged, about to REPLACE FragmentMovieGrid");
-
-        // create and REPLACE the movie filter spinner fragment, pass over false so that the
-        // favorites table will not be used
+        // replace the current FragmentMovieGrid any time a filter parameter has changed
+        // NOTE: MGF checks sharedPrefs key fetch_new_movies to see if it should make an API call,
+        // so there is no need to pass over a fragment argument in this case
         mFragmentManager.beginTransaction().replace(R.id.fragment_container,
                 FragmentMovieGrid.newInstance(false, mTwoPane)).commit();
-
-
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Log.i(LOGTAG, "entered onCreate");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
@@ -136,34 +126,27 @@ public class ActivityHome extends ActivitySingleFragment
             spinnerfragment = new FragmentMovieFiltersSpinner();
             mFragmentManager.beginTransaction().add(R.id.filter_spinner_container, spinnerfragment).commit();
         }
-
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        Log.i(LOGTAG, "entered onCreateOptionsMenu");
-
         getMenuInflater().inflate(R.menu.menu, menu);
-
         menu.findItem(R.id.action_sort_favorites).setVisible(false);
-
-
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
         Intent intent;
 
-        switch(id) {
+        switch(item.getItemId()) {
             case R.id.action_favorites:
-                    // no bundle needed here because ActivityFavorites always just loads a new
-                    // movie grid fragment with useFavorites arg = true
-                    intent = new Intent(this, ActivityFavorites.class);
-                    startActivity(intent);
-
+                // no bundle needed here because ActivityFavorites always just loads a new
+                // movie grid fragment with useFavorites arg = true
+                intent = new Intent(this, ActivityFavorites.class);
+                startActivity(intent);
                 break;
 
             case R.id.action_about_app:
@@ -177,16 +160,9 @@ public class ActivityHome extends ActivitySingleFragment
 
     @Override
     public void onUpdateToolbar(String movieTitle, String movieTagline) {
-
         // update the toolbar, but only if the details toolbar is present, which is only in tablet mode
         if(mTwoPane) {
-            Log.e(LOGTAG, "just in onUpdateToolbar, movieTitle passed in: " + movieTitle +
-            " and tagline: " + movieTagline);
-
-            TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
-            TextView movieTaglineTextView = (TextView) findViewById(R.id.toolbar_movie_tagline);
-            movieTitleTextView.setText(movieTitle);
-            movieTaglineTextView.setText(movieTagline);
+            Utility.updateToolbarTitleAndTagline(this, movieTitle, movieTagline);
         }
     }
 

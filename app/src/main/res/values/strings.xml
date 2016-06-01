@@ -3,8 +3,8 @@
     <string name="app_name">MovieBot5k</string>
     <string name="movie_filters_activity_label">Movie Filters</string>
     <string name="content_authority" translatable="false">com.nate.moviebot5k</string>
-
-   <!-- <string name="cancel">Cancel</string>-->
+    <string name="movie_details_pager_activity_label">Movie Details</string>
+    <string name="movie_details_pager_activity_favorites_label">Favorite Movie Details</string>
 
     <!-- api fetching basics, specific endpoint paths are in the java code -->
     <string name="themoviedb_authority" translatable="false">api.themoviedb.org</string>
@@ -23,7 +23,6 @@
     <string name="action_about_app">About</string>
     <string name="action_item_favorites_id" translatable="false">action_favorites</string>
     <string name="action_item_about_app_id" translatable="false">action_about_app</string>
-
 
     <!-- movie sortby filter labels -->
     <string name="filter_sortby_most_popular_label">Most Popular</string>

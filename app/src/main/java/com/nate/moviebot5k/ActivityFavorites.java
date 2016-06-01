@@ -1,6 +1,5 @@
 package com.nate.moviebot5k;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -66,15 +65,7 @@ public class ActivityFavorites extends ActivitySingleFragment
             // and tell it that ActivityFavorites is hosting it.. it needs to know that favorites
             // activity is hosting it so that it can tell movie detail fragment NOT to make any api
             // fetch calls, just like above with the fragment txn
-            Intent intent = new Intent(this, ActivityMovieDetailsPager.class);
-
-            Bundle bundle = new Bundle();
-            bundle.putIntegerArrayList("movie_id_list", moviesList);
-            bundle.putBoolean("use_favorites", true);
-            bundle.putInt("movie_id_just_clicked", movieId);
-            intent.putExtra("bundle_movie_list", bundle);
-
-            startActivity(intent);
+            startActivity(ActivityMovieDetailsPager.newIntent(this, moviesList, true, movieId));
         }
     }
     
@@ -128,7 +119,7 @@ public class ActivityFavorites extends ActivitySingleFragment
             case R.id.action_sort_favorites:
                 // launch a custom dialog fragment to allow user to select how they would like
                 // to sort their favorites.. this could be really useful if you have a large list
-                // of favorites and, for example, you might want to know which was one had the
+                // of favorites and, for example, you might want to know which one had the
                 // lowest or highest revenue
                 new DialogFragmentFavoritesSortby().show(getSupportFragmentManager(),
                         TAG_FAV_SORTBY_DIALOG_FRAGMENT);
@@ -141,25 +132,9 @@ public class ActivityFavorites extends ActivitySingleFragment
 
     @Override
     public void onUpdateToolbar(String movieTitle, String movieTagline) {
-
         // update the toolbar, but only if the details toolbar is present, which is only in tablet mode
         if(mTwoPane) {
-            // set the title and tagline in the action bar, depending on if the movie
-            // in question actually has tagline data stored in the db.. seems about 80% have taglines
-            TextView movieTitleTextView = (TextView) findViewById(R.id.toolbar_movie_title);
-            TextView movieTaglineTextView = (TextView) findViewById(R.id.toolbar_movie_tagline);
-
-            // it's nice to have the title centered when there is no tagline, so remove the tagline
-            // view from the layout temporarily so the title can center itself
-            if(movieTagline == null) {
-                movieTaglineTextView.setVisibility(View.GONE);
-                movieTitleTextView.setText(movieTitle);
-            }
-            else {
-                movieTaglineTextView.setVisibility(View.VISIBLE);
-                movieTitleTextView.setText(movieTitle);
-                movieTaglineTextView.setText(movieTagline);
-            }
+            Utility.updateToolbarTitleAndTagline(this, movieTitle, movieTagline);
         }
     }
 
@@ -169,7 +144,7 @@ public class ActivityFavorites extends ActivitySingleFragment
         // sharedPrefs have already been updated in DialogFragmentFavoritesSortby, so now just
         // need to replace the movie grid fragment.. it will read the sortby value from sharedPrefs
         // and query the db tables as appropriate
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+        mFragmentManager.beginTransaction().replace(R.id.fragment_container,
         FragmentMovieGrid.newInstance(true, mTwoPane)).commit();
     }
 
