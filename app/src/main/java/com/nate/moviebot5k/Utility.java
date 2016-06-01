@@ -17,14 +17,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Nathan Merris on 5/6/2016.
  */
 public class Utility {
-
+    private final String LOGTAG = ActivitySingleFragment.N8LOG + "Utility";
 
     // boilerplate networking code taken from Big Nerd Ranch Android Programming, 2nd ed
     // use getUrlBytes when downloading pics or other non-string data
@@ -94,8 +99,12 @@ public class Utility {
 
         // it's nice to have the title centered when there is no tagline, so remove the tagline
         // view from the layout temporarily so the title can center itself
+        // I am getting both null and empty strings in the db, so check for both
         if(movieTaglineTextView != null && movieTitleTextView != null) {
-            if (tagline == null) {
+            // I am getting both null and empty strings in the db for taglines, so check for both,
+            // but start with null check so short circuit OR will avoid possible null pointer exception
+            // when .equals executes
+            if (tagline == null || tagline.equals("")) {
                 movieTaglineTextView.setVisibility(View.GONE);
                 movieTitleTextView.setText(title);
             } else {
@@ -126,5 +135,33 @@ public class Utility {
         Log.i(logtag, "==== screen dpWidth is: " + dpWidth + ", and dpHeight is: " + dpHeight + " ====");
     }
 
+
+    public static Calendar parseDate(String dateString) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = dateFormat.parse(dateString);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            return calendar;
+
+//            String month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
+//            String year = String.valueOf(calendar.get(Calendar.YEAR));
+//            String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+//
+//            return month + " " + day + ", " + year;
+
+        } catch (ParseException e) {
+            Log.e(LOGTAG, "  dateFormat.parse error: " + e);
+            e.printStackTrace();
+            return null;
+        }
+
+
+
+
+
+    }
     
 }

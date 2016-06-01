@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
 
     <string name="app_name">MovieBot5k</string>
     <string name="movie_filters_activity_label">Movie Filters</string>
@@ -59,11 +59,15 @@
     <string name="about_app_moviedb_attribution_content">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
 
     <!-- fragment movie details -->
-    <string name="budget">Budget: </string>
-    <string name="revenue">Revenue: </string>
-    <string name="runtime">Runtime: </string>
-    <string name="release_date">Release Date: </string>
-    <string name="vote_average">Vote Average: </string>
-    <string name="num_votes">Total Votes: </string>
+    <!-- where have you been all my life, format strings? so convenient -->
+    <string name="format_budget">Budget: $<xliff:g id="budget">%,1d</xliff:g></string>
+    <string name="format_revenue">Revenue: $<xliff:g id="revenue">%,1d</xliff:g></string>
+    <string name="release_date">Release Date:</string>
+    <string name="vote_average">Vote Average:</string>
+    <string name="format_num_votes">Total Votes: <xliff:g id="num_votes">%,1d</xliff:g></string>
+    <string name="genres">Genres:</string>
+    <string name="format_release_date">Release Date: <xliff:g id="release_date">%1$tm %1$te,%1$tY</xliff:g></string>
+
+    <string name="format_runtime">Runtime: <xliff:g id="runtime">%1d</xliff:g> min</string>
 
 </resources>

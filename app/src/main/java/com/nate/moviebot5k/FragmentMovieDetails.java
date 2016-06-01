@@ -26,6 +26,9 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -59,10 +62,7 @@ public class FragmentMovieDetails extends Fragment
     @Bind(R.id.backdrop_imageview) ImageView mBackdropImageView;
     @Bind(R.id.movie_title_textview) TextView mMovieTitleTV;
     @Bind(R.id.movie_tagline_textview) TextView mMovieTaglineTV;
-    @Bind(R.id.movie_genre_1_textview) TextView mGenre1TV;
-    @Bind(R.id.movie_genre_2_textview) TextView mGenre2TV;
-    @Bind(R.id.movie_genre_3_textview) TextView mGenre3TV;
-    @Bind(R.id.movie_genre_4_textview) TextView mGenre4TV;
+    @Bind(R.id.movie_genre_textview) TextView mMovieGenresTV;
     @Bind(R.id.movie_release_date_textview) TextView mReleaseDateTV;
     @Bind(R.id.movie_vote_avg_textview) TextView mVoteAvgTV;
     @Bind(R.id.movie_num_votes_textview) TextView mNumVotesTV;
@@ -419,11 +419,11 @@ public class FragmentMovieDetails extends Fragment
                     // other misc movie detail data
                     String title = data.getString(COLUMN_MOVIE_TITLE);
                     String tagline = data.getString(COLUMN_TAGLINE);
-
                     mMovieTitleTV.setText(title);
 
                     // set the tagline or remove it from layout if it's null
-                    if(tagline != null) {
+                    // empty string and null are NOT the same
+                    if(tagline != null && !tagline.equals("")) {
                         mMovieTaglineTV.setVisibility(View.VISIBLE);
                         mMovieTaglineTV.setText(tagline);
                     }
@@ -431,30 +431,38 @@ public class FragmentMovieDetails extends Fragment
                         mMovieTaglineTV.setVisibility(View.GONE);
                     }
 
-                    // populate the genre textviews, or make them invisible if null data
+
+                    // populate the genre textviews, or make them invisible if null or empty
                     int[] genreColumns = {COLUMN_GENRE_NAME1, COLUMN_GENRE_NAME2,
                             COLUMN_GENRE_NAME3, COLUMN_GENRE_NAME4};
-                    TextView[] genreTVs = {mGenre1TV, mGenre2TV, mGenre3TV, mGenre4TV};
+                    String genres = getString(R.string.genres) + " ";
+
                     for(int i = 0; i < genreColumns.length; i++) {
                         String genreName = data.getString(genreColumns[i]);
-                        if(genreName != null) {
-                            genreTVs[i].setVisibility(View.VISIBLE);
-                            genreTVs[i].setText(genreName);
-                        }
-                        else {
-                            genreTVs[i].setVisibility(View.INVISIBLE);
+
+                        if((genreName == null || genreName.equals("")) && i == 0) {
+                            mMovieGenresTV.setVisibility(View.INVISIBLE);
+                            break;
+                        } else if(genreName == null || genreName.equals("")) {
+                            break;
+                        } else {
+                            if(i != 0) { genres += ", "; }
+                            mMovieGenresTV.setVisibility(View.VISIBLE);
+                            genres += genreName;
                         }
                     }
+                    mMovieGenresTV.setText(genres);
 
-                    // TODO: format the date to look nice
-                    mReleaseDateTV.setText(getString(R.string.release_date) +
-                            data.getString(COLUMN_RELEASE_DATE));
 
-                    mVoteAvgTV.setText(String.valueOf(getString(R.string.vote_average) +
+                    // must be in 'yyyy-MM-dd' format
+                    Calendar calendar = Utility.parseDate(data.getString(COLUMN_RELEASE_DATE));
+                    mReleaseDateTV.setText(String.format(getString(R.string.format_release_date), calendar));
+
+                    mVoteAvgTV.setText(String.valueOf(getString(R.string.vote_average) + " " +
                             data.getFloat(COLUMN_VOTE_AVG)));
 
-                    mNumVotesTV.setText(getString(R.string.num_votes) +
-                            data.getString(COLUMN_NUM_VOTES));
+                    mNumVotesTV.setText(String.format(getString(R.string.format_num_votes),
+                            data.getInt(COLUMN_NUM_VOTES)));
 
                     // set budget, revenue, and runtime or remove from view if zero
                     long budget = data.getLong(COLUMN_BUDGET);
@@ -463,8 +471,7 @@ public class FragmentMovieDetails extends Fragment
     
                     if(budget != 0) {
                         mBudgetTV.setVisibility(View.VISIBLE);
-                        mBudgetTV.setText(getString(R.string.budget) +
-                                String.valueOf(budget));
+                        mBudgetTV.setText(String.format(getString(R.string.format_budget), budget));
                     }
                     else {
                         mBudgetTV.setVisibility(View.GONE);
@@ -472,8 +479,7 @@ public class FragmentMovieDetails extends Fragment
     
                     if(revenue != 0) {
                         mRevenueTV.setVisibility(View.VISIBLE);
-                        mRevenueTV.setText(getString(R.string.revenue) +
-                                String.valueOf(revenue));
+                        mRevenueTV.setText(String.format(getString(R.string.format_revenue), revenue));
                     }
                     else {
                         mRevenueTV.setVisibility(View.GONE);
@@ -481,8 +487,7 @@ public class FragmentMovieDetails extends Fragment
     
                     if(runtime != 0) {
                         mRuntimeTV.setVisibility(View.VISIBLE);
-                        mRuntimeTV.setText(getString(R.string.runtime) +
-                                String.valueOf(runtime));
+                        mRuntimeTV.setText(String.format(getString(R.string.format_runtime), runtime));
                     }
                     else {
                         mRuntimeTV.setVisibility(View.GONE);
