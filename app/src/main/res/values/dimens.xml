@@ -14,6 +14,10 @@
 
     <dimen name="coordinator_layout_margin_left">@dimen/movie_grid_poster_margin</dimen>
     <dimen name="movie_detail_section_margin">16dp</dimen>
+    <dimen name="movie_detail_section_margin_small">6dp</dimen>
+
+    <dimen name="credits_imageview_width">80dp</dimen>
+
 
 
     <!-- FragmentAboutApp layout-->

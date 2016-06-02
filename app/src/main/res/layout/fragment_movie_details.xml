@@ -55,6 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fontFamily="sans-serif-smallcaps"
+                    android:textStyle="normal"
                     android:textColor="@color/white"
                     android:textSize="@dimen/movie_detail_movie_title_text_size"/>
 
@@ -140,17 +141,18 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/movie_detail_section_title_text_size"
                 android:layout_marginTop="@dimen/movie_detail_section_margin"
-                android:layout_marginBottom="6dp"
+                android:layout_marginBottom="@dimen/movie_detail_section_margin_small"
                 android:text="@string/credits"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/movie_detail_section_margin_small">
                 <ImageView
                     android:id="@+id/credits_profile_1_imageview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="80dp"
+                    android:layout_width="@dimen/credits_imageview_width"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"
@@ -176,11 +178,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
-                <ImageView
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/movie_detail_section_margin_small">
+
+            <ImageView
                     android:id="@+id/credits_profile_2_imageview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="80dp"
+                    android:layout_width="@dimen/credits_imageview_width"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"
@@ -206,11 +210,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
-                <ImageView
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/movie_detail_section_margin_small">
+
+            <ImageView
                     android:id="@+id/credits_profile_3_imageview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="80dp"
+                    android:layout_width="@dimen/credits_imageview_width"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"
@@ -236,11 +242,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
-                <ImageView
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/movie_detail_section_margin_small">
+
+            <ImageView
                     android:id="@+id/credits_profile_4_imageview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="80dp"
+                    android:layout_width="@dimen/credits_imageview_width"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"
