@@ -86,6 +86,12 @@ public class FragmentMovieDetails extends Fragment
     @Bind(R.id.credits_profile_4_character_name_textview) TextView mCharacterName4TV;
     @Bind(R.id.credits_profile_4_imageview) ImageView mProfile4ImageView;
 
+    @Bind(R.id.video_thumbnail1_imageview) ImageView mVideoThumbnailImageView1;
+    @Bind(R.id.video_thumbnail2_imageview) ImageView mVideoThumbnailImageView2;
+//    @Bind(R.id.video1_play_button) ImageView mVideoPlayButton1ImageView;
+//    @Bind(R.id.video2_play_button) ImageView mVideoPlayButton2ImageView;
+    @Bind(R.id.video1_share_button) ImageView mVideoShareButton1ImageView;
+    @Bind(R.id.video2_share_button) ImageView mVideoShareButton2ImageView;
 
 
 
@@ -518,44 +524,41 @@ public class FragmentMovieDetails extends Fragment
                     }
                     break;
 
+
                 case VIDEOS_LOADER_ID:
-//                    Log.e(LOGTAG, "  from videos table loader, key: " + data.getString(COLUMN_VIDEO_KEY));
+                    if(!data.getString(COLUMN_VIDEO_KEY).equals("")) {
+                        // video1 thumbnail image
+                        Picasso.with(getActivity())
+                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
+                                .placeholder(R.drawable.ic_play_circle_outline_white_48dp)
+                                .into(mVideoThumbnailImageView1);
 
-//                    // testing, prob. need some kind of adapter in due to varying numbers of videos
-//                    // but will always only show so many on main details page, and will need to have
-//                    // a link to another activity that shows them all in scrolling list
-//
-//                    // is it really worth it to use an adapter?  not sure
-//                    // I don't really need to check for full here, that was checked before this
-//                    // switch statement started when if(data.moveToFirst... executed
-//                    if(data.getString(COLUMN_VIDEO_KEY) != null) {
-//                        // video thumbnail image 1
-//                        Picasso.with(getActivity())
-//                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
-//                                .into(mVideoThumbnailImageView1);
-//                        // set a click listener on the ImageView video trailer thumbnail
-//                        mVideoThumbnailImageView1.setOnClickListener(new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
-//
-//                        // set a click listener on the ... well this will be an share ICON in future
-//                        mVideosTextView1.setText(data.getString(COLUMN_VIDEO_NAME));
-//                        mVideosTextView1.setOnClickListener(new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
-//
-//                    }
-//
-//
-//                    // again testing, just doing 2 videos now, if there are even 2
-//                    if(data.moveToNext()) {
-//                        // video thumbnail image 2
-//                        Picasso.with(getActivity())
-//                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
-//                                .into(mVideoThumbnailImageView2);
-//
-//                        mVideosTextView2.setText(data.getString(COLUMN_VIDEO_NAME));
-//                    }
+                        // set a click listener on the ImageView video trailer thumbnail and play button
+                        mVideoThumbnailImageView1.setOnClickListener(
+                                new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
+
+                        // set a click listener on the ImageView share button
+                        mVideoShareButton1ImageView.setOnClickListener(
+                                new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
+                    }
+    
+                    if(data.moveToNext() && !data.getString(COLUMN_VIDEO_KEY).equals("")) {
+                        // video1 thumbnail image
+                        Picasso.with(getActivity())
+                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
+                                .placeholder(R.drawable.ic_play_circle_outline_white_48dp)
+                                .into(mVideoThumbnailImageView2);
+        
+                        // set a click listener on the ImageView video trailer thumbnail and play button
+                        mVideoThumbnailImageView2.setOnClickListener(
+                                new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
+        
+                        // set a click listener on the ImageView share button
+                        mVideoShareButton2ImageView.setOnClickListener(
+                                new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
+                    }
+
                     break;
-
-
-
 
 
                 case REVIEWS_LOADER_ID:
@@ -590,6 +593,8 @@ public class FragmentMovieDetails extends Fragment
                     TextView[] castTVs = {mCastName1TV, mCastName2TV, mCastName3TV, mCastName4TV};
 
                     for(int i = 0; i < imageViews.length; i++) {
+                        if(data.isAfterLast()) { break; }
+
                         if (data.getString(profileImageColumn) != null) {
                             // cast member profile image path
                             Picasso.with(getActivity())
@@ -604,7 +609,6 @@ public class FragmentMovieDetails extends Fragment
                         }
                         data.moveToNext();
                     }
-                    
 
                     break;
 
@@ -622,191 +626,6 @@ public class FragmentMovieDetails extends Fragment
         Log.e(LOGTAG, "ENTERED ONLOADER RESET");
     }
 
-//
-//    private class FabClickListener implements View.OnClickListener {
-////        private Cursor cursor;
-//
-//        private FabClickListener() {
-//        }
-//
-//
-//        private final String[] projection = {
-//                MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE,
-//                MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH,
-//                MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_PATH,
-//                MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
-//                MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH
-//        };
-//        private final int COLUMN_IS_FAVORITE = 0;
-//        private final int COLUMN_POSTER_PATH = 1;
-//        private final int COLUMN_BACKDROP_PATH = 2;
-//        private final int COLUMN_POSTER_FILE_PATH = 3;
-//        private final int COLUMN_BACKDROP_FILE_PATH = 4;
-//
-//
-//        @Override
-//        public void onClick(View v) {
-//            Cursor cursor = getActivity().getContentResolver().query(
-//                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
-//                    new String[]{ MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE },
-//                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-//                    new String[]{ String.valueOf(mMovieId) }, null);
-//
-//            if(cursor != null && cursor.moveToFirst()) {
-//                cursor.moveToFirst();
-//                boolean initialFavState = Boolean.valueOf(cursor.getString(COLUMN_IS_FAVORITE));
-//                Log.i(LOGTAG, "  FAB listener.onClick, movieId is: " + mMovieId);
-//                Log.i(LOGTAG, "    and before anything else, column is_favorite for that id is: " + initialFavState);
-//                cursor.close();
-//
-//                // toggle the fab drawable
-//                int fabDrawable = initialFavState ?
-//                        R.drawable.btn_star_off_normal_holo_light : R.drawable.btn_star_on_normal_holo_light;
-////            Log.i(LOGTAG, "    and fabDrawable id is: " + fabDrawable);
-//                mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
-//
-//                toggleIsFavoriteInAllTables(initialFavState);
-//
-//                // if the movie was just saved as a favorite, save all relevant images to local device storage
-//                // and update the db tables with the file paths of these new files
-//                if (!initialFavState) {
-//                    saveImagesLocally();
-//                }
-//            }
-//
-//        }
-//
-//
-//        private void saveImagesLocally() {
-//            Log.i(LOGTAG, "entered saveImagesLocally");
-//
-//
-//
-//
-//            Target target = new Target() {
-//
-////                String localFilePath;
-////
-////                // may return null if any problems writing file to local device storage
-////                private String getFilePath() {
-////                    return localFilePath;
-////                }
-//
-//                @Override
-//                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-//                    Log.e(LOGTAG, "  entered onBitmapLoaded");
-//
-//                    File file = new File(getActivity().getExternalFilesDir(null), "testPoster.jpg");
-////                    String path;
-//
-//
-//                    try {
-////                        file.createNewFile();
-//                        FileOutputStream ostream = new FileOutputStream(file);
-//
-//
-//                        boolean wasWriteToStreamSuccess = bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ostream);
-//
-//                        Log.e(LOGTAG, "    compress bitmap and write to ostream was successful: " + wasWriteToStreamSuccess);
-//
-//                        String localFilePath = file.getPath();
-//                        Log.i(LOGTAG, "    file path is: " + localFilePath);
-//
-//                        ContentValues contentValues = new ContentValues();
-//                        contentValues.put(MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH, localFilePath);
-//
-//                        getActivity().getContentResolver().update(
-//                                MovieTheaterContract.MoviesEntry.buildMovieUriFromMovieId(mMovieId),
-//                                contentValues,
-//                                MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-//                                new String[]{ String.valueOf(mMovieId) });
-//
-//
-//
-//                        ostream.flush();
-//                        ostream.close();
-//                    } catch (IOException e) {
-//                        Log.e("IOException", e.getLocalizedMessage());
-//                    }
-//
-//
-//                }
-//
-//                @Override
-//                public void onBitmapFailed(Drawable errorDrawable) {
-//
-//                }
-//
-//                @Override
-//                public void onPrepareLoad(Drawable placeHolderDrawable) {
-//
-//                }
-//            };
-//
-//
-//
-//            Cursor cursor = getActivity().getContentResolver().query(
-//                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
-//                    projection,
-//                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-//                    new String[]{ String.valueOf(mMovieId) }, null);
-//
-//            if(cursor != null && cursor.moveToFirst()) {
-//                Picasso.with(getActivity())
-//                        .load(cursor.getString(COLUMN_POSTER_PATH))
-//                        .into(target);
-//
-//                cursor.close();
-//            }
-//
-//
-//        }
-
-
-
-
-//        // updates all db tables that match movieId.. pass in the current fav state and it will toggle it
-//        private void toggleIsFavoriteInAllTables(boolean initialFavState) {
-//            Log.i(LOGTAG, "in toggleIsFavoriteInAllTables, initialFavState is: " + initialFavState +
-//            " and will be updating all db records with movie_id: " + mMovieId + " to: " + !initialFavState);
-//
-//            ContentValues contentValues = new ContentValues();
-//            contentValues.put("is_favorite", String.valueOf(!initialFavState));
-//
-//            int numMovieRecordsUpated = getActivity().getContentResolver().update(
-//                    MovieTheaterContract.MoviesEntry.CONTENT_URI,
-//                    contentValues,
-//                    MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID + " = ?",
-//                    new String[]{ String.valueOf(mMovieId) });
-//            Log.i(LOGTAG, "      num movies table records updated: " + numMovieRecordsUpated);
-//
-////            contentValues.put(MovieTheaterContract.VideosEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
-//            int numVideosRecordsUpdated = getActivity().getContentResolver().update(
-//                    MovieTheaterContract.VideosEntry.buildVideosUriFromMovieId(mMovieId),
-//                    contentValues,
-//                    null,
-//                    null);
-//            Log.i(LOGTAG, "      num videos table records updated: " + numVideosRecordsUpdated);
-//
-//
-////            contentValues.put(MovieTheaterContract.CreditsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
-//            int numCreditsRecordsUpdated = getActivity().getContentResolver().update(
-//                    MovieTheaterContract.CreditsEntry.buildCreditsUriFromMovieId(mMovieId),
-//                    contentValues,
-//                    null,
-//                    null);
-//            Log.i(LOGTAG, "      num credits table records updated: " + numCreditsRecordsUpdated);
-//
-//
-////            contentValues.put(MovieTheaterContract.ReviewsEntry.COLUMN_IS_FAVORITE, String.valueOf(!initialFavState));
-//            int numReviewsRecordsUpdated = getActivity().getContentResolver().update(
-//                    MovieTheaterContract.ReviewsEntry.buildReviewsUriFromMovieId(mMovieId),
-//                    contentValues,
-//                    null,
-//                    null);
-//            Log.i(LOGTAG, "      num reviews table records updated: " + numReviewsRecordsUpdated);
-//
-//        }
 
     private class VideoViewListener implements View.OnClickListener {
         private String key;
@@ -887,20 +706,6 @@ public class FragmentMovieDetails extends Fragment
                     getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
                 }
             }
-
-//
-//
-//
-//
-//
-//            // need to check for null or app crashes if user clicks posters too rapidly,
-//            // because this task finishes after it's activity has been detached
-//            if(getActivity() != null) {
-//                getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
-//                getLoaderManager().initLoader(CREDITS_LOADER_ID, null, loaderCallbacks);
-//                getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, loaderCallbacks);
-//                getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, loaderCallbacks);
-//            }
         }
     }
 

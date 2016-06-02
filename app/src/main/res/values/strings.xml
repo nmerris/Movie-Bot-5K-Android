@@ -72,6 +72,7 @@
 
     <string name="overview">Overview</string>
     <string name="credits">Credits</string>
+    <string name="videos">Videos</string>
     <string name="format_character_name">CHARACTER: <xliff:g id="character_name">%1s</xliff:g></string>
     <string name="format_cast_name">NAME: <xliff:g id="cast_name">%1s</xliff:g></string>
 
