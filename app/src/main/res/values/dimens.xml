@@ -17,6 +17,7 @@
     <dimen name="movie_detail_section_margin_small">6dp</dimen>
 
     <dimen name="credits_imageview_width">80dp</dimen>
+    <dimen name="video_thumb_width">160dp</dimen>
 
 
 

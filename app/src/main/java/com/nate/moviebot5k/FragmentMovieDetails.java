@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
@@ -88,10 +89,13 @@ public class FragmentMovieDetails extends Fragment
 
     @Bind(R.id.video_thumbnail1_imageview) ImageView mVideoThumbnailImageView1;
     @Bind(R.id.video_thumbnail2_imageview) ImageView mVideoThumbnailImageView2;
-//    @Bind(R.id.video1_play_button) ImageView mVideoPlayButton1ImageView;
-//    @Bind(R.id.video2_play_button) ImageView mVideoPlayButton2ImageView;
     @Bind(R.id.video1_share_button) ImageView mVideoShareButton1ImageView;
     @Bind(R.id.video2_share_button) ImageView mVideoShareButton2ImageView;
+    @Bind(R.id.video_section_title) TextView mVideoSectionTitle;
+
+
+//    @Bind(R.id.video_layout1) LinearLayout mVideoLayout1;
+//    @Bind(R.id.video_layout2) LinearLayout mVideoLayout2;
 
 
 
@@ -406,210 +410,22 @@ public class FragmentMovieDetails extends Fragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
 
-        if(getView() != null && data.moveToFirst()) {
+        if(getView() != null) {
             switch (loader.getId()) {
                 case MOVIES_LOADER_ID:
-                    // get the FAB and set it's drawable depending on if movie is a favorite or not
-                    mFabFavorites.setOnClickListener(new FabClickListener(getActivity(), mMovieId, mFabFavorites));
-
-                    // set the fab drawable depending on if the movie being displayed is already a favorite or not
-                    // and depending on if the device was just rotated or not
-                    boolean favoriteState = Boolean.valueOf(data.getString(COLUMN_IS_FAVORITE));
-                    int fabDrawable = favoriteState ?
-                            R.drawable.btn_star_on : R.drawable.btn_star_off;
-                    mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
-
-                    // backdrop image.. load from either local device or from network, depending
-                    // on if this movie is a favorite.. even if this fragment is being hosted by
-                    // HomeActivity (which may or may not have some favorite movies mixed in with
-                    // whatever the api call returned), might as well still load the images from
-                    // local memory to save an expensive image download
-                    if(data.getString(COLUMN_IS_FAVORITE).equals("true")) {
-                        Picasso.with(getActivity())
-                                .load(data.getString(COLUMN_BACKDROP_FILE_PATH))
-                                .into(mBackdropImageView);
-                    }
-                    else {
-                        Picasso.with(getActivity())
-                                .load(data.getString(COLUMN_BACKDROP_PATH))
-                                .into(mBackdropImageView);
-                    }
-
-
-                    // other misc movie detail data
-                    String title = data.getString(COLUMN_MOVIE_TITLE);
-                    String tagline = data.getString(COLUMN_TAGLINE);
-                    mMovieTitleTV.setText(title);
-
-                    // set the tagline or remove it from layout if it's null
-                    // empty string and null are NOT the same
-                    if(tagline != null && !tagline.equals("")) {
-                        mMovieTaglineTV.setVisibility(View.VISIBLE);
-                        mMovieTaglineTV.setText(tagline);
-                    }
-                    else {
-                        mMovieTaglineTV.setVisibility(View.GONE);
-                    }
-
-
-                    // populate the genre textviews, or make them invisible if null or empty
-                    int[] genreColumns = {COLUMN_GENRE_NAME1, COLUMN_GENRE_NAME2,
-                            COLUMN_GENRE_NAME3, COLUMN_GENRE_NAME4};
-                    String genres = getString(R.string.genres) + " ";
-
-                    for(int i = 0; i < genreColumns.length; i++) {
-                        String genreName = data.getString(genreColumns[i]);
-
-                        if((genreName == null || genreName.equals("")) && i == 0) {
-                            mMovieGenresTV.setVisibility(View.INVISIBLE);
-                            break;
-                        } else if(genreName == null || genreName.equals("")) {
-                            break;
-                        } else {
-                            if(i != 0) { genres += ", "; }
-                            mMovieGenresTV.setVisibility(View.VISIBLE);
-                            genres += genreName;
-                        }
-                    }
-                    mMovieGenresTV.setText(genres);
-
-
-                    // must be in 'yyyy-MM-dd' format
-                    Calendar calendar = Utility.parseDate(data.getString(COLUMN_RELEASE_DATE));
-                    mReleaseDateTV.setText(String.format(getString(R.string.format_release_date), calendar));
-
-                    mVoteAvgTV.setText(String.valueOf(getString(R.string.vote_average) + " " +
-                            data.getFloat(COLUMN_VOTE_AVG)));
-
-                    mNumVotesTV.setText(String.format(getString(R.string.format_num_votes),
-                            data.getInt(COLUMN_NUM_VOTES)));
-
-                    // set budget, revenue, and runtime or remove from view if zero
-                    long budget = data.getLong(COLUMN_BUDGET);
-                    long revenue = data.getLong(COLUMN_REVENUE);
-                    int runtime = data.getInt(COLUMN_RUNTIME);
-    
-                    if(budget != 0) {
-                        mBudgetTV.setVisibility(View.VISIBLE);
-                        mBudgetTV.setText(String.format(getString(R.string.format_budget), budget));
-                    }
-                    else {
-                        mBudgetTV.setVisibility(View.GONE);
-                    }
-    
-                    if(revenue != 0) {
-                        mRevenueTV.setVisibility(View.VISIBLE);
-                        mRevenueTV.setText(String.format(getString(R.string.format_revenue), revenue));
-                    }
-                    else {
-                        mRevenueTV.setVisibility(View.GONE);
-                    }
-    
-                    if(runtime != 0) {
-                        mRuntimeTV.setVisibility(View.VISIBLE);
-                        mRuntimeTV.setText(String.format(getString(R.string.format_runtime), runtime));
-                    }
-                    else {
-                        mRuntimeTV.setVisibility(View.GONE);
-                    }
-
-                    // OVERVIEW
-                    mOverviewTV.setText(data.getString(COLUMN_OVERVIEW));
-
-
-                    if(mTwoPane) {
-                        // app is running in tablet mode, let hosting activity deal with toolbar update
-                        // there is nothing special in the toolbar in phone mode, FYI
-                        mCallbacks.onUpdateToolbar(title, tagline);
-                    }
+                    if(data.moveToFirst()) { updateMoviesUI(data); }
                     break;
-
 
                 case VIDEOS_LOADER_ID:
-                    if(!data.getString(COLUMN_VIDEO_KEY).equals("")) {
-                        // video1 thumbnail image
-                        Picasso.with(getActivity())
-                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
-                                .placeholder(R.drawable.ic_play_circle_outline_white_48dp)
-                                .into(mVideoThumbnailImageView1);
-
-                        // set a click listener on the ImageView video trailer thumbnail and play button
-                        mVideoThumbnailImageView1.setOnClickListener(
-                                new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
-
-                        // set a click listener on the ImageView share button
-                        mVideoShareButton1ImageView.setOnClickListener(
-                                new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
-                    }
-    
-                    if(data.moveToNext() && !data.getString(COLUMN_VIDEO_KEY).equals("")) {
-                        // video1 thumbnail image
-                        Picasso.with(getActivity())
-                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
-                                .placeholder(R.drawable.ic_play_circle_outline_white_48dp)
-                                .into(mVideoThumbnailImageView2);
-        
-                        // set a click listener on the ImageView video trailer thumbnail and play button
-                        mVideoThumbnailImageView2.setOnClickListener(
-                                new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
-        
-                        // set a click listener on the ImageView share button
-                        mVideoShareButton2ImageView.setOnClickListener(
-                                new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
-                    }
-
+                    updateVideosUI(data);
                     break;
-
 
                 case REVIEWS_LOADER_ID:
-
-//                    // testing
-//                    String testRevText = "REVIEW AUTHOR 1: " + data.getString(COLUMN_REVIEW_AUTHOR) +
-//                            "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
-//
-//                    if(data.moveToNext()) {
-//                        testRevText += "REVIEW AUTHOR 2: " + data.getString(COLUMN_REVIEW_AUTHOR) +
-//                                "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
-//                    }
-//                    if(data.moveToNext()) {
-//                        testRevText += "REVIEW AUTHOR 3: " + data.getString(COLUMN_REVIEW_AUTHOR) +
-//                                "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
-//                    }
-//
-//                    mReviewsTextView.setText(testRevText);
+                    updateReviewsUI(data);
                     break;
 
-
-
-
-
                 case CREDITS_LOADER_ID:
-                    int profileImageColumn = mUseFavorites ? COLUMN_PROFILE_FILE_PATH : COLUMN_PROFILE_PATH;
-
-                    ImageView[] imageViews = {mProfile1ImageView, mProfile2ImageView,
-                        mProfile3ImageView, mProfile4ImageView};
-                    TextView[] characterTVs = {mCharacterName1TV, mCharacterName2TV,
-                        mCharacterName3TV, mCharacterName4TV};
-                    TextView[] castTVs = {mCastName1TV, mCastName2TV, mCastName3TV, mCastName4TV};
-
-                    for(int i = 0; i < imageViews.length; i++) {
-                        if(data.isAfterLast()) { break; }
-
-                        if (data.getString(profileImageColumn) != null) {
-                            // cast member profile image path
-                            Picasso.with(getActivity())
-                                    .load(data.getString(profileImageColumn))
-                                    .placeholder(R.drawable.person_placeholder)
-                                    .into(imageViews[i]);
-
-                            characterTVs[i].setText(String.format(getString(R.string.format_character_name),
-                                    data.getString(COLUMN_CHARACTER)));
-                            castTVs[i].setText(String.format(getString(R.string.format_cast_name),
-                                    data.getString(COLUMN_CAST_NAME)));
-                        }
-                        data.moveToNext();
-                    }
-
+                    if(data.moveToFirst()) { updateCreditsUI(data); }
                     break;
 
                 default:
@@ -772,6 +588,221 @@ public class FragmentMovieDetails extends Fragment
     }
 
 
+    private void updateMoviesUI(Cursor data) {
+        // get the FAB and set it's drawable depending on if movie is a favorite or not
+        mFabFavorites.setOnClickListener(new FabClickListener(getActivity(), mMovieId, mFabFavorites));
+
+        // set the fab drawable depending on if the movie being displayed is already a favorite or not
+        // and depending on if the device was just rotated or not
+        boolean favoriteState = Boolean.valueOf(data.getString(COLUMN_IS_FAVORITE));
+        int fabDrawable = favoriteState ?
+                R.drawable.btn_star_on : R.drawable.btn_star_off;
+        mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
+
+        // backdrop image.. load from either local device or from network, depending
+        // on if this movie is a favorite.. even if this fragment is being hosted by
+        // HomeActivity (which may or may not have some favorite movies mixed in with
+        // whatever the api call returned), might as well still load the images from
+        // local memory to save an expensive image download
+        if(data.getString(COLUMN_IS_FAVORITE).equals("true")) {
+            Picasso.with(getActivity())
+                    .load(data.getString(COLUMN_BACKDROP_FILE_PATH))
+                    .into(mBackdropImageView);
+        }
+        else {
+            Picasso.with(getActivity())
+                    .load(data.getString(COLUMN_BACKDROP_PATH))
+                    .into(mBackdropImageView);
+        }
+
+
+        // other misc movie detail data
+        String title = data.getString(COLUMN_MOVIE_TITLE);
+        String tagline = data.getString(COLUMN_TAGLINE);
+        mMovieTitleTV.setText(title);
+
+        // set the tagline or remove it from layout if it's null
+        // empty string and null are NOT the same
+        if(tagline != null && !tagline.equals("")) {
+            mMovieTaglineTV.setVisibility(View.VISIBLE);
+            mMovieTaglineTV.setText(tagline);
+        }
+        else {
+            mMovieTaglineTV.setVisibility(View.GONE);
+        }
+
+
+        // populate the genre textviews, or make them invisible if null or empty
+        int[] genreColumns = {COLUMN_GENRE_NAME1, COLUMN_GENRE_NAME2,
+                COLUMN_GENRE_NAME3, COLUMN_GENRE_NAME4};
+        String genres = getString(R.string.genres) + " ";
+
+        for(int i = 0; i < genreColumns.length; i++) {
+            String genreName = data.getString(genreColumns[i]);
+
+            if((genreName == null || genreName.equals("")) && i == 0) {
+                mMovieGenresTV.setVisibility(View.INVISIBLE);
+                break;
+            } else if(genreName == null || genreName.equals("")) {
+                break;
+            } else {
+                if(i != 0) { genres += ", "; }
+                mMovieGenresTV.setVisibility(View.VISIBLE);
+                genres += genreName;
+            }
+        }
+        mMovieGenresTV.setText(genres);
+
+
+        // must be in 'yyyy-MM-dd' format
+        Calendar calendar = Utility.parseDate(data.getString(COLUMN_RELEASE_DATE));
+        mReleaseDateTV.setText(String.format(getString(R.string.format_release_date), calendar));
+
+        mVoteAvgTV.setText(String.valueOf(getString(R.string.vote_average) + " " +
+                data.getFloat(COLUMN_VOTE_AVG)));
+
+        mNumVotesTV.setText(String.format(getString(R.string.format_num_votes),
+                data.getInt(COLUMN_NUM_VOTES)));
+
+        // set budget, revenue, and runtime or remove from view if zero
+        long budget = data.getLong(COLUMN_BUDGET);
+        long revenue = data.getLong(COLUMN_REVENUE);
+        int runtime = data.getInt(COLUMN_RUNTIME);
+
+        if(budget != 0) {
+            mBudgetTV.setVisibility(View.VISIBLE);
+            mBudgetTV.setText(String.format(getString(R.string.format_budget), budget));
+        }
+        else {
+            mBudgetTV.setVisibility(View.GONE);
+        }
+
+        if(revenue != 0) {
+            mRevenueTV.setVisibility(View.VISIBLE);
+            mRevenueTV.setText(String.format(getString(R.string.format_revenue), revenue));
+        }
+        else {
+            mRevenueTV.setVisibility(View.GONE);
+        }
+
+        if(runtime != 0) {
+            mRuntimeTV.setVisibility(View.VISIBLE);
+            mRuntimeTV.setText(String.format(getString(R.string.format_runtime), runtime));
+        }
+        else {
+            mRuntimeTV.setVisibility(View.GONE);
+        }
+
+        // OVERVIEW
+        mOverviewTV.setText(data.getString(COLUMN_OVERVIEW));
+
+        if(mTwoPane) {
+            // app is running in tablet mode, let hosting activity deal with toolbar update
+            // there is nothing special in the toolbar in phone mode, FYI
+            mCallbacks.onUpdateToolbar(title, tagline);
+        }
+
+    }
+
+
+    private void updateVideosUI(Cursor data) {
+
+        if(!data.moveToFirst()) {
+            mVideoSectionTitle.setVisibility(View.GONE);
+            mVideoShareButton1ImageView.setVisibility(View.GONE);
+            mVideoShareButton2ImageView.setVisibility(View.GONE);
+            mVideoThumbnailImageView1.setVisibility(View.GONE);
+            mVideoThumbnailImageView2.setVisibility(View.GONE);
+            return;
+        }
+
+        if(!data.getString(COLUMN_VIDEO_KEY).equals("")) {
+//            Log.e(LOGTAG, "    video key: " + data.getString(COLUMN_VIDEO_KEY));
+//            Log.e(LOGTAG, "    youtube URL: " + Utility.buildYouTubeUri(data.getString(COLUMN_VIDEO_KEY)));
+//            Log.e(LOGTAG, "    thumb URL: " + data.getString(COLUMN_VIDEO_THUMBNAIL_URL));
+
+            data.moveToFirst();
+
+            // video thumbnail image
+            Picasso.with(getActivity())
+                    .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
+                    .placeholder(R.drawable.ic_play_circle_outline_white_48dp)
+                    .into(mVideoThumbnailImageView1);
+
+            // set a click listener on the ImageView video trailer thumbnail and play button
+            mVideoThumbnailImageView1.setOnClickListener(
+                    new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
+
+            // set a click listener on the ImageView share button
+            mVideoShareButton1ImageView.setOnClickListener(
+                    new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
+
+            if(!data.moveToNext()) {
+                mVideoShareButton2ImageView.setVisibility(View.GONE);
+                mVideoThumbnailImageView2.setVisibility(View.GONE);
+                return;
+            }
+        }
+
+        if(!data.getString(COLUMN_VIDEO_KEY).equals("")) {
+//            Log.e(LOGTAG, "    2video key: " + data.getString(COLUMN_VIDEO_KEY));
+//            Log.e(LOGTAG, "    2youtube URL: " + Utility.buildYouTubeUri(data.getString(COLUMN_VIDEO_KEY)));
+//            Log.e(LOGTAG, "    2thumb URL: " + data.getString(COLUMN_VIDEO_THUMBNAIL_URL));
+
+            // video thumbnail image
+            Picasso.with(getActivity())
+                    .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
+                    .placeholder(R.drawable.ic_play_circle_outline_white_48dp)
+                    .into(mVideoThumbnailImageView2);
+
+            // set a click listener on the ImageView video trailer thumbnail and play button
+            mVideoThumbnailImageView2.setOnClickListener(
+                    new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
+
+            // set a click listener on the ImageView share button
+            mVideoShareButton2ImageView.setOnClickListener(
+                    new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
+        }
+    }
+
+
+    private void updateReviewsUI(Cursor data) {
+
+
+
+
+
+
+    }
+
+
+    private void updateCreditsUI(Cursor data) {
+        int profileImageColumn = mUseFavorites ? COLUMN_PROFILE_FILE_PATH : COLUMN_PROFILE_PATH;
+
+        ImageView[] imageViews = {mProfile1ImageView, mProfile2ImageView,
+                mProfile3ImageView, mProfile4ImageView};
+        TextView[] characterTVs = {mCharacterName1TV, mCharacterName2TV,
+                mCharacterName3TV, mCharacterName4TV};
+        TextView[] castTVs = {mCastName1TV, mCastName2TV, mCastName3TV, mCastName4TV};
+
+        for(int i = 0; i < imageViews.length; i++) {
+            if(data.isAfterLast()) { break; }
+
+            if (data.getString(profileImageColumn) != null) {
+                // cast member profile image path
+                Picasso.with(getActivity())
+                        .load(data.getString(profileImageColumn))
+                        .placeholder(R.drawable.person_placeholder)
+                        .into(imageViews[i]);
+
+                characterTVs[i].setText(String.format(getString(R.string.format_character_name),
+                        data.getString(COLUMN_CHARACTER)));
+                castTVs[i].setText(String.format(getString(R.string.format_cast_name),
+                        data.getString(COLUMN_CAST_NAME)));
+            }
+            data.moveToNext();
+        }
+    }
 
 }
 

@@ -274,6 +274,7 @@
 
             <!-- videos -->
             <TextView
+                android:id="@+id/video_section_title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textColor="@color/white"
@@ -285,10 +286,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/movie_detail_section_margin_small">
                 <ImageView
                     android:id="@+id/video_thumbnail1_imageview"
-                    android:layout_width="160dp"
+                    android:layout_width="@dimen/video_thumb_width"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
@@ -307,15 +309,15 @@
                 android:orientation="horizontal">
                 <ImageView
                     android:id="@+id/video_thumbnail2_imageview"
-                    android:layout_width="120dp"
+                    android:layout_width="@dimen/video_thumb_width"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"/>
                 <ImageView
                     android:id="@+id/video2_share_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/movie_detail_section_margin"
                     android:background="@drawable/ic_share_white_48dp"/>
             </LinearLayout>
