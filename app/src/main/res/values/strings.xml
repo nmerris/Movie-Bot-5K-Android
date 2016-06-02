@@ -60,16 +60,19 @@
 
     <!-- fragment movie details -->
     <!-- where have you been all my life, format strings? so convenient -->
-    <string name="format_budget">Budget: $<xliff:g id="budget">%,1d</xliff:g></string>
-    <string name="format_revenue">Revenue: $<xliff:g id="revenue">%,1d</xliff:g></string>
-    <string name="release_date">Release Date:</string>
-    <string name="vote_average">Vote Average:</string>
-    <string name="format_num_votes">Total Votes: <xliff:g id="num_votes">%,1d</xliff:g></string>
-    <string name="genres">Genres:</string>
+    <string name="format_budget">BUDGET: $<xliff:g id="budget">%,1d</xliff:g></string>
+    <string name="format_revenue">REVENUE: $<xliff:g id="revenue">%,1d</xliff:g></string>
+    <string name="release_date">RELEASE DATE:</string>
+    <string name="vote_average">VOTE AVERAGE:</string>
+    <string name="format_num_votes">TOTAL VOTES: <xliff:g id="num_votes">%,1d</xliff:g></string>
+    <string name="genres">GENRES:</string>
     <!-- looks like: October 29, 1929 (extra credit if you know why that date is significant) -->
-    <string name="format_release_date">Release Date: <xliff:g id="release_date">%1$tB %1$te, %1$tY</xliff:g></string>
-    <string name="format_runtime">Runtime: <xliff:g id="runtime">%1d</xliff:g> min</string>
+    <string name="format_release_date">RELEASE DATE: <xliff:g id="release_date">%1$tB %1$te, %1$tY</xliff:g></string>
+    <string name="format_runtime">RUNTIME: <xliff:g id="runtime">%1d</xliff:g> min</string>
 
     <string name="overview">Overview</string>
+    <string name="credits">Credits</string>
+    <string name="format_character_name">Character: <xliff:g id="character_name">%1s</xliff:g></string>
+    <string name="format_cast_name">Name: <xliff:g id="cast_name">%1s</xliff:g></string>
 
 </resources>

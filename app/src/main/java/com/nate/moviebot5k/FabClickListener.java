@@ -88,7 +88,7 @@ class FabClickListener implements View.OnClickListener {
             
             // toggle the fab drawable
             int fabDrawable = removeFromFavorites ?
-                    R.drawable.btn_star_off_normal_holo_light : R.drawable.btn_star_on_normal_holo_light;
+                    R.drawable.btn_star_off: R.drawable.btn_star_on;
             mFabFavorites.setImageDrawable(mContext.getResources().getDrawable(fabDrawable));
 
             // update all the db records in all tables so they reflect the correct favorite status

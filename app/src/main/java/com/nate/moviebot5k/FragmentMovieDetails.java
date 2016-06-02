@@ -70,8 +70,21 @@ public class FragmentMovieDetails extends Fragment
     @Bind(R.id.movie_revenue_textview) TextView mRevenueTV;
     @Bind(R.id.movie_runtime_textview) TextView mRuntimeTV;
     @Bind(R.id.movie_overview_textview) TextView mOverviewTV;
-
-
+    @Bind(R.id.credits_profile_1_cast_name_textview) TextView mCastName1TV;
+    @Bind(R.id.credits_profile_1_character_name_textview) TextView mCharacterName1TV;
+    @Bind(R.id.credits_profile_1_imageview) ImageView mProfile1ImageView;
+    
+    @Bind(R.id.credits_profile_2_cast_name_textview) TextView mCastName2TV;
+    @Bind(R.id.credits_profile_2_character_name_textview) TextView mCharacterName2TV;
+    @Bind(R.id.credits_profile_2_imageview) ImageView mProfile2ImageView;
+    
+    @Bind(R.id.credits_profile_3_cast_name_textview) TextView mCastName3TV;
+    @Bind(R.id.credits_profile_3_character_name_textview) TextView mCharacterName3TV;
+    @Bind(R.id.credits_profile_3_imageview) ImageView mProfile3ImageView;
+    
+    @Bind(R.id.credits_profile_4_cast_name_textview) TextView mCastName4TV;
+    @Bind(R.id.credits_profile_4_character_name_textview) TextView mCharacterName4TV;
+    @Bind(R.id.credits_profile_4_imageview) ImageView mProfile4ImageView;
 
 
 
@@ -397,7 +410,7 @@ public class FragmentMovieDetails extends Fragment
                     // and depending on if the device was just rotated or not
                     boolean favoriteState = Boolean.valueOf(data.getString(COLUMN_IS_FAVORITE));
                     int fabDrawable = favoriteState ?
-                            R.drawable.btn_star_on_normal_holo_light : R.drawable.btn_star_off_normal_holo_light;
+                            R.drawable.btn_star_on : R.drawable.btn_star_off;
                     mFabFavorites.setImageDrawable(getResources().getDrawable(fabDrawable));
 
                     // backdrop image.. load from either local device or from network, depending
@@ -494,10 +507,8 @@ public class FragmentMovieDetails extends Fragment
                         mRuntimeTV.setVisibility(View.GONE);
                     }
 
-
-
+                    // OVERVIEW
                     mOverviewTV.setText(data.getString(COLUMN_OVERVIEW));
-
 
 
                     if(mTwoPane) {
@@ -570,50 +581,31 @@ public class FragmentMovieDetails extends Fragment
 
 
                 case CREDITS_LOADER_ID:
-                    // better check for null here.. some cast may not have a profile img path
-                    // the credits order should already be correct due to the order param passed
-                    // in when this particular loader was created
+                    int profileImageColumn = mUseFavorites ? COLUMN_PROFILE_FILE_PATH : COLUMN_PROFILE_PATH;
 
-//                    int profileImageColumn = mUseFavorites ? COLUMN_PROFILE_FILE_PATH : COLUMN_PROFILE_PATH;
-//
-//                    // testing
-//                    if(data.getString(profileImageColumn) != null) {
-//                        // cast member profile image path
-//                        Picasso.with(getActivity())
-//                                .load(data.getString(profileImageColumn))
-//                                .into(mCreditsProfile1);
-//
-//                        mCreditsTextView1.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
-//                    }
-//                    if(data.moveToNext()) {
-//                        if(data.getString(profileImageColumn) != null) {
-//                            Picasso.with(getActivity())
-//                                    .load(data.getString(profileImageColumn))
-//                                    .into(mCreditsProfile2);
-//                        }
-//                        mCreditsTextView2.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
-//                    }
-//                    if(data.moveToNext()) {
-//                        if(data.getString(profileImageColumn) != null) {
-//                            Picasso.with(getActivity())
-//                                    .load(data.getString(profileImageColumn))
-//                                    .into(mCreditsProfile3);
-//                        }
-//                        mCreditsTextView3.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
-//                    }
-//                    if(data.moveToNext()) {
-//                        if(data.getString(profileImageColumn) != null) {
-//                            Picasso.with(getActivity())
-//                                    .load(data.getString(profileImageColumn))
-//                                    .into(mCreditsProfile4);
-//                        }
-//                        mCreditsTextView4.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
-//                    }
+                    ImageView[] imageViews = {mProfile1ImageView, mProfile2ImageView,
+                        mProfile3ImageView, mProfile4ImageView};
+                    TextView[] characterTVs = {mCharacterName1TV, mCharacterName2TV,
+                        mCharacterName3TV, mCharacterName4TV};
+                    TextView[] castTVs = {mCastName1TV, mCastName2TV, mCastName3TV, mCastName4TV};
+
+                    for(int i = 0; i < imageViews.length; i++) {
+                        if (data.getString(profileImageColumn) != null) {
+                            // cast member profile image path
+                            Picasso.with(getActivity())
+                                    .load(data.getString(profileImageColumn))
+                                    .placeholder(R.drawable.person_placeholder)
+                                    .into(imageViews[i]);
+
+                            characterTVs[i].setText(String.format(getString(R.string.format_character_name),
+                                    data.getString(COLUMN_CHARACTER)));
+                            castTVs[i].setText(String.format(getString(R.string.format_cast_name),
+                                    data.getString(COLUMN_CAST_NAME)));
+                        }
+                        data.moveToNext();
+                    }
                     
+
                     break;
 
                 default:
@@ -621,176 +613,6 @@ public class FragmentMovieDetails extends Fragment
 
             } // end switch
         } // end if(rootView != null...)
-
-
-//        if(!data.moveToFirst()) Log.e(LOGTAG, "  AND DATA COULD NOT MOVE TO FIRST WITH LOADER ID: " + loader.getId());
-//
-//        if(rootView != null && data.moveToFirst()) {
-//
-//            switch (loader.getId()) {
-//                case MOVIES_LOADER_ID:
-//
-//                    // get the FAB and set it's drawable depending on if movie is a favorite or not
-////                    FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_favorites);
-//                    mFabFavorites.setOnClickListener(new FabClickListener(data));
-//
-//
-//
-//
-//
-//                    // backdrop image
-//                    Picasso.with(getActivity())
-//                            .load(data.getString(COLUMN_BACKDROP_PATH))
-//                            .into(mBackdropImageView);
-//
-//                    // other misc movie detail data
-//                    String genreName1 = data.getString(COLUMN_GENRE_NAME1);
-//                    String genreName2 = data.getString(COLUMN_GENRE_NAME2);
-//                    String genreName3 = data.getString(COLUMN_GENRE_NAME3);
-//                    String genreName4 = data.getString(COLUMN_GENRE_NAME4);
-//                    String overview = data.getString(COLUMN_OVERVIEW);
-//                    String releaseDate = data.getString(COLUMN_RELEASE_DATE);
-//                    String title = data.getString(COLUMN_MOVIE_TITLE);
-//                    float voteAvg = data.getFloat(COLUMN_VOTE_AVG);
-//                    long budget = data.getLong(COLUMN_BUDGET);
-//                    long revenue = data.getLong(COLUMN_REVENUE);
-//                    int runtime = data.getInt(COLUMN_RUNTIME);
-//                    String tagline = data.getString(COLUMN_TAGLINE);
-//
-//                    // update the toolbar title and subtitle
-//                    if(mTwoPane) {
-//                        // app is running in tablet mode, let hosting activity deal with toolbar update
-//                        mCallbacks.onUpdateToolbar(title, tagline);
-//                    }
-//
-//
-//                    mDetailsTextView.setText("DETAILS FROM MOVIE TABLE: \n" +
-//                            genreName1 + " " + genreName2 + " " + genreName3 + " " + genreName4 + "\n" +
-//                            "MOVIE_ID: " + mMovieId + "\n" +
-//                            overview + "\n" +
-//                            "Release Date: " + releaseDate + "\n" +
-//                            "Vote Avg: " + voteAvg + "\n" +
-//                            "Budget: " + budget + "\n" +
-//                            "Runtime: " + runtime + "\n");
-//
-//                    break;
-//
-//
-//
-//
-//
-//                case VIDEOS_LOADER_ID:
-//                    Log.e(LOGTAG, "  from videos table loader, key: " + data.getString(COLUMN_VIDEO_KEY));
-//
-//                    // testing, prob. need some kind of adapter in due to varying numbers of videos
-//                    // but will always only show so many on main details page, and will need to have
-//                    // a link to another activity that shows them all in scrolling list
-//
-//                    // is it really worth it to use an adapter?  not sure
-//                    // I don't really need to check for full here, that was checked before this
-//                    // switch statement started when if(data.moveToFirst... executed
-//                    if(data.getString(COLUMN_VIDEO_KEY) != null) {
-//                        // video thumbnail image 1
-//                        Picasso.with(getActivity())
-//                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
-//                                .into(mVideoThumbnailImageView1);
-//                        // set a click listener on the ImageView video trailer thumbnail
-//                        mVideoThumbnailImageView1.setOnClickListener(new VideoViewListener(data.getString(COLUMN_VIDEO_KEY)));
-//
-//                        // set a click listener on the ... well this will be an share ICON in future
-//                        mVideosTextView1.setText(data.getString(COLUMN_VIDEO_NAME));
-//                        mVideosTextView1.setOnClickListener(new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
-//
-//                    }
-//
-//
-//                    // again testing, just doing 2 videos now, if there are even 2
-//                    if(data.moveToNext()) {
-//                        // video thumbnail image 2
-//                        Picasso.with(getActivity())
-//                                .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
-//                                .into(mVideoThumbnailImageView2);
-//
-//                    mVideosTextView2.setText(data.getString(COLUMN_VIDEO_NAME));
-//                    }
-//                    break;
-//
-//
-//
-//
-//
-//                case REVIEWS_LOADER_ID:
-//
-//                    // testing
-//                    String testRevText = "REVIEW AUTHOR 1: " + data.getString(COLUMN_REVIEW_AUTHOR) +
-//                    "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
-//
-//                    if(data.moveToNext()) {
-//                        testRevText += "REVIEW AUTHOR 2: " + data.getString(COLUMN_REVIEW_AUTHOR) +
-//                                "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
-//                    }
-//                    if(data.moveToNext()) {
-//                        testRevText += "REVIEW AUTHOR 3: " + data.getString(COLUMN_REVIEW_AUTHOR) +
-//                                "\n" + data.getString(COLUMN_REVIEW_CONTENT) + "\n";
-//                    }
-//
-//                    mReviewsTextView.setText(testRevText);
-//                    break;
-//
-//
-//
-//
-//
-//                case CREDITS_LOADER_ID:
-//                    // better check for null here.. some cast may not have a profile img path
-//                    // the credits order should already be correct due to the order param passed
-//                    // in when this particular loader was created
-//
-//                    // testing
-//                    if(data.getString(COLUMN_PROFILE_PATH) != null) {
-//                        // cast member profile image path
-//                        Picasso.with(getActivity())
-//                                .load(data.getString(COLUMN_PROFILE_PATH))
-//                                .into(mCreditsProfile1);
-//
-//                        mCreditsTextView1.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-//                            ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
-//                    }
-//                    if(data.moveToNext()) {
-//                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
-//                            Picasso.with(getActivity())
-//                                    .load(data.getString(COLUMN_PROFILE_PATH))
-//                                    .into(mCreditsProfile2);
-//                        }
-//                        mCreditsTextView2.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
-//                    }
-//                    if(data.moveToNext()) {
-//                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
-//                            Picasso.with(getActivity())
-//                                    .load(data.getString(COLUMN_PROFILE_PATH))
-//                                    .into(mCreditsProfile3);
-//                        }
-//                        mCreditsTextView3.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
-//                    }
-//                    if(data.moveToNext()) {
-//                        if(data.getString(COLUMN_PROFILE_PATH) != null) {
-//                            Picasso.with(getActivity())
-//                                    .load(data.getString(COLUMN_PROFILE_PATH))
-//                                    .into(mCreditsProfile4);
-//                        }
-//                        mCreditsTextView4.setText("CHARACTER: " + data.getString(COLUMN_CHARACTER) +
-//                                ", CAST NAME: " + data.getString(COLUMN_CAST_NAME));
-//                    }
-//                    break;
-//
-//                default:
-//                    Log.e(LOGTAG, "    DEFAULT CASE REACHED IN ON-LOAD-FINISHED IN MOV DETAIL FRAGMENT!!");
-//
-//            } // end switch
-//        } // end if(rootView != null...)
-
     } // end onLoadFinished
 
 
