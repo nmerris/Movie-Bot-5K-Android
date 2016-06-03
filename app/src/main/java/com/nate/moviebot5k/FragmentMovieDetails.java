@@ -66,6 +66,8 @@ public class FragmentMovieDetails extends Fragment
     @Bind(R.id.movie_revenue_textview) TextView mRevenueTV;
     @Bind(R.id.movie_runtime_textview) TextView mRuntimeTV;
     @Bind(R.id.movie_overview_textview) TextView mOverviewTV;
+
+    @Bind(R.id.credits_show_all) TextView mCreditsShowAll;
     @Bind(R.id.credits_profile_1_cast_name_textview) TextView mCastName1TV;
     @Bind(R.id.credits_profile_1_character_name_textview) TextView mCharacterName1TV;
     @Bind(R.id.credits_profile_1_imageview) ImageView mProfile1ImageView;
@@ -213,6 +215,7 @@ public class FragmentMovieDetails extends Fragment
 
 //        void onFavoriteRemoved(int movieId);
         void onUpdateToolbar(String movieTitle, String movieTagline);
+        void onCreditsShowAllClicked(int movieId);
     }
 
     @Override
@@ -396,7 +399,22 @@ public class FragmentMovieDetails extends Fragment
                     break;
 
                 case CREDITS_LOADER_ID:
+                    // I have yet to come across a single movie that did not have credits data
                     if(data.moveToFirst()) { updateCreditsUI(data); }
+
+                    // due to the need to get this project done, I did not save every credits
+                    // profile image to the local device, so you only get 4 credits when viewing
+                    // favorites, however in 'normal' mode you can see them all
+                    if(mUseFavorites) {
+                        mCreditsShowAll.setVisibility(View.GONE);
+                    } else {
+                        mCreditsShowAll.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mCallbacks.onCreditsShowAllClicked(mMovieId);
+                            }
+                        });
+                    }
                     break;
 
                 default:

@@ -5,6 +5,7 @@
     <string name="content_authority" translatable="false">com.nate.moviebot5k</string>
     <string name="movie_details_pager_activity_label">Movie Details</string>
     <string name="movie_details_pager_activity_favorites_label">Favorite Movie Details</string>
+    <string name="credits_activity_label">Credits</string>
 
     <!-- api fetching basics, specific endpoint paths are in the java code -->
     <string name="themoviedb_authority" translatable="false">api.themoviedb.org</string>
@@ -77,5 +78,6 @@
     <string name="format_character_name">CHARACTER: <xliff:g id="character_name">%1s</xliff:g></string>
     <string name="format_cast_name">NAME: <xliff:g id="cast_name">%1s</xliff:g></string>
     <string name="format_review_author">by <xliff:g id="review_author">%1s</xliff:g></string>
+    <string name="show_all_credits">Show All Credits</string>
 
 </resources>

@@ -120,10 +120,18 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
 
     }
 
+
     @Override
     public void onUpdateToolbar(String movieTitle, String movieTagline) {
         // had a heckuva time getting this to work with the view pager, sorry to say I had to give
         // up as this project has already taken quite a lot of time
+    }
+
+
+    // called when user clicks on icon to show all the credits
+    @Override
+    public void onCreditsShowAllClicked(int movieId) {
+        startActivity(ActivityCredits.newIntent(this, movieId));
     }
 
 }

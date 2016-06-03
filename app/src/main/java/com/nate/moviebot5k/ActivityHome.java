@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -164,6 +165,13 @@ public class ActivityHome extends ActivitySingleFragment
         if(mTwoPane) {
             Utility.updateToolbarTitleAndTagline(this, movieTitle, movieTagline);
         }
+    }
+
+
+    // called when user clicks on icon to show all the credits
+    @Override
+    public void onCreditsShowAllClicked(int movieId) {
+        startActivity(ActivityCredits.newIntent(this, movieId));
     }
 
 }

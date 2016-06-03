@@ -25,6 +25,7 @@ public class ActivityCredits extends ActivitySingleFragment {
 
     @Override
     protected Fragment createFragment() {
+        getSupportActionBar().setTitle(getString(R.string.credits_activity_label));
         int movieId = getIntent().getBundleExtra(BUNDLE_INCOMING_INTENT).getInt(KEY_MOVIE_ID);
         return FragmentCredits.newInstance(movieId);
     }

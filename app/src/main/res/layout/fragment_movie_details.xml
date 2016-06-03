@@ -271,6 +271,18 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- show all credits -->
+            <TextView
+                android:id="@+id/credits_show_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/show_all_credits"
+                android:textColor="@color/white"
+                android:layout_marginTop="@dimen/movie_detail_section_margin"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/about_app_content_text_size"
+                android:drawableLeft="@drawable/ic_open_in_new_white_24dp"/>
+
 
             <!-- videos -->
             <TextView

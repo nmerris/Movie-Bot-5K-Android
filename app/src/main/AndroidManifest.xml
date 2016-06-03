@@ -54,6 +54,14 @@
                 android:value=".ActivityHome" />
         </activity>
 
+        <activity
+            android:name=".ActivityCredits"
+            android:parentActivityName=".ActivityHome">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ActivityHome" />
+        </activity>
 
 
         <provider

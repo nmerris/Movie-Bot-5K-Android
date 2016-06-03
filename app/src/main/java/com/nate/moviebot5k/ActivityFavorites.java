@@ -148,4 +148,11 @@ public class ActivityFavorites extends ActivitySingleFragment
         FragmentMovieGrid.newInstance(true, mTwoPane)).commit();
     }
 
+
+    // called when user clicks on icon to show all the credits
+    @Override
+    public void onCreditsShowAllClicked(int movieId) {
+        startActivity(ActivityCredits.newIntent(this, movieId));
+    }
+
 }

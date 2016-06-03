@@ -94,16 +94,16 @@ public class FragmentCredits extends Fragment implements LoaderManager.LoaderCal
     
     
     private final String[] CREDITS_PROJECTION = {
-//            MovieTheaterContract.CreditsEntry._ID,
+            MovieTheaterContract.CreditsEntry._ID,
 //            MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID,
 
             MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH,
             MovieTheaterContract.CreditsEntry.COLUMN_CHARACTER,
             MovieTheaterContract.CreditsEntry.COLUMN_NAME
     };
-    public static final int COL_PROFILE_PATH = 0;
-    public static final int COL_CHARACTER = 1;
-    public static final int COL_NAME = 2;
+    public static final int COL_PROFILE_PATH = 1;
+    public static final int COL_CHARACTER = 2;
+    public static final int COL_NAME = 3;
 //    public static final int MOVIES_TABLE_COL_VOTE_AVG = 5;
 //    public static final int MOVIES_TABLE_COL_REVENUE = 6;
     
