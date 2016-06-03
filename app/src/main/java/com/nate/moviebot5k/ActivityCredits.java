@@ -22,10 +22,25 @@ public class ActivityCredits extends ActivitySingleFragment {
         return intent;
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        try {
+            getSupportActionBar().setTitle(getString(R.string.credits_activity_label));
+        } catch (NullPointerException npe){
+            // nothing here, just need to handle this npe when in phone landscape mode, which is
+            // fullscreen without an action bar
+        }
+    }
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_credits_ref;
+    }
 
     @Override
     protected Fragment createFragment() {
-        getSupportActionBar().setTitle(getString(R.string.credits_activity_label));
         int movieId = getIntent().getBundleExtra(BUNDLE_INCOMING_INTENT).getInt(KEY_MOVIE_ID);
         return FragmentCredits.newInstance(movieId);
     }

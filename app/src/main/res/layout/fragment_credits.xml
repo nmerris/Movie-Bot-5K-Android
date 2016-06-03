@@ -8,5 +8,6 @@
         android:layout_height="match_parent"
         android:id="@+id/listview_credits"
         android:layout_gravity="center"
-        />
+        android:divider="@null"
+        android:dividerHeight="0dp"/>
 </FrameLayout>

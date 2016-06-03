@@ -62,8 +62,12 @@ public class CreditsAdapter extends CursorAdapter {
                 .placeholder(mContext.getResources().getDrawable(R.drawable.placeholder_person))
                 .into(viewHolder.creditProfileImageView);
 
-        viewHolder.creditCharacterNameTV.setText(cursor.getString(FragmentCredits.COL_CHARACTER));
-        viewHolder.creditCastNameTV.setText(cursor.getString(FragmentCredits.COL_NAME));
+        viewHolder.creditCharacterNameTV.setText(
+                String.format(mContext.getString(R.string.format_character_name),
+                        cursor.getString(FragmentCredits.COL_CHARACTER)));
+        viewHolder.creditCastNameTV.setText(
+                String.format(mContext.getString(R.string.format_cast_name),
+                        cursor.getString(FragmentCredits.COL_NAME)));
     }
 
 }

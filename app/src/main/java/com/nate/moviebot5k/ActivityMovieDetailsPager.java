@@ -81,7 +81,8 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
                 getSupportActionBar().setTitle(getString(R.string.movie_details_pager_activity_favorites_label));
             }
         } catch (NullPointerException npe) {
-            npe.printStackTrace();
+            // nothing here, just need to handle the case when in phone landscape and there is
+            // no action bar because app is running full screen
         }
 
         // get the intent bundle and grab all it's datumilicious goodies

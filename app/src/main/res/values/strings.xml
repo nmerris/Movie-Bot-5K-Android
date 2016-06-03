@@ -1,11 +1,12 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
 
-    <string name="app_name">MovieBot5k</string>
+    <string name="app_name">MovieBot5000</string>
     <string name="movie_filters_activity_label">Movie Filters</string>
     <string name="content_authority" translatable="false">com.nate.moviebot5k</string>
     <string name="movie_details_pager_activity_label">Movie Details</string>
     <string name="movie_details_pager_activity_favorites_label">Favorite Movie Details</string>
     <string name="credits_activity_label">Credits</string>
+    <string name="about_app_activity_label">About</string>
 
     <!-- api fetching basics, specific endpoint paths are in the java code -->
     <string name="themoviedb_authority" translatable="false">api.themoviedb.org</string>

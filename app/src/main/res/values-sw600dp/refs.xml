@@ -8,4 +8,8 @@
 
     <!-- same as activity_home layout but without the spinner fragment container -->
     <item name="activity_favorites_ref" type="layout">@layout/activity_favorites</item>
+
+    <!-- in tablet mode, activity credits is same as phone portrait, ie it has a toolbar -->
+    <item name="activity_credits_ref" type="layout">@layout/activity_single_fragment</item>
+
 </resources>

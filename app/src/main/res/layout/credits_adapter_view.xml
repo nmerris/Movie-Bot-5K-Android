@@ -1,32 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_marginBottom="@dimen/movie_detail_section_margin_small">
-    <ImageView
-        android:id="@+id/credits_adapter_imageview"
-        android:layout_width="@dimen/credits_imageview_width"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:adjustViewBounds="true"/>
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/credits_adapter_character_name_textview"
-            android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp">
+
+        <ImageView
+            android:id="@+id/credits_adapter_imageview"
+            android:layout_width="@dimen/credits_imageview_width"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/movie_detail_general_text_size"/>
-        <TextView
-            android:id="@+id/credits_adapter_cast_name_textview"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"/>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/movie_detail_general_text_size"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginLeft="10dp">
+
+            <TextView
+                android:id="@+id/credits_adapter_character_name_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/movie_detail_general_text_size"/>
+
+            <TextView
+                android:id="@+id/credits_adapter_cast_name_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/movie_detail_general_text_size"/>
+
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>
