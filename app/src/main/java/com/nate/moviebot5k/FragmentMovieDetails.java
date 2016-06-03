@@ -18,18 +18,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nate.moviebot5k.api_fetching.MovieDetailsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
-import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -776,7 +771,7 @@ public class FragmentMovieDetails extends Fragment
                 // cast member profile image path
                 Picasso.with(getActivity())
                         .load(data.getString(profileImageColumn))
-                        .placeholder(R.drawable.person_placeholder)
+                        .placeholder(R.drawable.placeholder_person)
                         .into(imageViews[i]);
 
                 characterTVs[i].setText(String.format(getString(R.string.format_character_name),
