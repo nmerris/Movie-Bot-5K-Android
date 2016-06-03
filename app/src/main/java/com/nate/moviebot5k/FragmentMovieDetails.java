@@ -588,11 +588,13 @@ public class FragmentMovieDetails extends Fragment
         if(data.getString(COLUMN_IS_FAVORITE).equals("true")) {
             Picasso.with(getActivity())
                     .load(data.getString(COLUMN_BACKDROP_FILE_PATH))
+                    .placeholder(getResources().getDrawable(R.drawable.placeholder_backdrop))
                     .into(mBackdropImageView);
         }
         else {
             Picasso.with(getActivity())
                     .load(data.getString(COLUMN_BACKDROP_PATH))
+                    .placeholder(getResources().getDrawable(R.drawable.placeholder_backdrop))
                     .into(mBackdropImageView);
         }
 

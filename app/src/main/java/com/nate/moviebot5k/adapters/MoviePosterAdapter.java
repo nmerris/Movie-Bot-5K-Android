@@ -3,6 +3,7 @@ package com.nate.moviebot5k.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +65,8 @@ public class MoviePosterAdapter extends CursorAdapter {
 
         // if viewing favorites, have Picasso load the locally stored files
         if(mUseFavorites) {
+            Log.i(LOGTAG, "  about to load poster path (favorites) with Picasso: " + cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_FILE_PATH));
+
             Picasso.with(context)
                     .load(cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_FILE_PATH))
                     .placeholder(mContext.getResources().getDrawable(R.drawable.placeholder_movie))

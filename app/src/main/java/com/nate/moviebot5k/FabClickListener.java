@@ -327,10 +327,17 @@ class FabClickListener implements View.OnClickListener {
          * @param tableName The db table name to update (either movies or credits)
          */
         public PicassoTarget(String theMovieDbImagePath, String dbColumnNameToInsert, String tableName) {
-            // extract the filename from themoviedb's URL for the image, makes sense to use the same
-            // filename here, it's just a bunch of random alphanumeric characters
-            Uri uri = Uri.parse(theMovieDbImagePath);
-            fileName = uri.getLastPathSegment();
+//            Uri uri = null;
+            try {
+                // extract the filename from themoviedb's URL for the image, makes sense to use the same
+                // filename here, it's just a bunch of random alphanumeric characters
+                fileName = Uri.parse(theMovieDbImagePath).getLastPathSegment();
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
+            }
+
+
+//            fileName = uri.getLastPathSegment();
 
             dbColumnToInsert = dbColumnNameToInsert;
             this.tableName = tableName;
