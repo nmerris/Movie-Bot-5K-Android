@@ -72,11 +72,16 @@ public class ActivityMovieDetailsPager extends AppCompatActivity
         // so set the title appropriately
         Toolbar actionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(actionBarToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        if(!mUseFavorites) {
-            getSupportActionBar().setTitle(getString(R.string.movie_details_pager_activity_label));
-        } else {
-            getSupportActionBar().setTitle(getString(R.string.movie_details_pager_activity_favorites_label));
+
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            if(!mUseFavorites) {
+                getSupportActionBar().setTitle(getString(R.string.movie_details_pager_activity_label));
+            } else {
+                getSupportActionBar().setTitle(getString(R.string.movie_details_pager_activity_favorites_label));
+            }
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         }
 
         // get the intent bundle and grab all it's datumilicious goodies

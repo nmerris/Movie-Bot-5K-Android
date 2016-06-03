@@ -182,9 +182,6 @@ public class FragmentMovieDetails extends Fragment
     private static final int COLUMN_VIDEO_NAME = 6;
 
 
-
-
-
     // the movieId will be used to read data from either the favorites or movies table
     public static FragmentMovieDetails newInstance(boolean useFavorites, int movieId, boolean mTwoPane) {
         Bundle args = new Bundle();
@@ -195,8 +192,6 @@ public class FragmentMovieDetails extends Fragment
         fragment.setArguments(args);
         return fragment;
     }
-
-
 
     /**
      * Required interface for any activity that hosts this fragment
@@ -335,7 +330,7 @@ public class FragmentMovieDetails extends Fragment
 
         // the ref points to the same details frag layout on tablet and phone portrait,
         // but points to a wider layout in phone landscape
-        View rootView = inflater.inflate(R.layout.fragment_movie_details_ref, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
         ButterKnife.bind(this, rootView);
 
         return rootView;
