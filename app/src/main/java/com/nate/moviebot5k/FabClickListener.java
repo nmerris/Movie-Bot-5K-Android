@@ -184,14 +184,23 @@ class FabClickListener implements View.OnClickListener {
             // the poster URI is stored in the db with 'file:' at beginning because that's the way
             // Picasso wants it, so strip that out to get the simple file path that android will
             // understand in order to delete the file
-            Uri uriPoster = Uri.parse(cursor.getString(COLUMN_POSTER_FILE_PATH));
-            filePathsToDelete.add(uriPoster.getPath());
+            try {
+                Uri uriPoster = Uri.parse(cursor.getString(COLUMN_POSTER_FILE_PATH));
+                filePathsToDelete.add(uriPoster.getPath());
 //            Log.e(LOGTAG, "  and path extracted from db column for poster image is: " + uriPoster.getPath());
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
+            }
 
             // similar for backdrop image path
-            Uri uriBackdrop = Uri.parse(cursor.getString(COLUMN_BACKDROP_FILE_PATH));
-            filePathsToDelete.add(uriBackdrop.getPath());
+
+            try {
+                Uri uriBackdrop = Uri.parse(cursor.getString(COLUMN_BACKDROP_FILE_PATH));
+                filePathsToDelete.add(uriBackdrop.getPath());
 //            Log.e(LOGTAG, "  and path extracted from db column for backdrop image is: " + uriBackdrop.getPath());
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
+            }
 
             cursor.close();
         }
@@ -214,9 +223,13 @@ class FabClickListener implements View.OnClickListener {
                 }
 
                 // strip the file path from the URI and add it to the list of paths to delete
-                Uri uri = Uri.parse(cursor.getString(0));
-                filePathsToDelete.add(uri.getPath());
+                try {
+                    Uri uri = Uri.parse(cursor.getString(0));
+                    filePathsToDelete.add(uri.getPath());
 //                Log.e(LOGTAG, "  and path extracted from db column for credit file is: " + uri.getPath());
+                } catch (Exception npe) {
+                    npe.printStackTrace();
+                }
                 cursor.moveToNext();
             }
             cursor.close();

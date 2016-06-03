@@ -93,31 +93,12 @@ public class FragmentMovieDetails extends Fragment
     @Bind(R.id.video2_share_button) ImageView mVideoShareButton2ImageView;
     @Bind(R.id.video_section_title) TextView mVideoSectionTitle;
 
+    @Bind(R.id.reviews_section_title) TextView mReviewSectionTitle;
+    @Bind(R.id.review_author1_textview) TextView mReviewAuthor1TV;
+    @Bind(R.id.review_author2_textview) TextView mReviewAuthor2TV;
+    @Bind(R.id.review_content1_textview) TextView mReviewContent1TV;
+    @Bind(R.id.review_content2_textview) TextView mReviewContent2TV;
 
-//    @Bind(R.id.video_layout1) LinearLayout mVideoLayout1;
-//    @Bind(R.id.video_layout2) LinearLayout mVideoLayout2;
-
-
-
-/*    @Bind(R.id.test_videos1_textview) TextView mVideosTextView1;
-    @Bind(R.id.test_videos2_textview) TextView mVideosTextView2;
-//    @Bind(R.id.test_videos3_textview) TextView mVideosTextView3;
-//    @Bind(R.id.test_videos4_textview) TextView mVideosTextView4;
-    @Bind(R.id.video_thumbnail1_imageview) ImageView mVideoThumbnailImageView1;
-    @Bind(R.id.video_thumbnail2_imageview) ImageView mVideoThumbnailImageView2;
-
-    @Bind(R.id.test_reviews_textview) TextView mReviewsTextView;
-
-    @Bind(R.id.test_credits_profile_1) ImageView mCreditsProfile1;
-    @Bind(R.id.test_credits_profile_2) ImageView mCreditsProfile2;
-    @Bind(R.id.test_credits_profile_3) ImageView mCreditsProfile3;
-    @Bind(R.id.test_credits_profile_4) ImageView mCreditsProfile4;
-    @Bind(R.id.test_credits_textview_1) TextView mCreditsTextView1;
-    @Bind(R.id.test_credits_textview_2) TextView mCreditsTextView2;
-    @Bind(R.id.test_credits_textview_3) TextView mCreditsTextView3;
-    @Bind(R.id.test_credits_textview_4) TextView mCreditsTextView4;*/
-    
-    
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] MOVIES_PROJECTION = {
             MovieTheaterContract.MoviesEntry._ID,
@@ -366,7 +347,7 @@ public class FragmentMovieDetails extends Fragment
     // and it may be a mix of favorites/non favs if in home activity or movie pager activity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i(LOGTAG, "entered onCreateLoader");
+        Log.e(LOGTAG, "entered onCreateLoader");
 
 //        String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
 //        String[] selectionArgs =
@@ -405,10 +386,10 @@ public class FragmentMovieDetails extends Fragment
         return null;
     }
 
-
     @SuppressLint("SetTextI18n")
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
+        Log.e(LOGTAG, "entered onLoadFinished");
 
         if(getView() != null) {
             switch (loader.getId()) {
@@ -717,12 +698,6 @@ public class FragmentMovieDetails extends Fragment
         }
 
         if(!data.getString(COLUMN_VIDEO_KEY).equals("")) {
-//            Log.e(LOGTAG, "    video key: " + data.getString(COLUMN_VIDEO_KEY));
-//            Log.e(LOGTAG, "    youtube URL: " + Utility.buildYouTubeUri(data.getString(COLUMN_VIDEO_KEY)));
-//            Log.e(LOGTAG, "    thumb URL: " + data.getString(COLUMN_VIDEO_THUMBNAIL_URL));
-
-            data.moveToFirst();
-
             // video thumbnail image
             Picasso.with(getActivity())
                     .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
@@ -745,10 +720,6 @@ public class FragmentMovieDetails extends Fragment
         }
 
         if(!data.getString(COLUMN_VIDEO_KEY).equals("")) {
-//            Log.e(LOGTAG, "    2video key: " + data.getString(COLUMN_VIDEO_KEY));
-//            Log.e(LOGTAG, "    2youtube URL: " + Utility.buildYouTubeUri(data.getString(COLUMN_VIDEO_KEY)));
-//            Log.e(LOGTAG, "    2thumb URL: " + data.getString(COLUMN_VIDEO_THUMBNAIL_URL));
-
             // video thumbnail image
             Picasso.with(getActivity())
                     .load(data.getString(COLUMN_VIDEO_THUMBNAIL_URL))
@@ -767,12 +738,28 @@ public class FragmentMovieDetails extends Fragment
 
 
     private void updateReviewsUI(Cursor data) {
+        if(!data.moveToFirst()) {
+            mReviewSectionTitle.setVisibility(View.GONE);
+            mReviewAuthor1TV.setVisibility(View.GONE);
+            mReviewAuthor2TV.setVisibility(View.GONE);
+            mReviewContent1TV.setVisibility(View.GONE);
+            mReviewContent2TV.setVisibility(View.GONE);
+            return;
+        }
 
+        mReviewAuthor1TV.setText(String.format(getString(R.string.format_review_author),
+                data.getString(COLUMN_REVIEW_AUTHOR)));
+        mReviewContent1TV.setText(data.getString(COLUMN_REVIEW_CONTENT));
 
+        if(!data.moveToNext()) {
+            mReviewAuthor2TV.setVisibility(View.GONE);
+            mReviewContent2TV.setVisibility(View.GONE);
+            return;
+        }
 
-
-
-
+        mReviewAuthor2TV.setText(String.format(getString(R.string.format_review_author),
+                data.getString(COLUMN_REVIEW_AUTHOR)));
+        mReviewContent2TV.setText(data.getString(COLUMN_REVIEW_CONTENT));
     }
 
 

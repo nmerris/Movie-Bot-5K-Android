@@ -235,6 +235,8 @@ public class MovieDetailsFetcher {
             valuesReviews.put(MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR, jsonObject.getString("author"));
             valuesReviews.put(MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT, jsonObject.getString("content"));
 
+//            Log.i(LOGTAG, " review " + i + " content: " + jsonObject.getString("content"));
+
             // set the is_favorite column to FALSE
             valuesReviews.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, "false");
 

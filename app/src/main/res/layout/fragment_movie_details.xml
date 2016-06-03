@@ -323,8 +323,43 @@
             </LinearLayout>
 
 
+            <!-- reviews -->
+            <TextView
+                android:id="@+id/reviews_section_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@color/white"
+                android:textSize="@dimen/movie_detail_section_title_text_size"
+                android:layout_marginTop="@dimen/movie_detail_section_margin"
+                android:layout_marginBottom="@dimen/movie_detail_section_margin_small"
+                android:text="@string/reviews"/>
+            
+            <TextView
+                android:id="@+id/review_author1_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="italic"
+                android:textSize="@dimen/about_app_content_text_size"/>
+            <TextView
+                android:id="@+id/review_content1_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/movie_detail_section_margin"/>
 
-            <!-- I do not know why the scrollview is cutting off the at the bottom, but having
+            <TextView
+                android:id="@+id/review_author2_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="italic"
+                android:textSize="@dimen/about_app_content_text_size"/>
+            <TextView
+                android:id="@+id/review_content2_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+            <!-- I do not know why the scrollview is cutting off the at the bottom, it probably
+            has something to do with setting the visibility to a bunch of view to GONE, but having
             this dummy Framelayout is a quick workaround -->
             <FrameLayout
                 android:layout_width="match_parent"
