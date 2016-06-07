@@ -31,7 +31,44 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Created by Nathan Merris on 5/16/2016.
+ * Displays movie details, the top 2 reviews (if there are any), the top 2 videos (if there are any),
+ * and the top 4 credits (there are almost always at least 4 credits associated with any movie, even
+ * the really obscure and/or old ones).  This fragment needs to know 3 things to work properly: the
+ * movieId in the movies table of the movie to show (mMovieId), if the app is running in tablet mode
+ * (mTwoPane), and if it should only use records labeled as favorites from the db (mUseFavorites).
+ * The hosting activity should use the static newInstance method to create this fragment.
+ *
+ * <br><br>
+ *     Loaders are used for each db table that is queried, and they are all initialized in
+ *     onActivityCreated.  There are two basic scenarios that play out after that:
+ *
+ *     <br>
+ *     1. NOT IN 'FAVORITES MODE' - The loaders are all restarted in FetchMovieDetailsTask.onPostExecute, if
+ *     the fetch task was successful.  At this point the db has already been updated with the new
+ *     data and restarting the loaders will update the UI.
+ *     <br>
+ *     2. IN 'FAVORITES MODE' - In favorites mode, no network activity occurs, the idea being that
+ *     the user can view their favorites even if they are a mile underground in a cave somewhere..
+ *     spelunking android app users who need to view their favorite movies list: it's a user demographic
+ *     that must not be ignored.  But seriously, the loaders just initialize in onActivityCreated,
+ *     and that's about it.. the db is already filled with all the data from whenver the user first
+ *     saved the movie as a favorite.
+ *
+ * <br><br>
+ * Note: to avoid unnecessary network calls, this fragment checks the db to see if the movie in question
+ * already has detail data.  If it does, no network call is made.
+ * To be clear: in this app the data in the db is created in 2 phases: an
+ * initial chunk of the 'movies' table is populated in FragmentMovieGrid.  But due to the limits
+ * imposed by themoviedb's API, additional fetches are needed to get the rest of the movie detail data.
+ * For example, the budget, revenue, runtime, and tagline columns are filled in HERE.  Additionally,
+ * all data in the credits, reviews, and videos tables are filled in here.
+ *
+ * <br><br>
+ * Finally, a Floating Action Button that appears are disappears as the screen is scrolled is set up
+ * to process favorite add/remove requests by the user.
+ *
+ * @see MovieDetailsFetcher
+ * @see MovieTheaterContract
  */
 public class FragmentMovieDetails extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -40,7 +77,6 @@ public class FragmentMovieDetails extends Fragment
     private static final String BUNDLE_USE_FAVORITES_KEY = "use_favorites";
     private static final String BUNDLE_MOVIE_ID_KEY = "movie_id";
     private static final String BUNDLE_MTWO_PANE = "mtwopane_mode";
-
     private Callbacks mCallbacks;
 
     private static final int MOVIES_LOADER_ID = R.id.loader_movies_fragment_movie_details;
@@ -48,11 +84,9 @@ public class FragmentMovieDetails extends Fragment
     private static final int VIDEOS_LOADER_ID = R.id.loader_videos_fragment_movie_details;
     private static final int REVIEWS_LOADER_ID = R.id.loader_reviews_fragment_movie_details;
 
-    private SharedPreferences mSharedPrefs;
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
     private int mMovieId; // the id for the movie or favorite movie
-    private boolean mTwoPane;
-    private List<Long> mMovieIdList; // the list of movies to display
+    private boolean mTwoPane; // true in tablet mode
 
     @Bind(R.id.fab_favorites) FloatingActionButton mFabFavorites;
     @Bind(R.id.backdrop_imageview) ImageView mBackdropImageView;
@@ -99,7 +133,6 @@ public class FragmentMovieDetails extends Fragment
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] MOVIES_PROJECTION = {
             MovieTheaterContract.MoviesEntry._ID,
-            MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID,
             MovieTheaterContract.MoviesEntry.COLUMN_OVERVIEW,
             MovieTheaterContract.MoviesEntry.COLUMN_RELEASE_DATE,
             MovieTheaterContract.MoviesEntry.COLUMN_GENRE_NAME1,
@@ -113,73 +146,68 @@ public class FragmentMovieDetails extends Fragment
             MovieTheaterContract.MoviesEntry.COLUMN_REVENUE,
             MovieTheaterContract.MoviesEntry.COLUMN_RUNTIME,
             MovieTheaterContract.MoviesEntry.COLUMN_TAGLINE,
-            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
             MovieTheaterContract.MoviesEntry.COLUMN_BACKDROP_FILE_PATH,
             MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE,
             MovieTheaterContract.MoviesEntry.COLUMN_VOTE_COUNT
     };
-    private static final int COLUMN_MOVIE_ID = 1; // need only for testing
-    private static final int COLUMN_OVERVIEW = 2;
-    private static final int COLUMN_RELEASE_DATE = 3;
-    private static final int COLUMN_GENRE_NAME1 = 4;
-    private static final int COLUMN_GENRE_NAME2 = 5;
-    private static final int COLUMN_GENRE_NAME3 = 6;
-    private static final int COLUMN_GENRE_NAME4 = 7;
-    private static final int COLUMN_MOVIE_TITLE = 8;
-    private static final int COLUMN_BACKDROP_PATH = 9;
-    private static final int COLUMN_VOTE_AVG = 10;
-    private static final int COLUMN_BUDGET = 11;
-    private static final int COLUMN_REVENUE = 12;
-    private static final int COLUMN_RUNTIME = 13;
-    private static final int COLUMN_TAGLINE = 14;
-    private static final int COLUMN_POSTER_FILE_PATH = 15;
-    private static final int COLUMN_BACKDROP_FILE_PATH = 16;
-    private static final int COLUMN_IS_FAVORITE = 17;
-    private static final int COLUMN_NUM_VOTES = 18;
+    private static final int COLUMN_OVERVIEW = 1;
+    private static final int COLUMN_RELEASE_DATE = 2;
+    private static final int COLUMN_GENRE_NAME1 = 3;
+    private static final int COLUMN_GENRE_NAME2 = 4;
+    private static final int COLUMN_GENRE_NAME3 = 5;
+    private static final int COLUMN_GENRE_NAME4 = 6;
+    private static final int COLUMN_MOVIE_TITLE = 7;
+    private static final int COLUMN_BACKDROP_PATH = 8;
+    private static final int COLUMN_VOTE_AVG = 9;
+    private static final int COLUMN_BUDGET = 10;
+    private static final int COLUMN_REVENUE = 11;
+    private static final int COLUMN_RUNTIME = 12;
+    private static final int COLUMN_TAGLINE = 13;
+    private static final int COLUMN_BACKDROP_FILE_PATH = 14;
+    private static final int COLUMN_IS_FAVORITE = 15;
+    private static final int COLUMN_NUM_VOTES = 16;
     
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] REVIEWS_PROJECTION = {
             MovieTheaterContract.ReviewsEntry._ID,
-            MovieTheaterContract.ReviewsEntry.COLUMN_MOVIE_ID,
             MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR,
             MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT,
     };
-    private static final int COLUMN_REVIEW_AUTHOR = 2;
-    private static final int COLUMN_REVIEW_CONTENT = 3;
+    private static final int COLUMN_REVIEW_AUTHOR = 1;
+    private static final int COLUMN_REVIEW_CONTENT = 2;
 
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] CREDITS_PROJECTION = {
             MovieTheaterContract.CreditsEntry._ID,
-            MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID,
             MovieTheaterContract.CreditsEntry.COLUMN_CHARACTER,
             MovieTheaterContract.CreditsEntry.COLUMN_NAME,
-            MovieTheaterContract.CreditsEntry.COLUMN_ORDER,
             MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH,
             MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_FILE_PATH,
     };
-    private static final int COLUMN_CHARACTER = 2;
-    private static final int COLUMN_CAST_NAME = 3;
-    private static final int COLUMN_PROFILE_PATH = 5;
-    private static final int COLUMN_PROFILE_FILE_PATH = 6;
+    private static final int COLUMN_CHARACTER = 1;
+    private static final int COLUMN_CAST_NAME = 2;
+    private static final int COLUMN_PROFILE_PATH = 3;
+    private static final int COLUMN_PROFILE_FILE_PATH = 4;
 
     // IF YOU CHANGE THIS THEN YOU MUST ALSO CHANGE THE INTS BELOW IT
     private final String[] VIDEOS_PROJECTION = {
             MovieTheaterContract.VideosEntry._ID,
-            MovieTheaterContract.VideosEntry.COLUMN_MOVIE_ID,
             MovieTheaterContract.VideosEntry.COLUMN_KEY,
-            MovieTheaterContract.VideosEntry.COLUMN_SITE,
-            MovieTheaterContract.VideosEntry.COLUMN_TYPE,
-            MovieTheaterContract.VideosEntry.COLUMN_THUMBNAIL_URL,
-            MovieTheaterContract.VideosEntry.COLUMN_NAME,
+            MovieTheaterContract.VideosEntry.COLUMN_THUMBNAIL_URL
     };
-    private static final int COLUMN_VIDEO_KEY = 2;
-    private static final int COLUMN_VIDEO_SITE = 3;
-    private static final int COLUMN_VIDEO_TYPE = 4;
-    private static final int COLUMN_VIDEO_THUMBNAIL_URL = 5;
-    private static final int COLUMN_VIDEO_NAME = 6;
+    private static final int COLUMN_VIDEO_KEY = 1;
+    private static final int COLUMN_VIDEO_THUMBNAIL_URL = 2;
 
 
-    // the movieId will be used to read data from either the favorites or movies table
+    /**
+     * Creates a new FragmentMovieDetails with all the info it needs to work.
+     *
+     * @param useFavorites pass true if this fragment should not make any network calls and instead
+     *                     only use data from the db tables to display a details fragment
+     * @param movieId themoviedb movieId of which to show the details
+     * @param mTwoPane pass true if app is running in tablet (ie two pane) mode
+     * @return a new fragment
+     */
     public static FragmentMovieDetails newInstance(boolean useFavorites, int movieId, boolean mTwoPane) {
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_USE_FAVORITES_KEY, useFavorites);
@@ -194,27 +222,21 @@ public class FragmentMovieDetails extends Fragment
      * Required interface for any activity that hosts this fragment
      */
     public interface Callbacks {
-        // if hosted by HomeActivity: nothing happens, just toggle favorites icon (same phone and tablet),
-        //   when toggled 'on' add the record to favs table, when toggled 'off' remove same record
-        // if hosted by FavoritesAct: (only possible in tablet) just toggle the fav icon and remove
-        //   the record from fav table, or vice versa insert it, it's ok if the user just removed
-        //   the last favorite, the favorites grid will be updated the next time they come back to
-        //   to favorites activity because the db will not have any records, actually prob. just gray
-        //   out the menu option to even allow user to navigate to fav act if they don't have any favs
-        // if hosted by detail favorites pager act: (only possible in phone mode) just toggle the favorites icon,
-        //   there is no need to remove it from the viewpager.. remove or add the record to the fav
-        //   table each time it's toggled, basically same as if hosted by home activity, when user
-        //   navigates back to favorites activity, the loader will refresh the grid and the removed
-        //   favorite will just not be there, when user comes back to favorites pager act, the loader
-        //   will similarly just not see the removed fav record in the fav table
-        // if hosted by normal detail pager act: (only possible in phone mode) just toggle the fav icon,
-        //   and remove or add back in the record to the favorites table, basically same as above
         /**
-         * Hosting Activity should determine what happens when a movie is removed from users favorites.
+         * At present, this method is only called in tablet mode because I had trouble getting the
+         * viewpager to work and stay in sync with the toolbar having custom title and subtitle.
+         * Fires when the second pane toolbar should be updated so the title and subtitle
+         * match that of the currently displayed movie.
+         *
+         * @param movieTitle the movie title of the currently displayed movie
+         * @param movieTagline the tagline of the currently displayed movie
          */
-
-//        void onFavoriteRemoved(int movieId);
         void onUpdateToolbar(String movieTitle, String movieTagline);
+
+        /**
+         * Fires when user clicks the button to view all the credits for the currently displayed movie.
+         * @param movieId the movieId currently being displayed
+         */
         void onCreditsShowAllClicked(int movieId);
     }
 
@@ -244,16 +266,8 @@ public class FragmentMovieDetails extends Fragment
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(LOGTAG, "******** JUST ENTERED ONACTIVITYCREATED ******");
-
 
         if(savedInstanceState == null && !mUseFavorites) {
-            Log.e(LOGTAG, "  and since SIS was null, about to MAYBE fire an async task, depends on if this movieId already has detail data in the db");
-
-            // returns true only if vids, credits, and reviews tables have no entries with mMovieId
-            // if it does find all those tables empty for mMovieId, it will fire a fetch details task
-            // that will insert data for those tables, in addition to the extra bits of movie detail
-            // data get put in the movies table
             boolean updatedVidsReviewsCredits = updateVidsReviewsCreditsIfNecessary();
 
             // since the fetch task returned false, that means the db already has data in it for mMovieId
@@ -266,8 +280,8 @@ public class FragmentMovieDetails extends Fragment
             if(!updatedVidsReviewsCredits) {
                 new FetchMovieDetailsTask(getActivity(), mMovieId, false, this).execute();
             }
-
         }
+
         // the movies loader has to be restarted if phone orientation changes or the fab icon
         // drawable may not be correct: if the user clicked the favorite button, then rotated their phone,
         // unless the loader is restarted (as opposed to just calling initLoader), the old cursor will
@@ -279,7 +293,10 @@ public class FragmentMovieDetails extends Fragment
             getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
             getLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
         }
-        else { // this is reached in tablet mode, which does not allow orientation changes
+
+        // this is reached in tablet mode, which does not allow orientation changes, so
+        // just initialize all the loaders
+        else {
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
             getLoaderManager().initLoader(CREDITS_LOADER_ID, null, this);
             getLoaderManager().initLoader(VIDEOS_LOADER_ID, null, this);
@@ -289,11 +306,10 @@ public class FragmentMovieDetails extends Fragment
         super.onActivityCreated(savedInstanceState);
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOGTAG, "entered onCreate");
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         // if this fragment is being created from new (ie it's hosting activity has performed a
         // fragment transaction), then get the movieId from the frag arg and then check to see if
@@ -301,36 +317,30 @@ public class FragmentMovieDetails extends Fragment
         // when it is done, which will be the second time that has happened because it would have
         // already happened on onActivityCreated when the loader is initialized.. seems acceptable
         if(savedInstanceState == null) {
-            Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool and movieId int from frag argument");
             mMovieId = getArguments().getInt(BUNDLE_MOVIE_ID_KEY);
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_KEY);
             mTwoPane = getArguments().getBoolean(BUNDLE_MTWO_PANE);
-            Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
-            Log.i(LOGTAG, "    mMovieId is now: " + mMovieId);
+            Log.i(LOGTAG, "in onCreate: mMovieId from fragment argument is: " + mMovieId);
         }
+
         // must be some other reason the fragment is being recreated, likely an orientation change,
         // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
         // the loader will restart next when onCreateView is called, there is no need to check if a
         // fetch details task needs to happen because that would have already happened when this fragment
         // was initially created
         else {
-            Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool and movieId int from SIS Bundle");
             mMovieId = savedInstanceState.getInt(BUNDLE_MOVIE_ID_KEY);
             mUseFavorites = savedInstanceState.getBoolean(BUNDLE_USE_FAVORITES_KEY);
             mTwoPane = savedInstanceState.getBoolean(BUNDLE_MTWO_PANE);
-            Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
-            Log.i(LOGTAG, "    mMovieId is now: " + mMovieId);
+            Log.i(LOGTAG, "in onCreate: mMovieId from savedInstanceState is: " + mMovieId);
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        // the ref points to the same details frag layout on tablet and phone portrait,
-        // but points to a wider layout in phone landscape
         View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
         ButterKnife.bind(this, rootView);
-
         return rootView;
     }
 
@@ -340,50 +350,43 @@ public class FragmentMovieDetails extends Fragment
     // and it may be a mix of favorites/non favs if in home activity or movie pager activity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.e(LOGTAG, "entered onCreateLoader");
-
-//        String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
-//        String[] selectionArgs =
-//                new String[]{ String.valueOf(mMovieId), String.valueOf(mUseFavorites) };
+        // selection and selectionArgs are same for every loader
         String selection = "movie_id = ?";
         String[] selectionArgs =
                 new String[]{ String.valueOf(mMovieId) };
 
         switch (id) {
             case MOVIES_LOADER_ID:
-//                Log.i(LOGTAG, "  and about to return new MOVIES_TABLE_LOADER");
                 return new CursorLoader(getActivity(), MovieTheaterContract.MoviesEntry.CONTENT_URI,
                         MOVIES_PROJECTION, selection, selectionArgs, null);
 
             case VIDEOS_LOADER_ID:
-//                Log.i(LOGTAG, "  and about to return new VIDEOS_LOADER_ID");
                 return new CursorLoader(getActivity(),
                         MovieTheaterContract.VideosEntry.CONTENT_URI, VIDEOS_PROJECTION,
                         selection, selectionArgs, null);
 
             case REVIEWS_LOADER_ID:
-//                Log.i(LOGTAG, "  and about to return new REVIEWS_LOADER_ID");
                 return new CursorLoader(getActivity(),
                         MovieTheaterContract.ReviewsEntry.CONTENT_URI, REVIEWS_PROJECTION,
                         selection, selectionArgs, null);
 
         case CREDITS_LOADER_ID:
-//            Log.i(LOGTAG, "  and about to return new CREDITS_LOADER_ID");
+            // credits table should be sorted, the order is by most prominent cast to least
             return new CursorLoader(getActivity(),
                     MovieTheaterContract.CreditsEntry.CONTENT_URI, CREDITS_PROJECTION,
                     selection, selectionArgs,
                     MovieTheaterContract.CreditsEntry.COLUMN_ORDER + " ASC");
 
         }
-
         return null;
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
-        Log.e(LOGTAG, "entered onLoadFinished");
 
+        // never hurts to check if this fragment's root view is still valid
+        // as each loader finishes, update the UI as appropriate
         if(getView() != null) {
             switch (loader.getId()) {
                 case MOVIES_LOADER_ID:
@@ -408,6 +411,8 @@ public class FragmentMovieDetails extends Fragment
                     if(mUseFavorites) {
                         mCreditsShowAll.setVisibility(View.GONE);
                     } else {
+                        // set a click listener on the Show All button and call back to hosting
+                        // activity if user clicks it
                         mCreditsShowAll.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -426,12 +431,13 @@ public class FragmentMovieDetails extends Fragment
 
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-        Log.e(LOGTAG, "ENTERED ONLOADER RESET");
-    }
+    public void onLoaderReset(Loader<Cursor> loader) {}
 
 
+    /**
+     * Listens for clicks on the video thumbnail image and fires an ACTION_VIEW intent if clicked,
+     * setting the youTube video key through with the intent.
+     */
     private class VideoViewListener implements View.OnClickListener {
         private String key;
 
@@ -443,11 +449,17 @@ public class FragmentMovieDetails extends Fragment
         public void onClick(View v) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Utility.buildYouTubeUri(key));
-            startActivity(intent);
+            if(intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivity(intent);
+            }
         }
     }
 
 
+    /**
+     * Listens for clicks on the share icon next to each video thumbnail and fires an ACTION_SEND
+     * intent, with an extra that is a link to the video just clicked.
+     */
     private class VideoShareListener implements View.OnClickListener {
         private String key;
 
@@ -468,6 +480,10 @@ public class FragmentMovieDetails extends Fragment
     }
 
 
+    /**
+     * Makes a network call to themoviedb.com server to fetch details data for the movie in question.
+     *
+     */
     private class FetchMovieDetailsTask extends AsyncTask<Void, Void, Boolean> {
         Context context;
         int movieId;
@@ -515,16 +531,27 @@ public class FragmentMovieDetails extends Fragment
     }
 
 
-    // TODO: clean this mess up
-    // need to check if the db already has details data in the 4 tables before firing the task, or
-    // you will end up with duplicate records in videos, credits, and reviews tables, which do not
-    // have a UNIQUE constraint on the movie_id column
-    // returns TRUE if the task was fired
+    /**
+     * Returns true only if videos, credits, and reviews tables have no entries that have
+     * column movie_id = mMovieId.
+     * If it does find all those tables empty, it will fire a fetch details task
+     * that will insert data for those tables, in addition to the extra bits of movie detail
+     * data gets updated in the movies table.
+     * <br><br>
+     * I am really not very happy with this entire method, I
+     * feel that it's pretty inefficient to do up to 3 queries in a row.  This project took longer
+     * than I anticipated and if I had infinite time I would make it more elegant, but it works.
+     * I really ended up relying too heavily on the db tables and my content provider in this app.
+     * I thought that was going to be the way to go, but it ended up being a lot of work.  I should
+     * have used something like a singleton, like in my first Popular Movies app, and kept more
+     * data in super fast memory in java objects.  And did a sparing amount of db work.  I am glad
+     * I got a lot of practice with db work in general though, so it's not all bad :)
+     * That would have saved me trouble elsewhere too.
+     * Live and learn!
+     *
+     * @return true if videos, reviews, and credits tables all have zero rows that match mMovieId
+     */
     private boolean updateVidsReviewsCreditsIfNecessary() {
-
-//            String selectMovieIdAndIsFav = "movie_id = ? AND is_favorite = ?";
-//            String[] selectionArgs =
-//                    new String[]{ String.valueOf(mMovieId), "false" };
         String selection = "movie_id = ?";
         String[] selectionArgs =
                 new String[]{ String.valueOf(mMovieId) };

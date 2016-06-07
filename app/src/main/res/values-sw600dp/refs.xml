@@ -3,9 +3,6 @@
     <!-- tablet mode uses horizontal spinner fragment layout -->
     <item name="fragment_filter_spinners_ref" type="layout">@layout/fragment_filter_spinners_horizontal</item>
 
-    <!-- similar aspect ration in both phone portrait and tablet modes, so use same layout for both -->
-    <item name="fragment_movie_details_ref" type="layout">@layout/fragment_movie_details</item>
-
     <!-- same as activity_home layout but without the spinner fragment container -->
     <item name="activity_favorites_ref" type="layout">@layout/activity_favorites</item>
 

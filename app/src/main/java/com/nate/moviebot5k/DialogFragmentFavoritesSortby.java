@@ -77,6 +77,7 @@ public class DialogFragmentFavoritesSortby extends DialogFragment
         int positionBeforeClick = mSharedPrefs
                 .getInt(getString(R.string.key_favorites_sortby_selected_item_position), 0);
 
+        // only proceed if the position actually changed
         if(positionBeforeClick != which) {
             // update sharedPrefs with new favorites sortby dialog label position and value
             SharedPreferences.Editor editor = mSharedPrefs.edit();

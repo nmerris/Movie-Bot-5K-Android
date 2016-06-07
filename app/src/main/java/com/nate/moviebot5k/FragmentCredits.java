@@ -1,7 +1,5 @@
 package com.nate.moviebot5k;
 
-import android.content.Context;
-import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
@@ -15,24 +13,20 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.nate.moviebot5k.adapters.CreditsAdapter;
-import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
-
-import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Created by Nathan Merris on 5/9/2016.
+ * Displays a scrolling list of credits, which includes a thumbnail image of the cast member,
+ * and there character name in the movie.  Picasso is used to load and cache them images.
  */
 public class FragmentCredits extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "CreditsFragment";
     
-    private static final String BUNDLE_USE_FAVORITES_TABLE_KEY = "use_favorites";
     private static final String BUNDLE_MOVIEID = "movie_id";
     private static final int CREDITS_LOADER_ID = R.id.loader_credits_fragment_credits;
-
     private int mMovieId;
     private CreditsAdapter mCreditsAdapter;
     
@@ -55,8 +49,8 @@ public class FragmentCredits extends Fragment implements LoaderManager.LoaderCal
     
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        // save the movieId to the outgoing bundle
         outState.putInt(BUNDLE_MOVIEID, mMovieId);
-        
         super.onSaveInstanceState(outState);
     }
     
@@ -66,9 +60,11 @@ public class FragmentCredits extends Fragment implements LoaderManager.LoaderCal
         super.onCreate(savedInstanceState);
         
         if(savedInstanceState == null) {
+            // get the movieId from the intent that launched this fragment
             mMovieId = getArguments().getInt(BUNDLE_MOVIEID);
         }
         else {
+            // or get the movieId from savedInstanceState
             mMovieId = savedInstanceState.getInt(BUNDLE_MOVIEID);
         }
         
@@ -84,19 +80,19 @@ public class FragmentCredits extends Fragment implements LoaderManager.LoaderCal
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mCreditsAdapter = new CreditsAdapter(getActivity(), null, 0);
         View rootView = inflater.inflate(R.layout.fragment_credits, container, false);
         ButterKnife.bind(this, rootView);
+
+        // create a new CreditsAdapter and set it on the listview that was just inflated
+        // and bound with ButterKnife
+        mCreditsAdapter = new CreditsAdapter(getActivity(), null, 0);
         mListView.setAdapter(mCreditsAdapter);
-        
         return rootView;
     }
     
     
     private final String[] CREDITS_PROJECTION = {
             MovieTheaterContract.CreditsEntry._ID,
-//            MovieTheaterContract.CreditsEntry.COLUMN_MOVIE_ID,
-
             MovieTheaterContract.CreditsEntry.COLUMN_PROFILE_PATH,
             MovieTheaterContract.CreditsEntry.COLUMN_CHARACTER,
             MovieTheaterContract.CreditsEntry.COLUMN_NAME
@@ -104,13 +100,12 @@ public class FragmentCredits extends Fragment implements LoaderManager.LoaderCal
     public static final int COL_PROFILE_PATH = 1;
     public static final int COL_CHARACTER = 2;
     public static final int COL_NAME = 3;
-//    public static final int MOVIES_TABLE_COL_VOTE_AVG = 5;
-//    public static final int MOVIES_TABLE_COL_REVENUE = 6;
     
     
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        
+
+        // return a Cursor pointed at the correct movieId rows in credits table
         if(id == CREDITS_LOADER_ID) {
             return new CursorLoader(getActivity(),
                     MovieTheaterContract.CreditsEntry.CONTENT_URI,
@@ -126,6 +121,7 @@ public class FragmentCredits extends Fragment implements LoaderManager.LoaderCal
     
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // not much going on here in this fragment, it's just a simple vertically scrolling listview
         mCreditsAdapter.swapCursor(data);
     }
     

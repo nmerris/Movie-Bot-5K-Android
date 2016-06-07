@@ -14,21 +14,19 @@ import android.util.Log;
 // I have also read that it is good practice to use support libraries when possible, even if not
 // necessarily needed, because that will allow the app to address Google API bug fixes between
 // full releases, because Google publishes support library revisions more often than full OS
-// version updgrades.
+// version upgrades.
 
 
 /**
  * A convenience class that prevents subclassing Activities from having to contain the same
  * FragmentManager code repeatedly, when loading a fragment into an Activity that hosts at least one single
- * fragment in a simple FrameLayout.  It also makes a few universally necessary members available
+ * fragment in a simple FrameLayout.  It also makes a couple universally necessary members available
  * to all subclassing Activities: mTwoPane and mFragmentManager.
  * Finally, the movie grid toolbar is inflated here.  Note that when this app is running in tablet
  * mode, a second toolbar is added above the movie details fragment pane.
  *
  * <p>
- * In some cases, the subclassing Activity many not even need
- * to override onCreate at all.  Note that ActivityMovieDetailPager does not subclass this because
- * it needs it's FrameLayout to be wrapped in a ViewPager.
+ * In some cases, the subclassing Activity may not even need
  * </p>
  *
  * <p>

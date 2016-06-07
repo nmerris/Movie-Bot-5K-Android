@@ -3,9 +3,6 @@
     <!-- phone portrait mode uses horizontal spinner fragment layout -->
     <item name="fragment_filter_spinners_ref" type="layout">@layout/fragment_filter_spinners_horizontal</item>
 
-    <!-- has master detail layout with 2 toolbars and container for spinner fragment -->
-    <item name="fragment_movie_details_ref" type="layout">@layout/fragment_movie_details</item>
-
     <!-- phone favorites activity is just a toolbar and framelayout for the grid-->
     <item name="activity_favorites_ref" type="layout">@layout/activity_single_fragment</item>
 

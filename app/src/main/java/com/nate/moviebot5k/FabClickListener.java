@@ -30,6 +30,8 @@ import java.util.ArrayList;
  * initially loads all the views; however, this class takes care of updating the icon when the
  * user actually CLICKS on the FAB.
  *
+ * @see FragmentMovieDetails
+ * @see MovieTheaterContract
  */
 class FabClickListener implements View.OnClickListener {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "FABClckLstnr";
@@ -327,17 +329,13 @@ class FabClickListener implements View.OnClickListener {
          * @param tableName The db table name to update (either movies or credits)
          */
         public PicassoTarget(String theMovieDbImagePath, String dbColumnNameToInsert, String tableName) {
-//            Uri uri = null;
             try {
                 // extract the filename from themoviedb's URL for the image, makes sense to use the same
-                // filename here, it's just a bunch of random alphanumeric characters
+                // filename here, it's just a bunch of random characters
                 fileName = Uri.parse(theMovieDbImagePath).getLastPathSegment();
             } catch (NullPointerException npe) {
                 npe.printStackTrace();
             }
-
-
-//            fileName = uri.getLastPathSegment();
 
             dbColumnToInsert = dbColumnNameToInsert;
             this.tableName = tableName;

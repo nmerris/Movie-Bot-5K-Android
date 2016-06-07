@@ -6,6 +6,4 @@
     <!-- in phone landscape credits activity is fullscreen (like phone land details pager activity -->
     <item name="activity_credits_ref" type="layout">@layout/activity_credits_fullscreen</item>
 
-    <!-- the details layout is a bit different in phone landscape -->
-  <!--  <item name="fragment_movie_details_ref" type="layout">@layout/fragment_movie_details_wide</item>-->
 </resources>

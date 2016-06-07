@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.nate.moviebot5k.ActivitySingleFragment;
 import com.nate.moviebot5k.FragmentCredits;
-import com.nate.moviebot5k.FragmentMovieGrid;
 import com.nate.moviebot5k.R;
 import com.squareup.picasso.Picasso;
 
@@ -19,8 +18,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- *
- * Created by Nathan Merris on 5/10/2016.
+ * Binds the data needed to construct a single item in the listview that is used by FragmentCredits.
+ * That data comes from the credits table, all from the same movieId.
  */
 public class CreditsAdapter extends CursorAdapter {
     private final String LOGTAG = ActivitySingleFragment.N8LOG + "CreditsAdptr";
@@ -31,6 +30,7 @@ public class CreditsAdapter extends CursorAdapter {
         mContext = context;
     }
 
+    // use a ViewHolder for efficiency
     public static class ViewHolder {
         @Bind(R.id.credits_adapter_imageview) ImageView creditProfileImageView;
         @Bind(R.id.credits_adapter_character_name_textview) TextView creditCharacterNameTV;
@@ -53,15 +53,16 @@ public class CreditsAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        // get the ViewHolder from the view's tag
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-//        Log.i(LOGTAG, "  about to load poster path with Picasso: " + cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_PATH));
-//        Log.i(LOGTAG, "    and the movieId for same movie is: " + cursor.getInt(FragmentMovieGrid.MOVIES_TABLE_COL_MOVIE_ID));
 
+        // set the image
         Picasso.with(context)
                 .load(cursor.getString(FragmentCredits.COL_PROFILE_PATH))
                 .placeholder(mContext.getResources().getDrawable(R.drawable.placeholder_person))
                 .into(viewHolder.creditProfileImageView);
 
+        // set the character and cast names
         viewHolder.creditCharacterNameTV.setText(
                 String.format(mContext.getString(R.string.format_character_name),
                         cursor.getString(FragmentCredits.COL_CHARACTER)));
