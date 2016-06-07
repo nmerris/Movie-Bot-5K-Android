@@ -17,19 +17,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.nate.moviebot5k.api_fetching.MoviesFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 import com.nate.moviebot5k.adapters.MoviePosterAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
+ * Displays a vertically scrolling grid of movie thumbnails.  The URI of the thumbnails come from the
+ * movies table.  The images for the movie poster thumbnails are read from local device storage if
+ * the hosting activity is showing favorites, or Picasso is used to load them from themoviedb
+ * servers otherwise. Hosting activities should use the newInstance method to create this fragment.
+ * <br><br>
+ * When the user clicks a thumbnail, onMovieSelected callback fires, passing
+ * the movieId of the movie that was just clicked.
+ * <br><br>
+ * When the movie grid itself is finished loading,
+ * the onGridLoaded callback fires.
+ *
  * Created by Nathan Merris on 5/9/2016.
  */
 public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -42,21 +50,22 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     private Callbacks mCallbacks; // hosting activity will define what the method(s) inside Callback interface should do
     private boolean mUseFavorites; // true if db favorites table should be used in this fragment
-    private boolean mTwoPane;
+    private boolean mTwoPane; // true if app is running in tablet mode
     private MoviePosterAdapter mMoviePosterAdapter;
     private SharedPreferences mSharedPrefs;
-    private ArrayList<Integer> mMovieIds;
+    private ArrayList<Integer> mMovieIds; // the list of all movieIds currently in the gridview
 
     @Bind(R.id.fragment_movie_grid_gridview) GridView mMoviePosterGridView;
 
 
     /**
      * Call from a hosting Activity to get a new fragment for a fragment transaction.  The fragment
-     * will display a list of movie posters in grid form: 2 columns in portrait, 3 in landscape.
+     * will display a list of movie posters in grid form.
      * Independence: it's not just an awesome US holiday.
      *
-     * @param useFavorites set to true if host needs to display movies using data from the
-     *                          favorites table, which can be used with no internet connection
+     * @param useFavorites set to true if host needs to display movies that are marked as favorites
+     *                     in the db, movies and their images will be displayed even with no internet connection
+     * @param mTwoPane set to true if the app is running in tablet mode
      * @return new FragmentMovieGrid <code>fragment</code>
      */
     public static FragmentMovieGrid newInstance(boolean useFavorites, boolean mTwoPane) {
@@ -75,13 +84,15 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         /**
          * Hosting Activity should determine what happens when a movie is tapped from the movie grid.
-         * The movieId provided will be the same in both the movies and favorites tables in the database.
          * @param movieId themoviedb ID of the movie that was just tapped by user from the grid view,
          *                which is how all movies and favorites are referenced in the database
-         *
          */
         void onMovieSelected(int movieId, ArrayList<Integer> moviesList);
 
+        /**
+         * Called when FragmentMovieGrid has finished loading all the movies in the gridview.
+         * @param moviesList the list of movies just loaded, in the same order they are in the grid
+         */
         void onGridLoaded(ArrayList<Integer> moviesList);
     }
 
@@ -102,11 +113,8 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-//        Log.i(LOGTAG, "entered onSaveInstanceState");
-//        Log.i(LOGTAG, "  about to stash in Bundle mUseFavorites: " + mUseFavorites);
         outState.putBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY, mUseFavorites);
         outState.putIntegerArrayList(BUNDLE_MOVIE_ID_LIST, mMovieIds);
-
         super.onSaveInstanceState(outState);
     }
 
@@ -114,24 +122,20 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mMovieIds = new ArrayList<>();
 
+        // get the fragment arguments if this fragment is being created from scratch
         if(savedInstanceState == null) {
-            Log.i(LOGTAG, "  and savedInstanceState is NULL, about to get useFavorites bool from frag argument");
             mUseFavorites = getArguments().getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             mTwoPane = getArguments().getBoolean(BUNDLE_TWO_PANE);
-            Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
         }
         // must be some other reason the fragment is being recreated, likely an orientation change,
-        // so get mUseFavorites table from the Bundle, which was stored prev. in onSaveInstanceState
+        // so get member variables from the Bundle, which were stored prev. in onSaveInstanceState
         else {
-            Log.i(LOGTAG, "  and savedInstanceState was NOT NULL, about to get useFavorites bool AND mMovieIds List from SIS Bundle");
             mUseFavorites = savedInstanceState.getBoolean(BUNDLE_USE_FAVORITES_TABLE_KEY);
             mMovieIds = savedInstanceState.getIntegerArrayList(BUNDLE_MOVIE_ID_LIST);
             mTwoPane = savedInstanceState.getBoolean(BUNDLE_TWO_PANE);
-            Log.i(LOGTAG, "    mUseFavorites is now: " + mUseFavorites);
         }
 
     }
@@ -139,12 +143,14 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(LOGTAG, "entered onActivityCreated");
-
         if(savedInstanceState == null && !mUseFavorites) {
+            // since fragment is being created from scratch and hosting activity is not requesting
+            // favorites be used, fire an async task to fetch a new batch of movie data.. this will
+            // update the movies table in the db, and restart the loader when it's done
             new FetchMoviesTask(getActivity(), this).execute();
         }
         else {
+            // otherwise just start the loader again
             getLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
         }
         super.onActivityCreated(savedInstanceState);
@@ -153,7 +159,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        Log.i(LOGTAG, "entered onCreateView");
         mMoviePosterAdapter = new MoviePosterAdapter(getActivity(), null, 0, mUseFavorites);
         View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         ButterKnife.bind(this, rootView);
@@ -167,16 +172,14 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             mMoviePosterGridView.setNumColumns(4);
         }
 
-//        Log.i(LOGTAG, "  setting num poster grid columns to: " + getResources().getInteger(R.integer.gridview_view_num_columns));
         mMoviePosterGridView.setAdapter(mMoviePosterAdapter);
 
         // set a click listener on the adapter
         mMoviePosterGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                // get the movieId from the tag attached to the view that was just clicked
-//                int movieId = (int) view.getTag(R.id.movie_poster_imageview_movie_id_key);
+                // get the movieId from the position that was just clicked.. the position of the click
+                // matches the index of the array list for a given movie
                 int movieId = mMovieIds.get(position);
 
                 // store the currently selected movieId in sharedPrefs
@@ -196,7 +199,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             }
         });
 
-
         // the 'no movies msg' is displayed either here, if no movies are in movieIds list, and
         // in FetchMoviesTask.onLoadFinished, if no movies were returned, need to swap view here
         // as well in case of orientation change, to show the correct view (movie grid or msg view)
@@ -213,73 +215,32 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
             }
         }
 
-
         return rootView;
     }
 
 
-//    @Override
-//    public void onResume() {
-//        Log.i(LOGTAG, "entered onResume");
-////        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-////
-////        // check if a new fetch movies task should be launched
-////        // technically mUseFavorites should never be true if sharedPrefs key_fetch_new_movies is true,
-////        // but it doesn't hurt to check it as well here before starting a fetch movies async task
-////        if(!mUseFavorites && sharedPrefs.getBoolean(getString(R.string.key_fetch_new_movies), true)) {
-////            Log.i(LOGTAG, "  and sharedPrefs fetch_new_movies was true, so about to get more movies");
-////
-////            new FetchMoviesTask(getActivity()).execute();
-////
-////            // restart the Loader for the movies table, it doesn't matter if the async task
-////            // does not return any movies, it won't update the movies table in that case and the
-////            // loader manager can just do nothing until it's restarted again
-////            getLoaderManager().restartLoader(MOVIES_TABLE_LOADER_ID, null, this);
-////        }
-//        super.onResume();
-//    }
-
-
-
-
-
-    // the reason the favorites tables has more columns in it's projection is because when sorting
-    // the favorites table, the sorting happens on the device, as opposed to the live movies table,
-    // where sorting is done by themoviedb API
     private final String[] MOVIES_TABLE_COLUMNS_PROJECTION = {
             MovieTheaterContract.MoviesEntry._ID,
             MovieTheaterContract.MoviesEntry.COLUMN_MOVIE_ID,
             MovieTheaterContract.MoviesEntry.COLUMN_POSTER_PATH,
-            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH,
-            MovieTheaterContract.MoviesEntry.COLUMN_POPULARITY,
-            MovieTheaterContract.MoviesEntry.COLUMN_VOTE_AVG,
-            MovieTheaterContract.MoviesEntry.COLUMN_REVENUE
+            MovieTheaterContract.MoviesEntry.COLUMN_POSTER_FILE_PATH
     };
-//    public static final int MOVIES_TABLE_COL_ID = 0;
     public static final int MOVIES_TABLE_COL_MOVIE_ID = 1;
     public static final int MOVIES_TABLE_COL_POSTER_PATH = 2;
     public static final int MOVIES_TABLE_COL_POSTER_FILE_PATH = 3;
-    public static final int MOVIES_TABLE_COL_POPULARITY = 4;
-    public static final int MOVIES_TABLE_COL_VOTE_AVG = 5;
-    public static final int MOVIES_TABLE_COL_REVENUE = 6;
 
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.e(LOGTAG, "entered onCreateLoader");
 
         if(id == MOVIES_LOADER_ID) {
 
             if(mUseFavorites) {
-                // get the sortby filter setting from sharedPrefs.. when this movie grid fragment is
-                // being hosted by FavoritesActivity, the only filter params that make sense are
-                // highest and lowest revenue, popularity, and rating.. could also have year in there,
-                // but I need to stop somewhere, and that might be a bit confusing because then there
-                // would be two simultaneous sortby options, so I would need to really consolidate it
-                // into one spinner, and I just need to get this project done!!
+                // get the sortby filter setting from sharedPrefs, the sortby setting for favorites
+                // is different than the sortby setting for 'normal' mode where api calls are made,
+                // and the sorting is actually done by themoviedb's servers, but here the sorting
+                // is done locally in this apps db
                 String sortBy = mSharedPrefs.getString(getString(R.string.key_favorites_sortby_value), null);
-//                String[] sortByParts = sortBy.split("\\.");
-//                Log.e(LOGTAG, "    key filter sortby after splitting: " + sortByParts[0] + " " + sortByParts[1]);
 
                 // only load the movies that are marked as favorite in the movies table in db
                 // and in this case just sort them by whatever the filter spinner is set to
@@ -291,15 +252,16 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                         sortBy);
             }
             else {
-                // load the movies with id's in mMovieIds, which are exactly the movies that
-                // MoviesFetcher returned after it's api call, this may end up being a mix
+                // load the movies in mMovieIds, which are exactly the movies that
+                // MoviesFetcher returned after it's api call, this may end up being a MIX
                 // of favorites and new movies, which is ok
                 // note that the db does not allow duplicate entries with the same movie_id
-
                 String movieIdSelection = "";
                 String[] movieIdSelectionArgs = new String[mMovieIds.size()];
                 int numMovieIds = mMovieIds.size();
 
+                // create an obnoxiously long selection statement to select the correct movieIds,
+                // its ugly printed out, but not too offensive here in a loop
                 for(int i = 0; i < mMovieIds.size(); i++) {
                     movieIdSelectionArgs[i] = String.valueOf(mMovieIds.get(i));
 
@@ -308,9 +270,7 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                     if(i == numMovieIds - 1) break;
                     movieIdSelection += " OR "; // do not want an OR at the end of this obnoxiously long selection statement
                 }
-//                Log.e(LOGTAG, "    movieIdSelection: " + movieIdSelection);
-
-
+                // and return a cursor that points to only the movies we want
                 return new CursorLoader(getActivity(),
                         MovieTheaterContract.MoviesEntry.CONTENT_URI, // the whole movies table
                         MOVIES_TABLE_COLUMNS_PROJECTION, // but only need these columns for this fragment
@@ -326,42 +286,40 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i(LOGTAG, "entered onLoadFinished");
-
         // if this fragment is being hosted by ActivityFavorites,
         // a fetch movies task will never fire.. so mMovieIds List will not be initialized
         // since that is normally done when the task completes, instead just need to create
         // the list from the cursor that was created when the cursor loader was started in onActivityCreated
         if(mUseFavorites) {
-            Log.i(LOGTAG, "  and mUseFavorites is TRUE, so about to populate mMovieIds list from cursor that returned all the favorites");
             if(data != null && data.moveToFirst()) {
                 while(!data.isAfterLast()) {
                     mMovieIds.add(data.getInt(MOVIES_TABLE_COL_MOVIE_ID));
-                    Log.e(LOGTAG, "    just added to mMovieIds list: " + data.getInt(MOVIES_TABLE_COL_MOVIE_ID));
                     data.moveToNext();
                 }
-                Log.i(LOGTAG, "      num movieIds now in list: " + mMovieIds.size());
             }
         }
 
-
         // swap the cursor so the adapter can load the new images
         mMoviePosterAdapter.swapCursor(data);
-
-//        // callback to hosting activity so that a new fragment can be loaded in tablet mode in the
-//        // second pane (ie the details view)
-//        mCallbacks.onGridLoaded(mMovieIds);
-
     }
 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.i(LOGTAG, "entered onLoaderReset");
         mMoviePosterAdapter.swapCursor(null);
     }
 
 
+    /**
+     * Queries themoviedb's servers to get movie data.  The query parameters are read in from
+     * sharePrefs and are used in MoviesFetcher, which this task launches in a background thread.
+     * The results are stored in the movies table in this apps db.  When this task completes, if at
+     * least one movie was fetched then it is displayed in the movie grid, otherwise an error
+     * message is displayed.  Finally, if at least one movie was fetched,
+     * FragmentMovieGrid.onGridLoaded callback fires, and the new list of movieIds is passed along.
+     *
+     * @see MoviesFetcher
+     */
     private class FetchMoviesTask extends AsyncTask<Void, Void, ArrayList<Integer>> {
         Context context;
         LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks;
@@ -378,8 +336,6 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
 
         @Override
         protected void onPostExecute(ArrayList<Integer> movieIdList) {
-            Log.i(LOGTAG,"  in FetchMoviesTask.onPostExecute, about to restart loader if at least one movie fetched, size of ArrayList movieIdList is: " + movieIdList.size());
-            
             // don't want anything to happen if this task returns and it's fragment or hosting
             // activity is dead, if rootView is not null, then we know that mMovieIds will not be null,
             // I don't think I need to check if getActivity() is null also, but I was getting some strange
@@ -396,14 +352,11 @@ public class FragmentMovieGrid extends Fragment implements LoaderManager.LoaderC
                 else {
                     rootView.findViewById(R.id.fragment_movie_grid_gridview).setVisibility(View.VISIBLE);
                     rootView.findViewById(R.id.problem_message_movie_grid).setVisibility(View.GONE);
-//                    mMovieIds = movieIdList;
                     getLoaderManager().initLoader(MOVIES_LOADER_ID, null, loaderCallbacks);
-
 
                     // callback to hosting activity so that a new fragment can be loaded in tablet mode in the
                     // second pane (ie the details view)
                     mCallbacks.onGridLoaded(mMovieIds);
-
 
                 }
             }

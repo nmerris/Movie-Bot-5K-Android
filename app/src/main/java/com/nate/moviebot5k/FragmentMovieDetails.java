@@ -482,7 +482,10 @@ public class FragmentMovieDetails extends Fragment
 
     /**
      * Makes a network call to themoviedb.com server to fetch details data for the movie in question.
-     *
+     * The db tables are updated in the background thread created with this task, if there are no
+     * problems.  Finally, the loaders associated with this fragment are started in onPostExecute,
+     * but only if the fetch task did not have any problems.  If there were any problems, a msg is
+     * displayed on screen explaining that there were problems.
      */
     private class FetchMovieDetailsTask extends AsyncTask<Void, Void, Boolean> {
         Context context;
@@ -490,7 +493,22 @@ public class FragmentMovieDetails extends Fragment
         boolean updateVidsReviewsCredits;
         LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks;
 
-        private FetchMovieDetailsTask(Context c, int movieId, boolean updateVidsReviewsCredits, LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks) {
+        /**
+         * Creates a new fetch task.  Before executing this task, check the db tables for videos,
+         * reviews, and credits to see if they already contain details data for movieId.  If the tables
+         * do NOT already have details data, pass in true for updateVidsReviewsCredits so that this
+         * task will update those tables.  loaderCallbacks are used to restart the loader after this
+         * task completes, but only if it was successful.
+         *
+         * @param movieId themoviedb movieId of which to fetch movie details data
+         * @param updateVidsReviewsCredits pass true if the task should also fetch videos, reviews,
+         *                                 and credits data, and update the appropriate tables, otherwise
+         *                                 pass false to avoid duplicate records in these tables
+         * @param loaderCallbacks the LoaderCallbacks object that will be used to restart the loader
+         *                        when this task completes, but only if it was successful during fetch
+         */
+        private FetchMovieDetailsTask(Context c, int movieId, boolean updateVidsReviewsCredits,
+                                      LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks) {
             context = c;
             this.movieId = movieId;
             this.updateVidsReviewsCredits = updateVidsReviewsCredits;
@@ -499,23 +517,25 @@ public class FragmentMovieDetails extends Fragment
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            Log.i(LOGTAG, "just entered FetchMovieDetailsTask.doInBackground");
+            // the meaty stuff happens here
             return new MovieDetailsFetcher(context, mMovieId, updateVidsReviewsCredits).fetchMovieDetails();
         }
 
         @Override
         protected void onPostExecute(Boolean wasSuccessful) {
-            Log.i(LOGTAG,"in FetchMovieDetailsTask.onPostExecute, about to restart the Loader if no problems during fetch");
-
+            // to avoid null pointer exceptions, best to check that both rootview and the activity
+            // that was hosting this task before it fired and started a new thread, are still valid
             View rootView = getView();
             if(getActivity() != null && rootView != null) {
-
+                // not a successful fetch, so show an error msg
                 if(!wasSuccessful) {
                     rootView.findViewById(R.id.problem_message_details).setVisibility(View.VISIBLE);
                     rootView.findViewById(R.id.scrollview).setVisibility(View.GONE);
                     rootView.findViewById(R.id.fab_favorites).setVisibility(View.GONE);
                     mCallbacks.onUpdateToolbar(null, null);
                 }
+                // fetch was ok, so make sure everything is visible and restart the loaders
+                // so the UI will be updated with the new data
                 else {
                     rootView.findViewById(R.id.scrollview).setVisibility(View.VISIBLE);
                     rootView.findViewById(R.id.fab_favorites).setVisibility(View.VISIBLE);
@@ -562,12 +582,7 @@ public class FragmentMovieDetails extends Fragment
                 selection,
                 selectionArgs,
                 null);
-        Log.i(LOGTAG, "  cursorCredits.getCount: " + cursorCredits.getCount());
 
-
-        // the downside is that the following code will perform 3 db queries to check if a details
-        // task should be fired, the upside is that it eliminates the possibility of duplicate
-        // videos, credits, or reviews data ever being written to the db
         if(cursorCredits != null && cursorCredits.getCount() == 0) {
             Cursor cursorVideos = getActivity().getContentResolver().query(
                     MovieTheaterContract.VideosEntry.CONTENT_URI,
@@ -575,7 +590,6 @@ public class FragmentMovieDetails extends Fragment
                     selection,
                     selectionArgs,
                     null);
-            Log.i(LOGTAG, "    cursorVideos.getCount: " + cursorVideos.getCount());
 
             if(cursorVideos != null && cursorVideos.getCount() == 0) {
                 Cursor cursorReviews = getActivity().getContentResolver().query(
@@ -584,26 +598,29 @@ public class FragmentMovieDetails extends Fragment
                         selection,
                         selectionArgs,
                         null);
-                Log.i(LOGTAG, "      cursorReviews.getCount: " + cursorReviews.getCount());
 
                 if(cursorReviews != null && cursorReviews.getCount() == 0) {
                     // since the count for the rows for this movieId was 0 for credits, videos, and reviews
                     // tables was zero, that must mean the detail data for this movieId has not
                     // yet been fetched, so go fetch it
-
-                    Log.i(LOGTAG, "        about to fire a fetch details task because it appears that the details data for this movieId does not exist in the db");
                     new FetchMovieDetailsTask(getActivity(), mMovieId, true, this).execute();
                 }
                 cursorReviews.close();
+                // there were no records in any of the tables for this movieId, so return true
                 return true;
             }
             cursorVideos.close();
         }
         cursorCredits.close();
+        // at least on of the tables had a record for this movieId, so return false
         return false;
     }
 
 
+    /**
+     * Updates the display portions that use data from the movies table.  Also sets a click
+     * listener on the Floating Action Button for add/remove favorite.
+     */
     private void updateMoviesUI(Cursor data) {
         // get the FAB and set it's drawable depending on if movie is a favorite or not
         mFabFavorites.setOnClickListener(new FabClickListener(getActivity(), mMovieId, mFabFavorites));
@@ -620,19 +637,12 @@ public class FragmentMovieDetails extends Fragment
         // HomeActivity (which may or may not have some favorite movies mixed in with
         // whatever the api call returned), might as well still load the images from
         // local memory to save an expensive image download
-        if(data.getString(COLUMN_IS_FAVORITE).equals("true")) {
-            Picasso.with(getActivity())
-                    .load(data.getString(COLUMN_BACKDROP_FILE_PATH))
-                    .placeholder(getResources().getDrawable(R.drawable.placeholder_backdrop))
-                    .into(mBackdropImageView);
-        }
-        else {
-            Picasso.with(getActivity())
-                    .load(data.getString(COLUMN_BACKDROP_PATH))
-                    .placeholder(getResources().getDrawable(R.drawable.placeholder_backdrop))
-                    .into(mBackdropImageView);
-        }
-
+        int column = data.getString(COLUMN_IS_FAVORITE).equals("true") ?
+                COLUMN_BACKDROP_FILE_PATH : COLUMN_BACKDROP_PATH;
+        Picasso.with(getActivity())
+                .load(data.getString(column))
+                .placeholder(getResources().getDrawable(R.drawable.placeholder_backdrop))
+                .into(mBackdropImageView);
 
         // other misc movie detail data
         String title = data.getString(COLUMN_MOVIE_TITLE);
@@ -648,8 +658,7 @@ public class FragmentMovieDetails extends Fragment
         else {
             mMovieTaglineTV.setVisibility(View.GONE);
         }
-
-
+        
         // populate the genre textviews, or make them invisible if null or empty
         int[] genreColumns = {COLUMN_GENRE_NAME1, COLUMN_GENRE_NAME2,
                 COLUMN_GENRE_NAME3, COLUMN_GENRE_NAME4};
@@ -721,10 +730,16 @@ public class FragmentMovieDetails extends Fragment
         }
 
     }
-
-
+    
+    
+    /**
+     * Updates the display portions that use data from the videos table.  Also sets click
+     * listeners on both the video thumbnail image (to view movies in youtube) and the share
+     * button next to each video.  Presently only shows a max of 2 videos.
+     */
     private void updateVideosUI(Cursor data) {
 
+        // hide everything if there are no videos to display
         if(!data.moveToFirst()) {
             mVideoSectionTitle.setVisibility(View.GONE);
             mVideoShareButton1ImageView.setVisibility(View.GONE);
@@ -772,9 +787,15 @@ public class FragmentMovieDetails extends Fragment
                     new VideoShareListener(data.getString(COLUMN_VIDEO_KEY)));
         }
     }
-
-
+    
+    
+    /**
+     * Updates the display portions that use data from the reviews table.
+     * Presently only shows a max of 2 reviews.
+     */
     private void updateReviewsUI(Cursor data) {
+        // hide everything if there are not actually any reviews
+        // I think this looks nicer than having it say 'no reviews' or whatever
         if(!data.moveToFirst()) {
             mReviewSectionTitle.setVisibility(View.GONE);
             mReviewAuthor1TV.setVisibility(View.GONE);
@@ -784,6 +805,7 @@ public class FragmentMovieDetails extends Fragment
             return;
         }
 
+        // set text for review author 1
         mReviewAuthor1TV.setText(String.format(getString(R.string.format_review_author),
                 data.getString(COLUMN_REVIEW_AUTHOR)));
         mReviewContent1TV.setText(data.getString(COLUMN_REVIEW_CONTENT));
@@ -794,12 +816,19 @@ public class FragmentMovieDetails extends Fragment
             return;
         }
 
+        // set text for review author 2
         mReviewAuthor2TV.setText(String.format(getString(R.string.format_review_author),
                 data.getString(COLUMN_REVIEW_AUTHOR)));
         mReviewContent2TV.setText(data.getString(COLUMN_REVIEW_CONTENT));
     }
 
-
+    /**
+     * Updates the display portions that use data from the credits table.
+     * Presently only shows a max of 4 credits in this fragment.  User can navigate to
+     * ActivityCredits to view all credits for a movie.  Due to time considerations, if you are
+     * viewing your favorites, you only get 4 credits.  It's not ideal, but I can't spend forever on
+     * this, my second serious Android project ever attempted.
+     */
     private void updateCreditsUI(Cursor data) {
         int profileImageColumn = mUseFavorites ? COLUMN_PROFILE_FILE_PATH : COLUMN_PROFILE_PATH;
 

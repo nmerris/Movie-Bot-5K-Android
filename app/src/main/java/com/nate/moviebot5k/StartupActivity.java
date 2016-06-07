@@ -16,10 +16,26 @@ import com.nate.moviebot5k.api_fetching.GenresAndCertsFetcher;
 import com.nate.moviebot5k.data.MovieTheaterContract;
 
 /**
- * Initializes this app the first time it is installed on device, and detects if internet is
- * available.  If internet is available, launches Intent to ActivityHome, if not it will check to
- * see if user has at least one favorite, and then asks user via an AlertDialog if they would like
- * to view their favorites.  If so, launches and Intent to FavoritesActivity.
+ * Initializes this app:
+ * <br>
+ *     1. at first install - creates all the necessary db tables and initializes all sharedPrefs
+ *     with default values
+ *     <br>
+ *     2. any startup after first install - clears out the vidoes, reviews, and credits tables
+ *     of all records not marked as 'favorites'
+ *
+ * <br><br>
+ * Fires a fetch task to see if a connection to themoviedb is available:
+ * <br>
+ *     1. if connection was ok - launches intent to ActivityHome
+ *     <br>
+ *     2. if connection error - launches intent to ActivityFavorites IF user has at least one
+ *     favorite saved, if they have NO favorites and NO network connection, then app just shows
+ *     and error message because there really nothing to do at that point
+ *
+ * <br><br>
+ * Note: a splashscreen is shown in the background while this is all going on.
+ *
  */
 public class StartupActivity extends AppCompatActivity {
     private static final String LOGTAG = ActivitySingleFragment.N8LOG + "StartupActivity";
@@ -28,8 +44,6 @@ public class StartupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOGTAG, "entered onCreate");
-
         setContentView(R.layout.activity_startup);
         TextView messageTextView = (TextView) findViewById(R.id.problem_message);
 
@@ -37,16 +51,13 @@ public class StartupActivity extends AppCompatActivity {
 
         clearCreditsVideosReviewsTables();
 
-        // go fetch a new list of genres and certs in a background thread, the app will then either continue
-        // on to ActivityHome if successful, or the user will be presented with a choice to view
-        // their favorites (if they have any), or the app will just show a msg saying that it needs
-        // to have internet connection to work (and that they have not favorites)
+        // after this task returns, the app will either go to ActivityFavorites or ActivityHome
         new FetchGenresAndCertsTask(this, messageTextView).execute();
     }
 
 
-    // NOTE: old movies records are deleted every time new movies are fetched in MoviesFetcher
-    // but for these tables, just clean out the non favorites records each time app starts from dead
+    // NOTE: old movies records are deleted every time new movies are fetched in MoviesFetcher,
+    // however for these tables, just clean out the non favorites records each time app starts from dead
     private void clearCreditsVideosReviewsTables() {
         Log.i(LOGTAG, "about to clear out credits, videos, and reviews tables but only NON favorites records");
         String[] selectionArgs = new String[]{ "false" };
@@ -62,10 +73,15 @@ public class StartupActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Launches background thread tasks to fetch a list of genres and certifications from
+     * themoviedb's servers.  I arbitrarily chose to use the number of genres returned as evidence
+     * of a good or faulty connection to themoviedb.  To clarify: if zero genres are returned, this
+     * app assumes an internet connection is not available and will then launch an intent to
+     * ActivityFavorites.  If at least 10 (also an arbitrary number) genres were returned, this app
+     * assumes an internet connection is good to go and launches an intent to ActivityHome.
+     */
     private class FetchGenresAndCertsTask extends AsyncTask<Void, Void, Integer> {
-
-        // async task needs it's own Context it can hold on to, in case of orientation change while
-        // do in background is running
         Context context;
         TextView messageTV;
 
@@ -76,13 +92,7 @@ public class StartupActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            Log.i(LOGTAG, "just entered FetchGenresAndCertsTask.doInBackground");
-
-            // fetch a new list of certs from themoviedb, the certifications table will be updated
             new GenresAndCertsFetcher(context).fetchAvailableCertifications();
-
-            // I'm choosing to use genres as the task that returns the number of items fetched,
-            // could be either, it's arbitrary, the genres table will also be updated
             return new GenresAndCertsFetcher(context).fetchAvailableGenres();
         }
 
@@ -98,6 +108,7 @@ public class StartupActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(context, ActivityHome.class);
                 startActivity(intent);
+                // finish this activity so that clicking 'back' from ActivityHome exits the app
                 finish();
 
             }
@@ -113,9 +124,7 @@ public class StartupActivity extends AppCompatActivity {
                         null);
 
                 if(cursor == null) {
-                    Log.e(LOGTAG, "    Woah there buddy, somehow a Cursor was null, this should never happen!");
-                    messageTV.setText("There appears to be a database problem.  Try restarting the" +
-                            " app and if that doesn't work try reinstalling.");
+                    messageTV.setText(getString(R.string.startup_activity_bad_db));
                 }
                 else {
                     try {
@@ -126,18 +135,13 @@ public class StartupActivity extends AppCompatActivity {
 
                             Intent intent = new Intent(context, ActivityFavorites.class);
                             TaskStackBuilder.create(context).addNextIntentWithParentStack(intent).startActivities();
+                            // finish this activity because we want 'back' to exit the app from ActivityFavorites
                             finish();
 
                         } else {
                             // not much can be done at this point, no connection to themoviedb AND
                             // user has no favorites saved, so just need to show them an appropriate msg
-
-                            Log.i(LOGTAG, "    NOTHING can be done at this point," +
-                                    " no connection to themoviedb and no favorites saved");
-                            messageTV.setText("Unfortunately there was a connection problem.  If you had" +
-                                    " any favorites saved, you would be able to view them now even without" +
-                                    " an internet connection, but it appears you do not have any.  Please" +
-                                    " try again when a connection is available and consider adding some favorites!");
+                            messageTV.setText(getString(R.string.startup_activity_dead_end));
                         }
                     } finally {
                         cursor.close();
@@ -148,9 +152,10 @@ public class StartupActivity extends AppCompatActivity {
     } // end AsyncTask
 
 
-
-    // initialize all sharedPrefs, need this to happen the first time app is installed
-    // or if user clears the app data, they will either ALL exist, or NONE will exist
+    /**
+     * Prepares all sharedPrefs: if they do not exist, they will be created and defaults will be written.
+     * If they already exist, nothing happens.
+     */
     private void initializeSharedPrefs() {
         Log.i(LOGTAG, "entered initializeSharedPrefs, will report if they do not exist yet");
 
@@ -161,7 +166,6 @@ public class StartupActivity extends AppCompatActivity {
         if(!sharedPreferences.contains(getString(R.string.key_movie_filter_year))) {
             Log.i(LOGTAG, "  sharedPrefs are being created for the first time, writing defaults...");
 
-            // TODO: prob won't end up using num_favorites, easier to just check db each time
             editor.putInt(getString(R.string.key_num_favorites), 0);
 
             editor.putString(getString(R.string.key_movie_filter_sortby_value),

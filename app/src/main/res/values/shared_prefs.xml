@@ -28,7 +28,7 @@
     <string name="default_favorites_sortby_value">vote_average DESC</string> <!-- most popular -->
     <string name="key_favorites_sortby_selected_item_position">fav_sortby_item_position</string>
 
-
+    <!-- currently selected non-favorite movie -->
     <string name="key_currently_selected_movie_id">curr_sel_movie_id</string>
     <integer name="default_currently_selected_movie_id">-1</integer> <!-- no movie selected -->
 

@@ -119,7 +119,7 @@ public class MovieDetailsFetcher {
                         jsonObject.getString("name"));
             }
         } catch (JSONException e) {
-                Log.i(LOGTAG, "  there were less than 4 genre names associated with this movie, this is not an error");
+//                Log.i(LOGTAG, "  there were less than 4 genre names associated with this movie, this is not an error");
         }
 
         // update the movies table record
@@ -139,26 +139,6 @@ public class MovieDetailsFetcher {
                 Log.e(LOGTAG, "Failed to parse JSON", je);
             }
         }
-
-//        if(updateVidsReviewsCredits) {
-//            try {
-//                processVideosJson(jsonBody);
-//            } catch (JSONException je) {
-//                Log.e(LOGTAG, "Failed to parse JSON in processVideosJson", je);
-//            }
-//
-//            try {
-//                processReviewsJson(jsonBody);
-//            } catch (JSONException je) {
-//                Log.e(LOGTAG, "Failed to parse JSON in processReviewsJson", je);
-//            }
-//
-//            try {
-//                processCreditsJson(jsonBody);
-//            } catch (JSONException je) {
-//                Log.e(LOGTAG, "Failed to parse JSON in processCreditsJson", je);
-//            }
-//        }
 
     }
     
@@ -234,8 +214,6 @@ public class MovieDetailsFetcher {
             // extract the data from the json object and put it in a single ContentValues object
             valuesReviews.put(MovieTheaterContract.ReviewsEntry.COLUMN_AUTHOR, jsonObject.getString("author"));
             valuesReviews.put(MovieTheaterContract.ReviewsEntry.COLUMN_CONTENT, jsonObject.getString("content"));
-
-//            Log.i(LOGTAG, " review " + i + " content: " + jsonObject.getString("content"));
 
             // set the is_favorite column to FALSE
             valuesReviews.put(MovieTheaterContract.MoviesEntry.COLUMN_IS_FAVORITE, "false");

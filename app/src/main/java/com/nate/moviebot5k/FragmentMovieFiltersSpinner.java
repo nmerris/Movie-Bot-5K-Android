@@ -29,7 +29,18 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Created by Nathan Merris on 5/11/2016.
+ * Displays 4 spinners which allow the user to select movie filtering criteria:
+ * <br><br>
+ *     1. sortby: most popular, highest rated, highest revenue, lowest revenue
+ *     <br>
+ *     2. genre: drama, western, thriller, etc
+ *     <br>
+ *     3. certification: NR, G, PG, PG-13, R, NC-17
+ *     <br>
+ *     4. release date: from 1920 to present
+ *
+ * <br><br>
+ * The selection is stored immediately in sharedPrefs, and then onFilterChange callback fires.
  */
 public class FragmentMovieFiltersSpinner extends Fragment
         implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
@@ -48,25 +59,19 @@ public class FragmentMovieFiltersSpinner extends Fragment
     private static final int GENRES_TABLE_LOADER_ID = R.id.loader_genre_spinner;
     private static final int CERTS_TABLE_LOADER_ID = R.id.loader_cert_spinner;
 
-    // genresProjection and the ints that follow must be changed together, order matters
+    // genresProjection and the int that follow must be changed together, order matters
     public static final String[] genresProjection = {
             MovieTheaterContract.GenresEntry._ID,
             MovieTheaterContract.GenresEntry.COLUMN_GENRE_ID,
             MovieTheaterContract.GenresEntry.COLUMN_NAME
     };
-    public static final int GENRE_TABLE_COLUMN_ID = 0;
     public static final int GENRE_TABLE_COLUMN_GENRE_ID = 1;
-    public static final int GENRE_TABLE_COLUMN_NAME = 2;
 
-    // certsProjection and the ints that follow must be changed together, order matters
     public static final String[] certsProjection = {
             MovieTheaterContract.CertsEntry._ID,
             MovieTheaterContract.CertsEntry.COLUMN_ORDER,
             MovieTheaterContract.CertsEntry.COLUMN_NAME
     };
-    public static final int CERTS_TABLE_COLUMN_ID = 0;
-    public static final int CERTS_TABLE_COLUMN_CERTS_ORDER = 1;
-    public static final int CERTS_TABLE_COLUMN_NAME = 2;
 
     /**
      * Required interface for any activity that hosts this fragment
@@ -102,25 +107,18 @@ public class FragmentMovieFiltersSpinner extends Fragment
         // this is where Loaders are recommended to be initialized
         getLoaderManager().initLoader(GENRES_TABLE_LOADER_ID, null, this);
         getLoaderManager().initLoader(CERTS_TABLE_LOADER_ID, null, this);
-
-//        new GenreAndCertSpinnerLoader(this, getActivity(),
-//                mGenreSpinnerAdapter, mCertSpinnerAdapter,
-//                mGenreSpinner, mCertSpinner, getLoaderManager());
-
         super.onActivityCreated(savedInstanceState);
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        Log.i(LOGTAG, "entered onCreateView");
-
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
 
         View rootView = inflater.inflate(R.layout.fragment_filter_spinners_ref, container, false);
         ButterKnife.bind(this, rootView);
 
+        // release date spinner
         ArrayAdapter<String> yrSpinnerAdapter = new YearSpinnerAdapter(getActivity());
         yrSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mYearSpinner.setAdapter(yrSpinnerAdapter);
@@ -129,7 +127,7 @@ public class FragmentMovieFiltersSpinner extends Fragment
                 getInt(getString(R.string.key_movie_filter_year_spinner_position), 0));
         mYearSpinner.setOnItemSelectedListener(this);
 
-
+        // sortby spinner
         ArrayAdapter<String> sortbySpinnerAdapter = new SortbySpinnerAdapter(getActivity());
         sortbySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSortbySpinner.setAdapter(sortbySpinnerAdapter);
@@ -137,12 +135,10 @@ public class FragmentMovieFiltersSpinner extends Fragment
                 getInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0));
         mSortbySpinner.setOnItemSelectedListener(this);
 
-
         // set an adapter on the genre spinner
         mGenreSpinnerAdapter = new GenreSpinnerAdapter(getActivity());
         mGenreSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mGenreSpinner.setAdapter(mGenreSpinnerAdapter);
-
 
         // set an adapter on the cert spinner
         mCertSpinnerAdapter = new CertSpinnerAdapter(getActivity());
@@ -155,7 +151,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        Log.i(LOGTAG, "entered onItemSelected");
         SharedPreferences.Editor editor = mSharedPrefs.edit();
 
         switch (parent.getId()) {
@@ -178,7 +173,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                     mCallbacks.onFilterChanged();
 
                     Log.i(LOGTAG, "  just wrote to sharedPrefs key_movie_filter_year: " + selectedYearFilter);
-                    Log.i(LOGTAG, "    and changed sharedPrefs key_fetch_new_movies bool to ****TRUE****");
                 }
                 break;
 
@@ -207,8 +201,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                     mCallbacks.onFilterChanged();
 
                     Log.i(LOGTAG, "  just wrote to sharedPrefs key_movie_filter_sortby_value: " + sortbyValues[position]);
-                    Log.i(LOGTAG, "    and changed sharedPrefs key_fetch_new_movies bool to ****TRUE****");
-
                 }
                 break;
 
@@ -233,8 +225,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                     mCallbacks.onFilterChanged();
 
                     Log.i(LOGTAG, "  just wrote to sharedPrefs key_movie_filter_genre_id: " + selectedGenreId);
-                    Log.i(LOGTAG, "    and changed sharedPrefs key_fetch_new_movies bool to ****TRUE****");
-
                 }
                 break;
 
@@ -260,8 +250,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                     mCallbacks.onFilterChanged();
 
                     Log.i(LOGTAG, "  just wrote to sharedPrefs key_movie_filter_cert_id: " + selectedCert);
-                    Log.i(LOGTAG, "    and changed sharedPrefs key_fetch_new_movies bool to ****TRUE****");
-
                 }
 
         }
@@ -276,11 +264,8 @@ public class FragmentMovieFiltersSpinner extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        Log.i(LOGTAG, "entered onCreateLoader");
 
         if(id == GENRES_TABLE_LOADER_ID) {
-//            Log.i(LOGTAG, "  and about to return new GENRES_TABLE_LOADER");
-
             return new CursorLoader(getActivity(),
                     MovieTheaterContract.GenresEntry.CONTENT_URI,
                     genresProjection,
@@ -289,8 +274,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                     null, null, null);
         }
         else if(id == CERTS_TABLE_LOADER_ID) {
-//            Log.i(LOGTAG, "  and about to return new CERTS_TABLE_LOADER");
-
             return new CursorLoader(getActivity(),
                     MovieTheaterContract.CertsEntry.CONTENT_URI,
                     certsProjection,
@@ -304,7 +287,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        Log.i(LOGTAG, "entered onLoadFinished");
 
         if(loader.getId() == GENRES_TABLE_LOADER_ID) {
             mGenreSpinnerAdapter.swapCursor(data);
@@ -313,7 +295,7 @@ public class FragmentMovieFiltersSpinner extends Fragment
             // onItemSelected spinner callback fires immediately when it's set up, and if
             // the selected item is not in the list yet (because the loader has not returned the
             // cursor which contains the spinner drop down elements), the onItemSelected method
-            // will think that the user changed the selection, while will trigger an unnecessary
+            // will think that the user changed the selection, which will trigger an unnecessary
             // API call when user navigates back to ActivityHome.. details details
             mGenreSpinner.setSelection(mSharedPrefs.
                     getInt(getActivity().getString(R.string.key_movie_filter_genre_spinner_position), 0));

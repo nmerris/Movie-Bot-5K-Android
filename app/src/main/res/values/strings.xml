@@ -81,4 +81,8 @@
     <string name="format_review_author">by <xliff:g id="review_author">%1s</xliff:g></string>
     <string name="show_all_credits">Show All Credits</string>
 
+    <!-- startup activity messages -->
+    <string name="startup_activity_dead_end">Unfortunately there was a connection problem.  If you had any favorites saved, you would be able to view them now even without an internet connection, but it appears you do not have any.  Please try again when a connection is available and consider adding some favorites!"</string>
+    <string name="startup_activity_bad_db">There appears to be a database problem.  Try restarting the app and if that doesn't work try reinstalling</string>
+
 </resources>
