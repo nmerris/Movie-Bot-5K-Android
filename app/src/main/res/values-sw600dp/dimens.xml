@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- don't want any margin in tablet mode because there is already a space between
+    fragment movie grid and fragment movie details -->
     <dimen name="coordinator_layout_margin_left">0dp</dimen>
 </resources>

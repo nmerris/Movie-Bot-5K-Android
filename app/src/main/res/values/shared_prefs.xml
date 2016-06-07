@@ -3,26 +3,27 @@
 <!-- keys and defaults for anything related to shared prefs -->
 <resources>
 
+    <!-- NON-favorites sortby -->
     <string name="key_movie_filter_sortby_value">filter_sortby</string> <!-- value type String -->
     <string name="default_movie_filter_sortby_value">popularity.desc</string> <!-- most popular -->
     <string name="key_movie_filter_sortby_spinner_position">sortby_spinner_position</string>
 
+    <!-- release date / year sortby -->
     <string name="key_movie_filter_year">filter_year</string> <!-- value type String -->
     <string name="default_movie_filter_year">@string/spinner_year_any_year_label</string>
     <string name="key_movie_filter_year_spinner_position">year_spinner_position</string>
 
-    <!-- NOTE: unlike genre queries, themoviedb just takes the name of the genre to query by genre -->
+    <!-- certification, NOTE: unlike genre queries, themoviedb just takes the name of the genre to query by genre -->
     <string name="key_movie_filter_cert">filter_cert</string> <!-- value type String -->
     <string name="default_movie_filter_cert">@string/spinner_cert_any_cert_label</string>
     <string name="key_movie_filter_cert_spinner_position">cert_spinner_position</string>
 
-    <!-- NOTE: themoviedb takes a numerical genre **ID** to query by genre -->
+    <!-- genre, NOTE: themoviedb takes a numerical genre **ID** to query by genre -->
     <string name="key_movie_filter_genre_id">filter_genre</string> <!-- value type String -->
-    <!--<string name="default_movie_filter_genre_id">@string/spinner_genre_any_genre_label</string>-->
     <string name="default_movie_filter_genre_id">-1</string> <!-- Any Genre -->
     <string name="key_movie_filter_genre_spinner_position">genre_spinner_position</string>
 
-    <!-- favorites sortby, sorts only favorites in favorites table locally, this sortby filter is
+    <!-- FAVORITES sortby, sorts only favorites in favorites table locally, this sortby filter is
     not associated with any API calls -->
     <string name="key_favorites_sortby_value">favorites_sortby</string> <!-- value type String -->
     <string name="default_favorites_sortby_value">vote_average DESC</string> <!-- most popular -->
@@ -32,7 +33,7 @@
     <string name="key_currently_selected_movie_id">curr_sel_movie_id</string>
     <integer name="default_currently_selected_movie_id">-1</integer> <!-- no movie selected -->
 
-    <!-- currently selected favorite -->
+    <!-- currently selected FAVORITE -->
     <string name="key_currently_selected_favorite_id">curr_sel_favorite_id</string>
     <integer name="default_currently_selected_favorite_id">-1</integer> <!-- no favorite selected -->
 

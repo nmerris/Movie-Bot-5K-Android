@@ -10,7 +10,7 @@
     to download image thumbnails from themoviedb, I would need to do some more serious multithreading
     for that, I'm not even sure if themoviedb would even allow 70 credits (some movies have that many)
     profile images to be downloaded in rapid succession, so the gist is: in offline mode you only get
-    4 profile images to look at.. but you can still see the text.  m.e.h. -->
+    4 profile images to look at..  m.e.h. -->
     <integer name="num_credits_profile_images_to_store_offline">4</integer>
 
 </resources>

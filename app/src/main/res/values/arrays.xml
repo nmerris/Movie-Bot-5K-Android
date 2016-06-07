@@ -14,10 +14,10 @@
         <item>revenue.desc</item>
         <item>revenue.asc</item>
     </string-array>
-    
+
+
+    <!-- order also matters here, these are the sortby labels used to sort NON-favorites -->
     <string-array name="favorites_sortby_labels">
-<!--        <item>@string/favorites_sortby_most_popular_label</item>
-        <item>@string/favorites_sortby_least_popular_label</item>-->
         <item>@string/favorites_sortby_highest_rated_label</item>
         <item>@string/favorites_sortby_lowest_rated_label</item>
         <item>@string/favorites_sortby_highest_revenue_label</item>
@@ -27,8 +27,6 @@
     </string-array>
     <!-- the values array is used in FragmentMovieGrid to sort the favorites records in the db -->
     <string-array name="favorites_sortby_values">
-<!--        <item>@string/default_favorites_sortby_value</item>
-        <item>popularity ASC</item>-->
         <item>@string/default_favorites_sortby_value</item>
         <item>vote_average ASC</item>
         <item>revenue DESC</item>
@@ -36,6 +34,5 @@
         <item>release_date DESC</item>
         <item>release_date ASC</item>
     </string-array>
-    
 
 </resources>
