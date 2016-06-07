@@ -1,16 +1,12 @@
 package com.nate.moviebot5k;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-
-import com.nate.moviebot5k.data.MovieTheaterContract;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,12 +16,12 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
+ * A collection of utility methods used in this app.
+ *
  * Created by Nathan Merris on 5/6/2016.
  */
 public class Utility {
@@ -60,11 +56,14 @@ public class Utility {
     }
 
 
-
-    // returns an array of Strings to fill the year filter spinner, starting at the min year
-    // as defined in values/ints resource file and ending at the current year
-    // the zeroth element is filled with the default year, which is 'Any Year'
-    // NOTE: the spinner adapter lists the zeroth element first
+    /**
+     * Returns an array of Strings to fill the year filter spinner, starting at the min year
+     * as defined in values/ints resource file and ending at the current year.
+     * The zeroth element is filled with the default year, which is 'Any Year'
+     * NOTE: the spinner adapter lists the zeroth element first
+     * @param context
+     * @return
+     */
     public static String[] getMovieFilterYears(Context context) {
 
         String currentYear = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
@@ -87,7 +86,7 @@ public class Utility {
      * a details toolbar.
      *
      * @param activity The calling activity which should have a details toolbar
-     * @param title The toolbar title to display, will center it if tagline is null
+     * @param title The toolbar title to display, will center it if tagline is null or empty
      * @param tagline The toolbar subtitle to display
      */
     public static void updateToolbarTitleAndTagline(AppCompatActivity activity, String title, String tagline) {
@@ -115,6 +114,12 @@ public class Utility {
     }
 
 
+    /**
+     * Builds a URL that opens either the youtube video website for the video key passed in, or
+     * depending on the device and users choice, may just launch the youtube app.
+     * @param youTubeKey the unique key for the youtube video to show
+     * @return fully formed URL
+     */
     public static Uri buildYouTubeUri(String youTubeKey) {
         Uri.Builder youTubeUrl = new Uri.Builder();
         youTubeUrl.scheme("https")
@@ -126,6 +131,9 @@ public class Utility {
     }
 
 
+    /**
+     * Displays the screen dp.
+     */
     public static void displayScreenDP(Context context, String logtag) {
         // TESTING: just want to see what screen dp of device is..
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
@@ -135,6 +143,11 @@ public class Utility {
     }
 
 
+    /**
+     * Returns a calendar instance set to the date passed in to dateString
+     * @param dateString the 'yyyy-MM-dd' formatted date string to process
+     * @return a Calendar instance set to dateString
+     */
     public static Calendar parseDate(String dateString) {
         try {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -144,23 +157,11 @@ public class Utility {
             calendar.setTime(date);
 
             return calendar;
-
-//            String month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
-//            String year = String.valueOf(calendar.get(Calendar.YEAR));
-//            String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-//
-//            return month + " " + day + ", " + year;
-
         } catch (ParseException e) {
             Log.e("EXCEPTION", "  dateFormat.parse error: " + e);
             e.printStackTrace();
             return null;
         }
-
-
-
-
-
     }
     
 }

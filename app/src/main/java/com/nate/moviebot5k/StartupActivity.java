@@ -163,6 +163,7 @@ public class StartupActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         // if any single sharedPrefs exists, then they all do and have already been initialized
+        // otherwise initialize them, as each pref is NOT found, it is created and a default written
         if(!sharedPreferences.contains(getString(R.string.key_movie_filter_year))) {
             Log.i(LOGTAG, "  sharedPrefs are being created for the first time, writing defaults...");
 
@@ -189,8 +190,6 @@ public class StartupActivity extends AppCompatActivity {
             editor.putInt(getString(R.string.key_currently_selected_favorite_id),
                     getResources().getInteger(R.integer.default_currently_selected_favorite_id));
 
-//            editor.putBoolean(getString(R.string.key_fetch_new_movies), true);
-
             // all spinners start at zeroth position
             editor.putInt(getString(R.string.key_movie_filter_year_spinner_position), 0);
             editor.putInt(getString(R.string.key_movie_filter_sortby_spinner_position), 0);
@@ -199,15 +198,8 @@ public class StartupActivity extends AppCompatActivity {
 
             // the favorites sortby dialog fragment also starts in zeroth position
             editor.putInt(getString(R.string.key_favorites_sortby_selected_item_position), 0);
-
-//            editor.commit();
         }
-
-        // and it's always a good idea to fetch new movies when the app starts from dead
-        // because the movies in themoviedb database may have changed since app was last used
-        editor.putBoolean(getString(R.string.key_fetch_new_movies), true);
         editor.commit();
-
     }
 
 }

@@ -36,10 +36,7 @@
     <string name="key_currently_selected_favorite_id">curr_sel_favorite_id</string>
     <integer name="default_currently_selected_favorite_id">-1</integer> <!-- no favorite selected -->
 
+    <!-- number of favorites -->
     <string name="key_num_favorites">num_favorites</string>
-    <!--<integer name="default_num_favorites">0</integer>-->
-
-    <string name="key_fetch_new_movies">fetch_new_movies</string>
-    <!--<bool name="default_fetch_new_movies">true</bool>-->
 
 </resources>

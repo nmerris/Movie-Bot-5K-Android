@@ -162,9 +162,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                 if(!currentYearFilter.equals(selectedYearFilter)) {
                     // update the year filter
                     editor.putString(getActivity().getString(R.string.key_movie_filter_year), selectedYearFilter);
-                    // set fetch movies key to true so that MoviesFetcher is called when user goes back to
-                    // ActivityHome which hosts FragmentMovieGrid, which launches the fetch task
-                    editor.putBoolean(getActivity().getString(R.string.key_fetch_new_movies), true);
                     // store the position in the spinner so that it's the same next time user comes back here
                     editor.putInt(getActivity().getString(R.string.key_movie_filter_year_spinner_position), position);
                     editor.commit();
@@ -189,10 +186,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                     // the value is what is used in MoviesFetcher for the API call
                     // the label is what the user sees in the spinner
                     editor.putString(getActivity().getString(R.string.key_movie_filter_sortby_value), sortbyValues[position]);
-
-                    // set fetch movies key to true so that MoviesFetcher is called when user goes back to
-                    // ActivityHome which hosts FragmentMovieGrid, which launches the fetch task
-                    editor.putBoolean(getActivity().getString(R.string.key_fetch_new_movies), true);
                     // store the position in the spinner so that it's the same next time user comes back here
                     editor.putInt(getActivity().getString(R.string.key_movie_filter_sortby_spinner_position), position);
                     editor.commit();
@@ -215,8 +208,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                 if(!savedGenreId.equals(selectedGenreId)) {
                     // update the genreId saved in sharedPrefs
                     editor.putString(getActivity().getString(R.string.key_movie_filter_genre_id), selectedGenreId);
-                    // update fetch_new_movies so a new fetch task starts when appropriate
-                    editor.putBoolean(getActivity().getString(R.string.key_fetch_new_movies), true);
                     // save the new position of the spinner
                     editor.putInt(getActivity().getString(R.string.key_movie_filter_genre_spinner_position), position);
                     editor.commit();
@@ -240,8 +231,6 @@ public class FragmentMovieFiltersSpinner extends Fragment
                 if(!savedCert.equals(selectedCert)) {
                     // update the certId saved in sharedPrefs
                     editor.putString(getActivity().getString(R.string.key_movie_filter_cert), selectedCert);
-                    // update fetch_new_movies so a new fetch task starts when appropriate
-                    editor.putBoolean(getActivity().getString(R.string.key_fetch_new_movies), true);
                     // save the new position of the spinner
                     editor.putInt(getActivity().getString(R.string.key_movie_filter_cert_spinner_position), position);
                     editor.commit();
