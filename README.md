@@ -1,2 +1,2 @@
 # moviebot5000-clean
-A clean version of my second Udacity project
+Please check out the Wiki for this repository!
