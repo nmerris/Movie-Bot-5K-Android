@@ -1,3 +1,2 @@
 # moviebot5000-clean
-Please check out the Wiki for this repository!
-<a href="http://www.w3schools.com">Visit W3Schools</a>
+<a href="https://github.com/nmerris/moviebot5000-clean/wiki">Please check out my Wiki for this repository!</a>
