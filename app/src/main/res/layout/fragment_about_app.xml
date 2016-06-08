@@ -11,40 +11,126 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp">
 
+        <!-- Usage Notes title -->
         <TextView
-            android:id="@+id/fragment_aboutapp_usage_notes_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
             android:textSize="@dimen/about_app_heading_text_size"
-            android:text="@string/about_app_usage_notes_title" />
+            android:text="@string/about_app_usage_notes_title"
+            android:layout_marginBottom="@dimen/about_app_content_padding_bottom"/>
 
+            <!-- Homescreen subtitle -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/about_app_subtitle_text_size"
+                android:text="@string/about_app_usage_notes_homescreen_title" />
+            <!-- Homescreen content -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/about_app_content_text_size"
+                android:paddingBottom="@dimen/about_app_content_padding_bottom"
+                android:text="@string/about_app_usage_notes_homescreen_content" />
+
+            <!-- Detailsscreen subtitle -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/about_app_subtitle_text_size"
+                android:text="@string/about_app_usage_notes_detailsscreen_title" />
+            <!-- Detailsscreen content -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/about_app_content_text_size"
+                android:paddingBottom="@dimen/about_app_content_padding_bottom"
+                android:text="@string/about_app_usage_notes_detailsscreen_content" />
+
+            <!-- Favoritesscreen subtitle -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/about_app_subtitle_text_size"
+                android:text="@string/about_app_usage_notes_favoritesscreen_title" />
+            <!-- Detailsscreen content -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/about_app_content_text_size"
+                android:paddingBottom="@dimen/about_app_content_padding_bottom"
+                android:text="@string/about_app_usage_notes_favoritesscreen_content" />
+
+        <!-- Tech Notes title -->
         <TextView
-            android:id="@+id/fragment_aboutapp_usage_notes_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="@dimen/about_app_heading_text_size"
+            android:text="@string/about_app_tech_notes_title"/>
+
+            <!-- tech notes content -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/about_app_content_text_size"
+                android:paddingBottom="@dimen/about_app_content_padding_bottom"
+                android:text="@string/about_app_tech_notes_content" />
+
+        <!-- link to my github wiki title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/about_app_subtitle_text_size"
+            android:text="@string/about_app_wiki_link_title"
+            android:autoLink="web"
+            android:linksClickable="true"/>
+        <!-- the actual link URL -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/about_app_subtitle_text_size"
+            android:text="@string/about_app_github_link_url"
+            android:autoLink="web"
+            android:linksClickable="true"
+            android:paddingBottom="@dimen/about_app_content_padding_bottom"/>
+
+        <!-- design highlights title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="@dimen/about_app_heading_text_size"
+            android:text="@string/about_app_design_highlights_title"/>
+        <!-- design highlights content -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/about_app_content_text_size"
             android:paddingBottom="@dimen/about_app_content_padding_bottom"
-            android:text="@string/about_app_usage_notes_content" />
+            android:text="@string/about_app_design_highlights_content" />
 
+        <!-- attention to details title -->
         <TextView
-            android:id="@+id/fragment_aboutapp_about_author_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
             android:textSize="@dimen/about_app_heading_text_size"
-            android:text="@string/about_app_about_author_technotes_title" />
-
+            android:text="@string/about_app_attention_to_details_title"/>
+        <!-- attention to details content -->
         <TextView
-            android:id="@+id/fragment_aboutapp_about_author_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/about_app_content_text_size"
             android:paddingBottom="@dimen/about_app_content_padding_bottom"
-            android:text="@string/about_app_about_author_content" />
+            android:text="@string/about_app_attention_to_details_content" />
 
+        <!-- themoviedb attribution and logo -->
         <TextView
-            android:id="@+id/fragment_aboutapp_moviedb_attribution_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/about_app_content_text_size"
@@ -56,7 +142,6 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/fragment_aboutapp_moviedb_logo"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/moviedb_logo"

@@ -20,10 +20,11 @@
     <dimen name="video_thumb_width">160dp</dimen>
 
     <!-- FragmentAboutApp layout-->
-    <dimen name="about_app_heading_text_size">20sp</dimen>
+    <dimen name="about_app_heading_text_size">24sp</dimen>
     <dimen name="about_app_content_text_size">16sp</dimen>
     <dimen name="about_app_content_padding_bottom">16dp</dimen>
     <dimen name="about_app_moviedb_attribution_padding_top">36dp</dimen>
+    <dimen name="about_app_subtitle_text_size">20sp</dimen>
 
     <!-- spinner year filter -->
     <dimen name="spinner_year_width">256dp</dimen>

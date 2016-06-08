@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="about_app_usage_notes_title">Usage Notes</string>
+    <string name="about_app_tech_notes_title">Technical Notes</string>
+    <string name="about_app_wiki_link_title">Check out my GitHub Wiki!</string>
+    <string name="about_app_design_highlights_title">Design Highlights</string>
+    <string name="about_app_attention_to_details_title">Attention to Details</string>
+    <string name="about_app_usage_notes_homescreen_title">Home Screen</string>
+    <string name="about_app_usage_notes_detailsscreen_title">Movie Details Screen</string>
+    <string name="about_app_usage_notes_favoritesscreen_title">Favorite Movies Screen</string>
+    <string name="about_app_picasso_link_title">Picasso</string>
+    <string name="about_app_butterknife_link_title">Butterknife</string>
+    <string name="about_app_thirdparty_libs_title">Third Party Libraries Used</string>
+
+    <string name="about_app_usage_notes_homescreen_content">When first started, MovieBot5000 will show an arrangement of the most popular movie posters, with no additional filtering.  The list of movies can be updated by changing the filters above the movies.  Clicking on a movie shows the details of that movie.  Note that it is possible to select movie filters that are too restrictive, and no movies may be found.  If this happens a message will be shown.  The toolbar menu can be used to see your Favorite Movies collection.  Note that you can still view your favorite movies even if you have no internet connection.</string>
+    <string name="about_app_usage_notes_detailsscreen_content">While viewing movie details, SWIPE left or right to browse between the other movies in your list.  Click on the floating action button (the circle with the star in it at the bottom right of the screen) to add or remove a movie from your favorites.  Note that the button fades in and out as the details view is swiped up and down.  If a movie has any videos, you can click the video thumbnail image to watch the video.  Next to each video is a share button, just click it to send a link of that video to a friend.  Click the button labeled Show All Credits to see a scrollable list of all the credits for a movie.  Unfortunately I had to get this project done, so I limited the number of credits to four when viewing favorite movie details, but at least you still get to see the images for those four cast members when offline.  Note that some movies have no videos, and some have no reviews.</string>
+    <string name="about_app_usage_notes_favoritesscreen_content">The app will start on this screen if it detects that there is no connection available to themoviedb, AND if you have at least one favorite saved.  You can also navigate to the Favorites Screen by choosing it from the toolbar menu in Home Screen.  Just like in Home Screen, simply click a movie thumbnail to view it\'s details.  Clicking UP from here will take you back to Home Screen.</string>
+
+    <string name="about_app_tech_notes_content">"MovieBot5000 was the second serious attempt I have made to write an Android app.  Just like I did in my first app, I decided I should make it better and more useful than the basic requirements laid out in the project rubric.  I also wanted to make it intuitive, and to try very hard to make it behave like a professional app.. in short, I wanted to create something I could be proud of.  If you are running this app from Android Studio, use \'N8LOG\' to filter the logcat output, if you want to see the basic inner workings of my app.\n\nI am mostly happy with the way this app turned out; however there are a few things I would change if I had infinite time.  First, the adding and removing of favorites is not robust enough.. ie if you rapidly click the FAB favorites button, one of the images may not end up being saved to the local device.  I believe I need to write a customer executor for Picasso, because as I understand it, the default Picasso singleton instance only uses 3 threads. Either that or maybe just prevent further clicks from doing anything while the last click is still executing.  Similarly, I had trouble getting Picasso to download a bunch of images to save locally, like when a movie has 70 credits and each one has an image, Picasso just wasn't handling it well.  I am ashamed to admit that I just limited the number of favorites credits to 4.\n\nThe other big-picture design mistake I made was relying too heavily on the sqlite database.  In stage one of this app  I used a singleton to manage almost all the data.  This worked rather well I thought.  After reading up on the use of singletons, it seemed to me they are rather controversial (at least on StackOverflow), so I decided to avoid using them entirely.  I regret that.  Constantly querying the db through the ContentProvider is just kind of clunky, and slower.  I should query and update the db as infrequently as possible, like when new movie data comes in from an API fetch, or when populating the movie grid.  Ironically I ended up passing a list of movieIds around between the fragments anyway, and it would have been nice if I just had a single class to keep track of all the currently displayed movies, and their data."</string>
+
+    <string name="about_app_github_link_url"><a href="https://github.com/nmerris/moviebot5000-clean/wiki">https://github.com/nmerris/moviebot5000-clean/wiki</a></string>
+
+    <string name="about_app_picasso_link_url">http://square.github.io/picasso/</string>
+    <string name="about_app_butterknife_link_url">http://jakewharton.github.io/butterknife/</string>
+
+    <string name="about_app_moviedb_attribution_content">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
+
+    <string name="about_app_design_highlights_content">"-- added movie filter options that update the movie list in real time: genre, rating, and release date
+-- arrays that back the spinners for genre and rating are programmatically updated each time the app is started from dead, this guarantees that the selectable list is up to date with themoviedb.org
+-- added credits with thumbnail images of each cast member
+-- saved movie poster, backdrop, and the first four credits thumbnail images to local device storage, so that the app can be used to view favorites even without internet
+-- app startup logic starts the app in ActivityFavorites (as opposed to ActivityHome) if it detects that there is no connection to themoviedb.org server AND if the user has at least one favorite saved
+-- placeholder images are used everywhere Picasso is used to insert an image into the layout, which (in my experience) keeps GridView happy and less glitchy, and also makes the UI look nicer when a particular cast member does not have a thumbnail image
+-- redundant network calls are minimized, two examples: rotating the device does not just fire off another async task to fetch data from themoviedb.org, and changing a movie filter setting to the same setting (ie clicking the same genre twice in a row) will not fire off another async network fetch task
+-- saves your last app 'state': app keeps track of your last selected favorite and non-favorite movie, and if possible, will show you the same movie even after the entire process has been killed off by Android
+-- in tablet mode, the second pane (the details view) will never start 'empty': first it will try to show your last viewed movie, but if it can't (because perhaps the user removed that movie from their favorites list and never selected another), it will show the first movie in the grid
+-- implemented a ViewPager in phone mode, allowing the user to swipe left and right to go through all the details views of all the movies that were in their grid, both for favorites and non-favorites
+-- I am aware that there are 3rd party tools that can be used to make content providers, but I needed the experience, so I wrote my own database contract class and content provider
+-- sqlite database uses four tables to keep track of movie data: movies (each record is constrained to be unique based on the movieId), credits, reviews, and videos (no unique constraint on the last three tables)
+-- Loaders are used to query the db
+-- custom FloatingActionButton.Behavior class that fades the FAB in and out as the details layout is scrolled
+-- ActivitySingleFragment is a base class I used to reduce some repeated fragment transaction code, subclassing activities can choose what fragment it should display, and if desired, what layout it should use"</string>
+
+    <string name="about_app_attention_to_details_content">"-- custom 9 patch image is used to animate the movie filter spinners, which match the color scheme of the app
+-- split toolbar in tablet mode: the toolbar above the movie grid is set as the support action bar, while the toolbar above the movie details pane is used to show the movie title and tagline
+-- loss of internet while using app displays an appropriate message to user, as opposed to just showing a blank screen
+-- movie details sections that contain no data are stripped from the layout, for example if a movie has no reviews associated with it, the entire reviews section is removed from the screen
+-- app goes to full screen in phone landscape when viewing movie details or the full credits list, which I thought worked well, especially considering how easy it is to swipe left and right with the ViewPager
+-- if a movie lacks a tagline, the title is centered in the second pane toolbar, because otherwise it looks off center
+-- the array that is used to populate the release date filter spinner is computed every time the app starts from dead, and it auto updates to include the current year as needed"</string>
+
+</resources>

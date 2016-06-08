@@ -65,8 +65,6 @@ public class MoviePosterAdapter extends CursorAdapter {
 
         // if viewing favorites, have Picasso load the locally stored files
         if(mUseFavorites) {
-            Log.i(LOGTAG, "  about to load poster path (favorites) with Picasso: " + cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_FILE_PATH));
-
             Picasso.with(context)
                     .load(cursor.getString(FragmentMovieGrid.MOVIES_TABLE_COL_POSTER_FILE_PATH))
                     .placeholder(mContext.getResources().getDrawable(R.drawable.placeholder_movie))
