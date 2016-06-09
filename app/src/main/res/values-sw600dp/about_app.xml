@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="about_app_usage_notes_detailsscreen_content">Click on the floating action button (the circle with the star in it at the bottom right of the screen) to add or remove a movie from your favorites.  Note that the button fades in and out as the details view is swiped up and down.  If a movie has any videos, you can click the video thumbnail image to watch the video.  Next to each video is a share button, just click it to send a link of that video to a friend.  Click the button labeled Show All Credits to see a scrollable list of all the credits for a movie.  Unfortunately I had to get this project done, so I limited the number of credits to four when viewing favorite movie details, but at least you still get to see the images for those four cast members when offline.  Note that some movies have no videos, and some have no reviews.</string>
+
+</resources>
