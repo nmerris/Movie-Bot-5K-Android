@@ -14,12 +14,12 @@ import android.view.View;
  * <br>
  * Credit for this class goes to: https://guides.codepath.com/android/Floating-Action-Buttons
  */
-public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
+public class ScrollAwareFabBehavior extends FloatingActionButton.Behavior {
 
 
     // you have to call the super constructor with AttributeSet in the signature because the FAB
     // is defined in XML, otherwise you get a layout inflator exception
-    public ScrollAwareFABBehavior(Context context, AttributeSet attrs) {
+    public ScrollAwareFabBehavior(Context context, AttributeSet attrs) {
         super();
     }
 

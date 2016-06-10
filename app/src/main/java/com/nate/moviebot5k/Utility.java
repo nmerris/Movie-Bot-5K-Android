@@ -24,7 +24,9 @@ import java.util.Date;
  *
  * Created by Nathan Merris on 5/6/2016.
  */
-public class Utility {
+public final class Utility {
+
+    private Utility(){} // suppress constructor
 
     // boilerplate networking code taken from Big Nerd Ranch Android Programming, 2nd ed
     // use getUrlBytes when downloading pics or other non-string data

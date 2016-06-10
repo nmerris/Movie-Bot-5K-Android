@@ -395,7 +395,7 @@
         android:layout_margin="16dp"
         app:layout_anchor="@id/scrollview"
         app:layout_anchorGravity="bottom|right|end"
-        app:layout_behavior="com.nate.moviebot5k.ScrollAwareFABBehavior" />
+        app:layout_behavior="com.nate.moviebot5k.ScrollAwareFabBehavior" />
 
 </android.support.design.widget.CoordinatorLayout>
 
